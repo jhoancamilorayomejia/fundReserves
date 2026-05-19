@@ -1,0 +1,419 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - FoundReserves</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+</head>
+<body>
+
+    <!-- ══════════════════════════════════
+         SIDEBAR
+    ══════════════════════════════════ -->
+    <aside class="fr-sidebar">
+
+        <div class="fr-brand">
+            <div class="fr-brand-icon">FR</div>
+            <span class="fr-brand-name">FoundReserves</span>
+        </div>
+
+        <nav class="fr-nav">
+            <a href="#" class="fr-nav-item active" data-section="resumen">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Resumen
+            </a>
+            <a href="#" class="fr-nav-item" data-section="admins">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 8l1.5 1.5L23 7"/></svg>
+                Administradores
+                <span class="fr-badge fr-badge-admin" id="cnt-admins">0</span>
+            </a>
+            <a href="#" class="fr-nav-item" data-section="customers">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Clientes
+                <span class="fr-badge fr-badge-customer" id="cnt-customers">0</span>
+            </a>
+        </nav>
+
+        <div class="fr-sidebar-footer">
+            <div class="fr-avatar-circle">
+                @(ViewBag.Name != null ? ((string)ViewBag.Name).Substring(0,1).ToUpper() : "A")@(ViewBag.Lastname != null ? ((string)ViewBag.Lastname).Substring(0,1).ToUpper() : "")
+            </div>
+            <div class="fr-user-meta">
+                <span class="fr-user-name">@ViewBag.Name @ViewBag.Lastname</span>
+                <span class="fr-user-role">Administrador</span>
+            </div>
+            <form method="post" asp-controller="Home" asp-action="Logout" class="ms-auto">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="fr-btn-logout" title="Cerrar sesión">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+    <!-- ══════════════════════════════════
+         CONTENIDO PRINCIPAL
+    ══════════════════════════════════ -->
+    <main class="fr-main">
+
+        <!-- Encabezado -->
+        <div class="fr-topbar">
+            <div>
+                <h1 class="fr-page-title" id="page-title">Resumen</h1>
+                <p class="fr-page-sub" id="page-sub">Panel de control general</p>
+            </div>
+            <div class="fr-search-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="buscador" class="fr-search" placeholder="Buscar por nombre, cédula o correo..." />
+            </div>
+        </div>
+
+        <!-- Banner de error -->
+        <div id="error-msg" class="alert alert-danger mx-4 mt-3 d-none" role="alert">
+            No se pudieron cargar los usuarios. Revisa la consola (F12) para más detalles.
+        </div>
+
+        <!-- ── SECCIÓN: RESUMEN ── -->
+        <div class="fr-section" id="sec-resumen">
+
+            <!-- Tarjetas de conteo -->
+            <div class="fr-stats-row">
+                <div class="fr-stat-card">
+                    <div class="fr-stat-icon ic-admin">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 8l1.5 1.5L23 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="fr-stat-label">Administradores</p>
+                        <p class="fr-stat-val" id="s-admins">—</p>
+                    </div>
+                </div>
+                <div class="fr-stat-card">
+                    <div class="fr-stat-icon ic-customer">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div>
+                        <p class="fr-stat-label">Clientes</p>
+                        <p class="fr-stat-val" id="s-customers">—</p>
+                    </div>
+                </div>
+                <div class="fr-stat-card">
+                    <div class="fr-stat-icon ic-total">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div>
+                        <p class="fr-stat-label">Total usuarios</p>
+                        <p class="fr-stat-val" id="s-total">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla todos -->
+            <div class="fr-card">
+                <div class="fr-card-head">
+                    <h2 class="fr-card-title">Todos los usuarios</h2>
+                    <span class="fr-pill" id="lbl-resumen">cargando...</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table fr-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre completo</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Correo electrónico</th>
+                                <th>Rol</th>
+                                <th>Fecha de registro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-resumen">
+                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── SECCIÓN: ADMINISTRADORES ── -->
+        <div class="fr-section d-none" id="sec-admins">
+            <div class="fr-card">
+                <div class="fr-card-head">
+                    <h2 class="fr-card-title">Administradores del sistema</h2>
+                    <span class="fr-pill fr-pill-admin" id="lbl-admins">0 registros</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table fr-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ID</th>
+                                <th>Nombre completo</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Correo electrónico</th>
+                                <th>Fecha de registro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-admins">
+                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECCIÓN: CLIENTES ── -->
+        <div class="fr-section d-none" id="sec-customers">
+            <div class="fr-card">
+                <div class="fr-card-head">
+                    <h2 class="fr-card-title">Clientes registrados</h2>
+                    <span class="fr-pill fr-pill-customer" id="lbl-customers">0 registros</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table fr-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ID</th>
+                                <th>Nombre completo</th>
+                                <th>Cédula</th>
+                                <th>Teléfono</th>
+                                <th>Correo electrónico</th>
+                                <th>Fecha de registro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-customers">
+                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        /* ══════════════════════════════
+           ESTADO GLOBAL
+        ══════════════════════════════ */
+        let allUsers = [];
+
+        const SECTIONS = {
+            resumen:   { title: 'Resumen',          sub: 'Panel de control general' },
+            admins:    { title: 'Administradores',   sub: 'Usuarios con rol Admin' },
+            customers: { title: 'Clientes',          sub: 'Usuarios con rol Customer' }
+        };
+
+        /* ══════════════════════════════
+           HELPERS
+        ══════════════════════════════ */
+        function fmtFecha(str) {
+            if (!str) return '—';
+            try {
+                return new Date(str).toLocaleDateString('es-CO', {
+                    year: 'numeric', month: 'short', day: '2-digit'
+                });
+            } catch { return '—'; }
+        }
+
+        function rolPill(rol) {
+            if (rol === 'Admin')
+                return '<span class="fr-pill fr-pill-admin">Admin</span>';
+            return '<span class="fr-pill fr-pill-customer">Cliente</span>';
+        }
+
+        function iniciales(name, last) {
+            return ((name||'').charAt(0) + (last||'').charAt(0)).toUpperCase();
+        }
+
+        function avatarHtml(u) {
+            const cls = u.rol === 'Admin' ? 'av-admin' : 'av-customer';
+            return `<span class="fr-av ${cls}">${iniciales(u.name, u.lastname)}</span>`;
+        }
+
+        /* ══════════════════════════════
+           CONSTRUCCIÓN DE FILAS
+        ══════════════════════════════ */
+
+        // Fila para tabla de resumen (incluye columna Rol)
+        function filaResumen(u, i) {
+            return `<tr>
+                <td class="fr-mono text-muted">${i + 1}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        ${avatarHtml(u)}
+                        <div>
+                            <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
+                            <div class="fr-sub-email">${u.email || ''}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="fr-mono">${u.cedula || '—'}</td>
+                <td>${u.phone || '—'}</td>
+                <td class="text-muted">${u.email || '—'}</td>
+                <td>${rolPill(u.rol)}</td>
+                <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+            </tr>`;
+        }
+
+        // Fila para tablas de Admin / Customer (incluye columna ID)
+        function filaDetalle(u, i) {
+            return `<tr>
+                <td class="fr-mono text-muted">${i + 1}</td>
+                <td class="fr-mono text-muted">${u.iduser}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        ${avatarHtml(u)}
+                        <div>
+                            <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="fr-mono">${u.cedula || '—'}</td>
+                <td>${u.phone || '—'}</td>
+                <td class="text-muted">${u.email || '—'}</td>
+                <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+            </tr>`;
+        }
+
+        function filaVacia(cols, msg) {
+            return `<tr><td colspan="${cols}" class="text-center text-muted py-4">${msg}</td></tr>`;
+        }
+
+        /* ══════════════════════════════
+           RENDER TABLAS
+        ══════════════════════════════ */
+        function render(users) {
+            const admins    = users.filter(u => u.rol === 'Admin');
+            const customers = users.filter(u => u.rol === 'Customer');
+
+            // Stat cards
+            document.getElementById('s-admins').textContent    = admins.length;
+            document.getElementById('s-customers').textContent  = customers.length;
+            document.getElementById('s-total').textContent      = users.length;
+
+            // Badges sidebar
+            document.getElementById('cnt-admins').textContent    = admins.length;
+            document.getElementById('cnt-customers').textContent  = customers.length;
+
+            // Labels cabecera de tabla
+            document.getElementById('lbl-resumen').textContent    = `${users.length} usuarios`;
+            document.getElementById('lbl-admins').textContent      = `${admins.length} registros`;
+            document.getElementById('lbl-customers').textContent   = `${customers.length} registros`;
+
+            // Tabla resumen
+            document.getElementById('tb-resumen').innerHTML =
+                users.length
+                    ? users.map(filaResumen).join('')
+                    : filaVacia(7, 'No hay usuarios');
+
+            // Tabla admins
+            document.getElementById('tb-admins').innerHTML =
+                admins.length
+                    ? admins.map(filaDetalle).join('')
+                    : filaVacia(7, 'No hay administradores');
+
+            // Tabla customers
+            document.getElementById('tb-customers').innerHTML =
+                customers.length
+                    ? customers.map(filaDetalle).join('')
+                    : filaVacia(7, 'No hay clientes registrados');
+        }
+
+        /* ══════════════════════════════
+           CARGA DE DATOS
+        ══════════════════════════════ */
+        async function cargarUsuarios() {
+            try {
+                const res = await fetch('/api/users/all');
+
+                if (!res.ok) {
+                    console.error('Error HTTP:', res.status, res.statusText);
+                    mostrarError();
+                    return;
+                }
+
+                const data = await res.json();
+                console.log('[FoundReserves] Usuarios recibidos:', data.length, data);
+                allUsers = data;
+                render(allUsers);
+
+            } catch (err) {
+                console.error('[FoundReserves] Fetch error:', err);
+                mostrarError();
+            }
+        }
+
+        function mostrarError() {
+            document.getElementById('error-msg').classList.remove('d-none');
+            ['tb-resumen','tb-admins','tb-customers'].forEach(id => {
+                document.getElementById(id).innerHTML =
+                    `<tr><td colspan="7" class="text-center text-danger py-4">
+                        Error al cargar datos — abre F12 para ver detalles
+                    </td></tr>`;
+            });
+        }
+
+        /* ══════════════════════════════
+           NAVEGACIÓN SIDEBAR
+        ══════════════════════════════ */
+        document.querySelectorAll('.fr-nav-item').forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const sec = item.dataset.section;
+
+                // Marca activo
+                document.querySelectorAll('.fr-nav-item')
+                    .forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+
+                // Muestra sección
+                document.querySelectorAll('.fr-section')
+                    .forEach(s => s.classList.add('d-none'));
+                document.getElementById('sec-' + sec).classList.remove('d-none');
+
+                // Título header
+                document.getElementById('page-title').textContent = SECTIONS[sec].title;
+                document.getElementById('page-sub').textContent   = SECTIONS[sec].sub;
+
+                // Limpia búsqueda y re-renderiza sin filtro
+                document.getElementById('buscador').value = '';
+                render(allUsers);
+            });
+        });
+
+        /* ══════════════════════════════
+           BÚSQUEDA EN TIEMPO REAL
+        ══════════════════════════════ */
+        document.getElementById('buscador').addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            const filtrados = q
+                ? allUsers.filter(u =>
+                    (u.name     || '').toLowerCase().includes(q) ||
+                    (u.lastname || '').toLowerCase().includes(q) ||
+                    (u.cedula   || '').toLowerCase().includes(q) ||
+                    (u.email    || '').toLowerCase().includes(q) ||
+                    (u.phone    || '').includes(q))
+                : allUsers;
+            render(filtrados);
+        });
+
+        /* ══════════════════════════════
+           INICIO
+        ══════════════════════════════ */
+        cargarUsuarios();
+
+    </script>
+</body>
+</html>

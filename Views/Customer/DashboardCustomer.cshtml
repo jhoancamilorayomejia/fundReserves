@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Customers- FoundReserves</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="card p-4">
+            <h2>Bienvenido usuario Cliente, @ViewBag.Email</h2>
+            <h4>CC: @ViewBag.Cedula</h4>
+            <h4>Nombre's: @ViewBag.Name</h4>
+            <h4>Apellidos: @ViewBag.Lastname</h4>
+            <h4>Celular: @ViewBag.Phone</h4>
+            <p>Rol: <strong>@ViewBag.Rol</strong></p>
+            <form method="post" asp-controller="Home" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

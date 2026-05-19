@@ -135,3 +135,4 @@
 /home/jhoan/Documentos/ReservasNet/fundReserves/obj/Debug/net8.0/FoundReserves.pdb
 /home/jhoan/Documentos/ReservasNet/fundReserves/obj/Debug/net8.0/FoundReserves.genruntimeconfig.cache
 /home/jhoan/Documentos/ReservasNet/fundReserves/obj/Debug/net8.0/ref/FoundReserves.dll
+/home/jhoan/Documentos/ReservasNet/fundReserves/bin/Debug/net8.0/BCrypt-Net-Next.dll

@@ -5,7 +5,7 @@ using FoundReserves.Models;
 
 namespace FoundReserves.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -17,53 +17,77 @@ namespace FoundReserves.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+public async Task<IActionResult> Login([FromBody] LoginModel model)
+{
+    if (!ModelState.IsValid)
+{
+    return BadRequest(new
+    {
+        message = "Datos inválidos",
+        errors = ModelState
+    });
+}
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.email == model.Email);
+    var user = await _context.Users
+        .FirstOrDefaultAsync(u => u.cedula == model.Cedula);
 
-            if (user == null)
-                return Unauthorized(new { message = "Correo o contraseña incorrectos" });
+    if (user == null || user.password != model.Password)
+        return Unauthorized(new { message = "Cédula o contraseña incorrectos" });
 
-            // Comparación directa sin hash
-            if (user.password != model.Password)
-                return Unauthorized(new { message = "Correo o contraseña incorrectos" });
-
-            return Ok(new
-            {
-                message = "Login exitoso",
-                userId = user.id,
-                email = user.email,
-                rol = user.rol
-            });
-        }
+    return Ok(new
+    {
+        message = "Login exitoso",
+        userId = user.iduser,
+        cedula = user.cedula,
+        name = user.name,
+        lastname = user.lastname,
+        phone = user.phone,
+        email = user.email,
+        rol = user.rol,
+        createdAt = user.createdAt
+    });
+}
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+public async Task<IActionResult> Register([FromBody] RegisterModel model)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
 
-            var exists = await _context.Users
-                .AnyAsync(u => u.email == model.Email);
+    var exists = await _context.Users
+        .AnyAsync(u => u.email == model.Email);
 
-            if (exists)
-                return Conflict(new { message = "El correo ya está registrado" });
+    if (exists)
+        return Conflict(new { message = "El correo ya está registrado" });
 
-            var user = new User
-            {
-                email = model.Email,
-                password = model.Password, // sin hash
-                rol = model.Rol ?? "Client"
-            };
+    // ✅ Verifica también por cédula
+    var existsCedula = await _context.Users
+        .AnyAsync(u => u.cedula == model.Cedula);
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+    if (existsCedula)
+        return Conflict(new { message = "La cédula ya está registrada" });
 
-            return Ok(new { message = "Usuario creado", userId = user.id });
-        }
+    // REGISTRO
+    var user = new User
+{
+    cedula = model.Cedula,
+    name = model.Name,
+    lastname = model.Lastname,
+    phone = model.Phone,
+    email = model.Email,
+    password = BCrypt.Net.BCrypt.HashPassword(model.Password), // ✅ Encripta
+    rol = "Customer",
+    createdAt = DateTime.Now
+};
+
+    // LOGIN en AuthController
+    if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.password)) // ✅ Verifica
+        return Unauthorized(new { message = "Cédula o contraseña incorrectos" });
+
+    _context.Users.Add(user);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Usuario creado correctamente" });
+}
     }
 }

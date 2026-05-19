@@ -8,7 +8,14 @@ namespace FoundReserves.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int id { get; set; }
+        public int iduser { get; set; }
+
+        public required string cedula { get; set; }
+
+        public required string name { get; set; }
+
+        public required string lastname { get; set; }
+        public required string phone { get; set; }
 
         public required string email { get; set; }
 
@@ -16,6 +23,6 @@ namespace FoundReserves.Models
 
         public required string rol { get; set; }
 
-        public DateTime createdAt { get; set; } = DateTime.UtcNow;
+        public DateTime createdAt { get; set; } = DateTime.Now;
     }
 }

@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets/FoundReserves.bundle.scp.css"
     },
     {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/dashboard.css",
+      "PackagePath": "staticwebassets/css/dashboard.css"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/login.css",
+      "PackagePath": "staticwebassets/css/login.css"
+    },
+    {
       "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },
