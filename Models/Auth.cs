@@ -35,5 +35,17 @@ namespace FoundReserves.Models
 
     // Ya no es [Required], tiene valor por defecto
     public string Rol { get; set; } = "Customer";
+
+
+    // campos que me faltaban
+    public DateOnly? FechaNacimiento { get; set; }
+public string? Departamento { get; set; }
+public string? Municipio { get; set; }
+public string? Barrio { get; set; }
+public string? Direccion { get; set; }
+public string? PreguntaSecreta { get; set; }
+public string? RespuestaSecreta { get; set; }
+public bool? AutorizaCorreo { get; set; }
+public bool? AutorizaCelular { get; set; }
 }
 }

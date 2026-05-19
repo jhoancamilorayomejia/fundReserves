@@ -68,16 +68,25 @@ public async Task<IActionResult> Register([FromBody] RegisterModel model)
         return Conflict(new { message = "La cédula ya está registrada" });
 
     // REGISTRO
-    var user = new User
+   var user = new User
 {
-    cedula = model.Cedula,
-    name = model.Name,
-    lastname = model.Lastname,
-    phone = model.Phone,
-    email = model.Email,
-    password = BCrypt.Net.BCrypt.HashPassword(model.Password), // ✅ Encripta
-    rol = "Customer",
-    createdAt = DateTime.Now
+    cedula           = model.Cedula,
+    name             = model.Name,
+    lastname         = model.Lastname,
+    phone            = model.Phone,
+    email            = model.Email,
+    password         = BCrypt.Net.BCrypt.HashPassword(model.Password),
+    rol              = "Customer",
+    createdAt        = DateTime.Now,
+    fechaNacimiento  = model.FechaNacimiento,
+    departamento     = model.Departamento,
+    municipio        = model.Municipio,
+    barrio           = model.Barrio,
+    direccion        = model.Direccion,
+    preguntaSecreta  = model.PreguntaSecreta,
+    respuestaSecreta = model.RespuestaSecreta,
+    autorizaCorreo   = model.AutorizaCorreo,   // ya es bool?
+    autorizaCelular  = model.AutorizaCelular
 };
 
     // LOGIN en AuthController

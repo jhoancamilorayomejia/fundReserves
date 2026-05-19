@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets/css/dashboard.css"
     },
     {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/dashboardCustomer.css",
+      "PackagePath": "staticwebassets/css/dashboardCustomer.css"
+    },
+    {
       "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/login.css",
       "PackagePath": "staticwebassets/css/login.css"
     },

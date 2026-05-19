@@ -24,5 +24,16 @@ namespace FoundReserves.Models
         public required string rol { get; set; }
 
         public DateTime createdAt { get; set; } = DateTime.Now;
+        
+        //campos que me faltaban
+        public DateOnly? fechaNacimiento { get; set; }
+public string? departamento { get; set; }
+public string? municipio { get; set; }
+public string? barrio { get; set; }
+public string? direccion { get; set; }
+public string? preguntaSecreta { get; set; }
+public string? respuestaSecreta { get; set; }
+public bool? autorizaCorreo { get; set; }    // ← nullable
+public bool? autorizaCelular { get; set; }   // ← nullable
     }
 }

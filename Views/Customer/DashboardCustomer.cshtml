@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Dashboard Cliente";
     Layout = null;
 }
 
@@ -8,23 +8,287 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard Customers- FoundReserves</title>
+    <title>FoundReserves — Sedes</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/dashboardCustomer.css" />
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="card p-4">
-            <h2>Bienvenido usuario Cliente, @ViewBag.Email</h2>
-            <h4>CC: @ViewBag.Cedula</h4>
-            <h4>Nombre's: @ViewBag.Name</h4>
-            <h4>Apellidos: @ViewBag.Lastname</h4>
-            <h4>Celular: @ViewBag.Phone</h4>
-            <p>Rol: <strong>@ViewBag.Rol</strong></p>
+<body>
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="fc-topbar">
+        <div class="fc-topbar-left">
+            <div class="fc-brand">
+                <span class="fc-brand-icon">FR</span>
+                <span class="fc-brand-name">FoundReserves</span>
+            </div>
+            <nav class="fc-top-nav">
+                <a href="#" class="fc-top-link active" data-tab="sedes">Sedes Recreativas y Apartamentos</a>
+                <a href="#" class="fc-top-link" data-tab="fechas">Seleccione sus Fechas</a>
+            </nav>
+        </div>
+        <div class="fc-topbar-right">
+            <div class="fc-user-chip">
+                <div class="fc-user-avatar">
+                    @(ViewBag.Name != null ? ((string)ViewBag.Name).Substring(0,1).ToUpper() : "U")
+                </div>
+                <span class="fc-user-label">@ViewBag.Name @ViewBag.Lastname</span>
+            </div>
             <form method="post" asp-controller="Home" asp-action="Logout">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+                <button type="submit" class="fc-btn-logout">Cerrar sesión</button>
             </form>
         </div>
+    </header>
+
+    <!-- ══ CONTENIDO ══ -->
+    <main class="fc-main">
+
+        <!-- ── TAB: SEDES ── -->
+        <div class="fc-tab-content" id="tab-sedes">
+
+            <div class="fc-page-header">
+                <h1 class="fc-page-title">Sedes Recreativas y Apartamentos</h1>
+            </div>
+
+            <!-- Sub-tabs -->
+            <div class="fc-subtabs">
+                <button class="fc-subtab active" data-filter="all">Sedes Recreativas y Apartamentos</button>
+                <button class="fc-subtab" data-filter="Sede Recreativa">Sedes Recreativas</button>
+                <button class="fc-subtab" data-filter="Apartamento">Apartamentos</button>
+            </div>
+
+            <!-- Buscador -->
+            <div class="fc-search-bar">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="buscador" placeholder="Buscar por nombre, ciudad o tipo..." />
+            </div>
+
+            <!-- Tabla de sedes -->
+            <div class="fc-table-wrap">
+                <table class="fc-table">
+                    <thead>
+                        <tr>
+                            <th class="col-img"></th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                            <th>Ubicación</th>
+                            <th>Capacidad</th>
+                            <th>Precio/noche</th>
+                            <th>Seleccionar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-sedes">
+                        <tr>
+                            <td colspan="8" class="fc-empty">Cargando sedes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ── TAB: FECHAS ── -->
+        <div class="fc-tab-content d-none" id="tab-fechas">
+            <div class="fc-page-header">
+                <h1 class="fc-page-title">Seleccione sus Fechas</h1>
+                <p class="fc-page-sub">Elige el período de tu estadía para la sede seleccionada.</p>
+            </div>
+            <div class="fc-empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <p>Primero selecciona una sede para continuar.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ══ MODAL DETALLE SEDE ══ -->
+    <div class="fc-modal-overlay d-none" id="modal-overlay">
+        <div class="fc-modal">
+            <button class="fc-modal-close" id="modal-close">✕</button>
+            <div class="fc-modal-body" id="modal-body">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="fc-modal-footer">
+                <button class="fc-btn-secondary" id="modal-cancelar">Cancelar</button>
+                <button class="fc-btn-primary" id="modal-reservar">Reservar esta sede</button>
+            </div>
+        </div>
     </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        /* ══ ESTADO ══ */
+        let todasLasSedes = [];
+        let filtroActivo  = 'all';
+        let sedeSeleccionada = null;
+
+        /* ══ HELPERS ══ */
+        function fmt(n) {
+            if (n == null) return '—';
+            return Number(n).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+        }
+
+        function shortDesc(txt, max = 120) {
+            if (!txt) return '—';
+            return txt.length > max ? txt.substring(0, max) + '...' : txt;
+        }
+
+        function tipoBadge(tipo) {
+            if (!tipo) return '—';
+            const cls = tipo.toLowerCase().includes('apart') ? 'badge-apart' : 'badge-sede';
+            return `<span class="fc-badge ${cls}">${tipo}</span>`;
+        }
+
+        /* ══ RENDER TABLA ══ */
+        function renderSedes(sedes) {
+            const tbody = document.getElementById('tb-sedes');
+
+            if (!sedes.length) {
+                tbody.innerHTML = `<tr><td colspan="8" class="fc-empty">No se encontraron sedes.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = sedes.map((s, i) => `
+                <tr class="fc-row" style="animation-delay:${i * 40}ms">
+                    <td class="col-img">
+                        <div class="fc-img-placeholder">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </div>
+                    </td>
+                    <td class="fc-td-name">
+                        <span class="fc-sede-name">${s.name || '—'}</span>
+                    </td>
+                    <td class="fc-td-desc">${shortDesc(s.description)}</td>
+                    <td>${tipoBadge(s.type)}</td>
+                    <td class="fc-td-city">${s.city || '—'}</td>
+                    <td class="fc-td-cap">
+                        <span class="fc-cap">${s.maximumCapacity ?? '—'} <small>pers.</small></span>
+                    </td>
+                    <td class="fc-td-price">${fmt(s.priceLaundry)}</td>
+                    <td>
+                        <button class="fc-btn-select" onclick="abrirModal(${s.idSede})">
+                            Seleccionar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        /* ══ FILTRO ══ */
+        function aplicarFiltro() {
+            const q   = document.getElementById('buscador').value.toLowerCase().trim();
+            let lista = filtroActivo === 'all'
+                ? todasLasSedes
+                : todasLasSedes.filter(s => (s.type || '').toLowerCase().includes(filtroActivo.toLowerCase()));
+
+            if (q) {
+                lista = lista.filter(s =>
+                    (s.name        || '').toLowerCase().includes(q) ||
+                    (s.city        || '').toLowerCase().includes(q) ||
+                    (s.type        || '').toLowerCase().includes(q) ||
+                    (s.description || '').toLowerCase().includes(q)
+                );
+            }
+            renderSedes(lista);
+        }
+
+        /* ══ CARGA DE DATOS ══ */
+        async function cargarSedes() {
+            try {
+                const res  = await fetch('/api/sedes/all');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                todasLasSedes = data;
+                renderSedes(data);
+            } catch (err) {
+                console.error('[FR] Error cargando sedes:', err);
+                document.getElementById('tb-sedes').innerHTML =
+                    `<tr><td colspan="8" class="fc-empty fc-error">Error al cargar sedes — revisa F12</td></tr>`;
+            }
+        }
+
+        /* ══ MODAL ══ */
+        function abrirModal(idSede) {
+            const s = todasLasSedes.find(x => x.idSede === idSede);
+            if (!s) return;
+            sedeSeleccionada = s;
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="fc-modal-img">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </div>
+                <h2 class="fc-modal-title">${s.name}</h2>
+                <div class="fc-modal-meta">
+                    ${tipoBadge(s.type)}
+                    <span class="fc-modal-city">📍 ${s.city}, ${s.region}</span>
+                </div>
+                <p class="fc-modal-desc">${s.description || 'Sin descripción.'}</p>
+                <div class="fc-modal-info-grid">
+                    <div class="fc-info-item">
+                        <span class="fc-info-label">Capacidad máxima</span>
+                        <span class="fc-info-val">${s.maximumCapacity} personas</span>
+                    </div>
+                    <div class="fc-info-item">
+                        <span class="fc-info-label">Precio</span>
+                        <span class="fc-info-val">${fmt(s.priceLaundry)}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modal-overlay').classList.remove('d-none');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-overlay').classList.add('d-none');
+            sedeSeleccionada = null;
+        }
+
+        document.getElementById('modal-close').addEventListener('click', cerrarModal);
+        document.getElementById('modal-cancelar').addEventListener('click', cerrarModal);
+        document.getElementById('modal-overlay').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal-overlay')) cerrarModal();
+        });
+
+        document.getElementById('modal-reservar').addEventListener('click', () => {
+            if (!sedeSeleccionada) return;
+            cerrarModal();
+            // Cambia al tab de fechas
+            document.querySelectorAll('.fc-top-link').forEach(l => l.classList.remove('active'));
+            document.querySelector('[data-tab="fechas"]').classList.add('active');
+            document.querySelectorAll('.fc-tab-content').forEach(t => t.classList.add('d-none'));
+            document.getElementById('tab-fechas').classList.remove('d-none');
+        });
+
+        /* ══ TABS ══ */
+        document.querySelectorAll('.fc-top-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.fc-top-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                const tab = link.dataset.tab;
+                document.querySelectorAll('.fc-tab-content').forEach(t => t.classList.add('d-none'));
+                document.getElementById('tab-' + tab).classList.remove('d-none');
+            });
+        });
+
+        /* ══ SUB-TABS FILTRO ══ */
+        document.querySelectorAll('.fc-subtab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.fc-subtab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filtroActivo = btn.dataset.filter;
+                aplicarFiltro();
+            });
+        });
+
+        /* ══ BÚSQUEDA ══ */
+        document.getElementById('buscador').addEventListener('input', aplicarFiltro);
+
+        /* ══ INICIO ══ */
+        cargarSedes();
+
+    </script>
 </body>
 </html>

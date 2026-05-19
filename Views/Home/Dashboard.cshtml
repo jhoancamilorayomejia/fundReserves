@@ -15,7 +15,7 @@
 <body>
 
     <!-- ══════════════════════════════════
-         SIDEBAR
+        SIDEBAR
     ══════════════════════════════════ -->
     <aside class="fr-sidebar">
 
@@ -131,7 +131,7 @@
                                 <th>Teléfono</th>
                                 <th>Correo electrónico</th>
                                 <th>Rol</th>
-                                <th>Fecha de registro</th>
+                                <th>Fecha de registro</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tb-resumen">
@@ -181,16 +181,26 @@
                 <div class="table-responsive">
                     <table class="table fr-table mb-0">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ID</th>
-                                <th>Nombre completo</th>
-                                <th>Cédula</th>
-                                <th>Teléfono</th>
-                                <th>Correo electrónico</th>
-                                <th>Fecha de registro</th>
-                            </tr>
-                        </thead>
+    <tr>
+        <th>#</th>
+        <th>ID</th>
+        <th>Nombre completo</th>
+        <th>Cédula</th>
+        <th>Teléfono</th>
+        <th>Correo electrónico</th>
+        <th>F. Nacimiento</th>
+        <th>Departamento</th>
+        <th>Municipio</th>
+        <th>Barrio</th>
+        <th>Dirección</th>
+        <th>Pregunta secreta</th>
+        <th>Respuesta secreta</th>
+        <th>Aut. Correo</th>
+        <th>Aut. Celular</th>
+        <th>Fecha de registro</th>
+        <th>Acciones</th>
+    </tr>
+</thead>
                         <tbody id="tb-customers">
                             <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
                         </tbody>
@@ -264,28 +274,68 @@
                 <td class="text-muted">${u.email || '—'}</td>
                 <td>${rolPill(u.rol)}</td>
                 <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+                <td>
+                <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
+                Eliminar
+                </button>
+                </td>
             </tr>`;
         }
 
         // Fila para tablas de Admin / Customer (incluye columna ID)
-        function filaDetalle(u, i) {
-            return `<tr>
-                <td class="fr-mono text-muted">${i + 1}</td>
-                <td class="fr-mono text-muted">${u.iduser}</td>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        ${avatarHtml(u)}
-                        <div>
-                            <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="fr-mono">${u.cedula || '—'}</td>
-                <td>${u.phone || '—'}</td>
-                <td class="text-muted">${u.email || '—'}</td>
-                <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
-            </tr>`;
-        }
+        // Fila para ADMINISTRADORES (sin campos extra)
+function filaAdmin(u, i) {
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${u.iduser}</td>
+        <td>
+            <div class="d-flex align-items-center gap-2">
+                ${avatarHtml(u)}
+                <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
+            </div>
+        </td>
+        <td class="fr-mono">${u.cedula || '—'}</td>
+        <td>${u.phone || '—'}</td>
+        <td class="text-muted">${u.email || '—'}</td>
+        <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+    </tr>`;
+}
+
+// Fila para CLIENTES (con todos los campos nuevos)
+function filaCustomer(u, i) {
+    const si  = '<span class="badge bg-success">Sí</span>';
+    const no  = '<span class="badge bg-secondary">No</span>';
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${u.iduser}</td>
+        <td>
+            <div class="d-flex align-items-center gap-2">
+                ${avatarHtml(u)}
+                <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
+            </div>
+        </td>
+        <td class="fr-mono">${u.cedula || '—'}</td>
+        <td>${u.phone || '—'}</td>
+        <td class="text-muted">${u.email || '—'}</td>
+        <td class="fr-mono">${fmtFecha(u.fechaNacimiento)}</td>
+        <td>${u.departamento || '—'}</td>
+        <td>${u.municipio || '—'}</td>
+        <td>${u.barrio || '—'}</td>
+        <td>${u.direccion || '—'}</td>
+        <td>${u.preguntaSecreta || '—'}</td>
+        <td>${u.respuestaSecreta || '—'}</td>
+<td>${u.autorizaCorreo  === true ? si : u.autorizaCorreo === false ? no : '—'}</td>
+<td>${u.autorizaCelular === true ? si : u.autorizaCelular === false ? no : '—'}</td>
+        <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
+                Eliminar
+            </button>
+        </td>
+    </tr>`;
+}
 
         function filaVacia(cols, msg) {
             return `<tr><td colspan="${cols}" class="text-center text-muted py-4">${msg}</td></tr>`;
@@ -320,15 +370,15 @@
 
             // Tabla admins
             document.getElementById('tb-admins').innerHTML =
-                admins.length
-                    ? admins.map(filaDetalle).join('')
-                    : filaVacia(7, 'No hay administradores');
+    admins.length
+        ? admins.map(filaAdmin).join('')
+        : filaVacia(7, 'No hay administradores');
 
             // Tabla customers
             document.getElementById('tb-customers').innerHTML =
-                customers.length
-                    ? customers.map(filaDetalle).join('')
-                    : filaVacia(7, 'No hay clientes registrados');
+    customers.length
+        ? customers.map(filaCustomer).join('')
+        : filaVacia(17, 'No hay clientes registrados');
         }
 
         /* ══════════════════════════════
@@ -408,6 +458,38 @@
                 : allUsers;
             render(filtrados);
         });
+
+       async function eliminarUsuario(id, nombre) {
+
+    const confirmar = confirm(
+        `¿Estás seguro de eliminar al usuario "${nombre}"?\n\n` +
+        `Esta acción es permanente y no se puede deshacer.`
+    );
+
+    if (!confirmar) return;
+
+    try {
+        const res = await fetch(`/api/users/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert('Error: ' + (err.message || res.statusText));
+            return;
+        }
+
+        // Elimina del array local y re-renderiza
+        allUsers = allUsers.filter(u => u.iduser !== id);
+        render(allUsers);
+
+        alert(`Usuario "${nombre}" eliminado correctamente`);
+
+    } catch (err) {
+        console.error('[FoundReserves] Error al eliminar:', err);
+        alert('Error de conexión al intentar eliminar');
+    }
+}
 
         /* ══════════════════════════════
            INICIO
