@@ -8,375 +8,572 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard - FoundReserves</title>
+    <title>Dashboard — FoundReserves</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/dashboard.css" />
 </head>
 <body>
 
-    <!-- ══════════════════════════════════
-        SIDEBAR
-    ══════════════════════════════════ -->
-    <aside class="fr-sidebar">
+<!-- ════════════════════════════════════════
+    SIDEBAR
+════════════════════════════════════════ -->
+<aside class="fr-sidebar">
 
-        <div class="fr-brand">
-            <div class="fr-brand-icon">FR</div>
-            <span class="fr-brand-name">FoundReserves</span>
+    <!-- Marca -->
+    <div class="fr-brand">
+        <div class="fr-brand-icon">FR</div>
+        <span class="fr-brand-name">FoundReserves</span>
+    </div>
+
+    <!-- Navegación principal -->
+    <nav class="fr-nav">
+
+        <a href="#" class="fr-nav-item active" data-section="resumen">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            Resumen
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="admins">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                <path d="M19 8l1.5 1.5L23 7"/>
+            </svg>
+            Administradores
+            <span class="fr-badge fr-badge-admin" id="cnt-admins">0</span>
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="customers">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Clientes
+            <span class="fr-badge fr-badge-customer" id="cnt-customers">0</span>
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="sedes">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Sedes
+            <span class="fr-badge fr-badge-admin" id="cnt-sedes">0</span>
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="accommodation">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                <path d="M7 12h10"/>
+                <path d="M7 8h4"/>
+            </svg>
+            Alojamientos
+            <span class="fr-badge fr-badge-customer" id="cnt-accommodation">0</span>
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="seasons">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 2v4"/>
+                <path d="M16 2v4"/>
+                <rect width="18" height="18" x="3" y="4" rx="2"/>
+                <path d="M3 10h18"/>
+            </svg>
+            Temporadas
+            <span class="fr-badge fr-badge-admin" id="cnt-seasons">0</span>
+        </a>
+
+        <a href="#" class="fr-nav-item" data-section="rates">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1v22"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            Tarifas
+            <span class="fr-badge fr-badge-admin" id="cnt-rates">0</span>
+        </a>
+
+    </nav>
+
+    <!-- Usuario activo + cerrar sesión -->
+    <div class="fr-sidebar-footer">
+        <div class="fr-avatar-circle">
+            @(ViewBag.Name != null ? ((string)ViewBag.Name).Substring(0,1).ToUpper() : "A")@(ViewBag.Lastname != null ? ((string)ViewBag.Lastname).Substring(0,1).ToUpper() : "")
+        </div>
+        <div class="fr-user-meta">
+            <span class="fr-user-name">@ViewBag.Name @ViewBag.Lastname</span>
+            <span class="fr-user-role">Administrador</span>
+        </div>
+        <form method="post" asp-controller="Home" asp-action="Logout" class="ms-auto">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="fr-btn-logout" title="Cerrar sesión">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+</aside>
+
+
+<!-- ════════════════════════════════════════
+     CONTENIDO PRINCIPAL
+════════════════════════════════════════ -->
+<main class="fr-main">
+
+    <!-- Topbar: título dinámico + buscador -->
+    <div class="fr-topbar">
+        <div>
+            <h1 class="fr-page-title" id="page-title">Resumen</h1>
+            <p class="fr-page-sub"   id="page-sub">Panel de control general</p>
+        </div>
+        <div class="fr-search-wrap">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="buscador" class="fr-search"
+                   placeholder="Buscar por nombre, cédula o correo..." />
+        </div>
+    </div>
+
+    <!-- Banner de error global -->
+    <div id="error-msg" class="alert alert-danger mx-4 mt-3 d-none" role="alert">
+        No se pudieron cargar los usuarios. Abre la consola (F12) para más detalles.
+    </div>
+
+
+    <!-- ─────────────────────────────
+         SECCIÓN: RESUMEN
+    ───────────────────────────── -->
+    <div class="fr-section" id="sec-resumen">
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="fr-stats-row">
+            <div class="fr-stat-card">
+                <div class="fr-stat-icon ic-admin">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        <path d="M19 8l1.5 1.5L23 7"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="fr-stat-label">Administradores</p>
+                    <p class="fr-stat-val" id="s-admins">—</p>
+                </div>
+            </div>
+            <div class="fr-stat-card">
+                <div class="fr-stat-icon ic-customer">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="fr-stat-label">Clientes</p>
+                    <p class="fr-stat-val" id="s-customers">—</p>
+                </div>
+            </div>
+            <div class="fr-stat-card">
+                <div class="fr-stat-icon ic-total">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="fr-stat-label">Total usuarios</p>
+                    <p class="fr-stat-val" id="s-total">—</p>
+                </div>
+            </div>
         </div>
 
-        <nav class="fr-nav">
-            <a href="#" class="fr-nav-item active" data-section="resumen">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Resumen
-            </a>
-            <a href="#" class="fr-nav-item" data-section="admins">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 8l1.5 1.5L23 7"/></svg>
-                Administradores
-                <span class="fr-badge fr-badge-admin" id="cnt-admins">0</span>
-            </a>
-            <a href="#" class="fr-nav-item" data-section="customers">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Clientes
-                <span class="fr-badge fr-badge-customer" id="cnt-customers">0</span>
-            </a>
-            <a href="#" class="fr-nav-item" data-section="sedes">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-    Sedes
-    <span class="fr-badge fr-badge-admin" id="cnt-sedes">0</span>
-</a>
-
-  <!-- ══════════════════════════════════
-        Alojamiento
-    ══════════════════════════════════ -->
-
-<a href="#" class="fr-nav-item" data-section="accommodation">
-    <svg width="16" height="16" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="4" width="18" height="16" rx="2"/>
-        <path d="M7 12h10"/>
-        <path d="M7 8h4"/>
-    </svg>
-
-    Alojamientos
-
-    <span class="fr-badge fr-badge-customer"
-          id="cnt-accommodation">0</span>
-</a>
-
-  <!-- ══════════════════════════════════
-        Temporadas
-    ══════════════════════════════════ -->
-<a href="#" class="fr-nav-item" data-section="seasons">
-    <svg width="16" height="16" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M8 2v4"/>
-        <path d="M16 2v4"/>
-        <rect width="18" height="18" x="3" y="4" rx="2"/>
-        <path d="M3 10h18"/>
-    </svg>
-
-    Temporadas
-
-    <span class="fr-badge fr-badge-admin"
-          id="cnt-seasons">0</span>
-</a>
-
-
-<!-- ══════════════════════════════════
-        TARIFAS
-══════════════════════════════════ -->
-<a href="#" class="fr-nav-item" data-section="rates">
-    <svg width="16" height="16" viewBox="0 0 24 24"
-         fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 1v22"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6"/>
-    </svg>
-
-    Tarifas
-
-    <span class="fr-badge fr-badge-admin"
-          id="cnt-rates">0</span>
-</a>
-        </nav>
-
-        <div class="fr-sidebar-footer">
-            <div class="fr-avatar-circle">
-                @(ViewBag.Name != null ? ((string)ViewBag.Name).Substring(0,1).ToUpper() : "A")@(ViewBag.Lastname != null ? ((string)ViewBag.Lastname).Substring(0,1).ToUpper() : "")
+        <!-- Tabla resumen de todos los usuarios -->
+        <div class="fr-card">
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Todos los usuarios</h2>
+                <span class="fr-pill" id="lbl-resumen">cargando...</span>
             </div>
-            <div class="fr-user-meta">
-                <span class="fr-user-name">@ViewBag.Name @ViewBag.Lastname</span>
-                <span class="fr-user-role">Administrador</span>
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre completo</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Correo electrónico</th>
+                            <th>Rol</th>
+                            <th>Fecha de registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-resumen">
+                        <tr><td colspan="8" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <form method="post" asp-controller="Home" asp-action="Logout" class="ms-auto">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="fr-btn-logout" title="Cerrar sesión">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
+        </div>
+
+    </div><!-- /sec-resumen -->
+
+
+    <!-- ─────────────────────────────
+         SECCIÓN: ADMINISTRADORES
+    ───────────────────────────── -->
+    <div class="fr-section d-none" id="sec-admins">
+        <div class="fr-card">
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Administradores del sistema</h2>
+                <span class="fr-pill fr-pill-admin" id="lbl-admins">0 registros</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Nombre completo</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Correo electrónico</th>
+                            <th>Fecha de registro</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-admins">
+                        <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /sec-admins -->
+
+
+    <!-- ─────────────────────────────
+         SECCIÓN: CLIENTES
+    ───────────────────────────── -->
+    <div class="fr-section d-none" id="sec-customers">
+        <div class="fr-card">
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Clientes registrados</h2>
+                <span class="fr-pill fr-pill-customer" id="lbl-customers">0 registros</span>
+            </div>
+            <!-- Tabla resumida: columnas clave + botón Ver para abrir modal -->
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Nombre completo</th>
+                            <th>Cédula</th>
+                            <th>Teléfono</th>
+                            <th>Correo electrónico</th>
+                            <th>Municipio</th>
+                            <th>Fecha de registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-customers">
+                        <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><!-- /sec-customers -->
+
+    <!-- ─────────────────────────────
+         MODAL: DETALLE DE CLIENTE
+    ───────────────────────────── -->
+    <div class="modal fade" id="modal-cliente" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content fr-modal-content">
+
+                <!-- Cabecera del modal -->
+                <div class="fr-modal-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fr-modal-avatar" id="modal-avatar">SM</div>
+                        <div>
+                            <h5 class="fr-modal-title" id="modal-nombre">—</h5>
+                            <span class="fr-pill fr-pill-customer" style="font-size:10.5px">Cliente</span>
+                        </div>
+                    </div>
+                    <button type="button" class="fr-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Cuerpo del modal en grupos -->
+                <div class="fr-modal-body">
+
+                    <!-- Grupo: Información personal -->
+                    <div class="fr-modal-group">
+                        <p class="fr-modal-group-label">Información personal</p>
+                        <div class="fr-modal-grid">
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">ID</span>
+                                <span class="fr-modal-field-val fr-mono" id="md-id">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Cédula</span>
+                                <span class="fr-modal-field-val fr-mono" id="md-cedula">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">F. Nacimiento</span>
+                                <span class="fr-modal-field-val" id="md-nacimiento">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Teléfono</span>
+                                <span class="fr-modal-field-val" id="md-phone">—</span>
+                            </div>
+                            <div class="fr-modal-field" style="grid-column: span 2">
+                                <span class="fr-modal-field-label">Correo electrónico</span>
+                                <span class="fr-modal-field-val" id="md-email">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grupo: Ubicación -->
+                    <div class="fr-modal-group">
+                        <p class="fr-modal-group-label">Ubicación</p>
+                        <div class="fr-modal-grid">
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Departamento</span>
+                                <span class="fr-modal-field-val" id="md-departamento">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Municipio</span>
+                                <span class="fr-modal-field-val" id="md-municipio">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Barrio</span>
+                                <span class="fr-modal-field-val" id="md-barrio">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Dirección</span>
+                                <span class="fr-modal-field-val" id="md-direccion">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grupo: Seguridad -->
+                    <div class="fr-modal-group">
+                        <p class="fr-modal-group-label">Seguridad</p>
+                        <div class="fr-modal-grid">
+                            <div class="fr-modal-field" style="grid-column: span 2">
+                                <span class="fr-modal-field-label">Pregunta secreta</span>
+                                <span class="fr-modal-field-val" id="md-pregunta">—</span>
+                            </div>
+                            <div class="fr-modal-field" style="grid-column: span 2">
+                                <span class="fr-modal-field-label">Respuesta secreta</span>
+                                <span class="fr-modal-field-val" id="md-respuesta">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grupo: Autorizaciones + registro -->
+                    <div class="fr-modal-group">
+                        <p class="fr-modal-group-label">Autorizaciones y registro</p>
+                        <div class="fr-modal-grid">
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Aut. Correo</span>
+                                <span class="fr-modal-field-val" id="md-aut-correo">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Aut. Celular</span>
+                                <span class="fr-modal-field-val" id="md-aut-celular">—</span>
+                            </div>
+                            <div class="fr-modal-field">
+                                <span class="fr-modal-field-label">Fecha de registro</span>
+                                <span class="fr-modal-field-val fr-mono" id="md-registro">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /fr-modal-body -->
+
+                <!-- Footer: botón eliminar -->
+                <div class="fr-modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="modal-btn-eliminar">
+                        Eliminar cliente
+                    </button>
+                    <button type="button" class="btn btn-dark btn-sm" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /modal-cliente -->
+
+
+    <!-- ─────────────────────────────
+         SECCIÓN: SEDES
+    ───────────────────────────── -->
+    <div class="fr-section d-none" id="sec-sedes">
+        <div class="fr-card">
+
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Sedes registradas</h2>
+                <span class="fr-pill fr-pill-admin" id="lbl-sedes">0 registros</span>
+            </div>
+
+            <!-- Formulario: agregar sede -->
+            <div class="p-4 border-bottom">
+                <h5 class="mb-3">Agregar nueva sede</h5>
+                <form id="form-sede" class="row g-3">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" id="city" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Región</label>
+                        <input type="text" class="form-control" id="region">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="type">
+                            <option value="Hotel">Sede Recreativa</option>
+                            <option value="Apartamento">Apartamento</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Capacidad máxima</label>
+                        <input type="number" class="form-control" id="maximumCapacity">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Precio lavandería</label>
+                        <input type="number" class="form-control" id="priceLaundry">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-dark" id="btn-sede">
+                            Registrar sede
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Tabla de sedes -->
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Ciudad</th>
+                            <th>Región</th>
+                            <th>Tipo</th>
+                            <th>Capacidad máx.</th>
+                            <th>Precio lavandería</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-sedes">
+                        <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div><!-- /sec-sedes -->
+
+
+    <!-- ─────────────────────────────
+     SECCIÓN: ALOJAMIENTOS
+───────────────────────────── -->
+<div class="fr-section d-none" id="sec-accommodation">
+    <div class="fr-card">
+
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">Alojamientos registrados</h2>
+            <span class="fr-pill fr-pill-customer" id="lbl-accommodation">0 registros</span>
+        </div>
+
+        <!-- Formulario: agregar alojamiento -->
+        <div class="p-4 border-bottom">
+            <h5 class="mb-3">Agregar nuevo alojamiento</h5>
+            <form id="form-accommodation" class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Sede</label>
+                    <!-- Poblado dinámicamente con poblarSelectSede() -->
+                    <select class="form-select" id="acc-idSede" required>
+                        <option value="">Selecciona una sede...</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="acc-name" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Número</label>
+                    <input type="text" class="form-control" id="acc-number" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Máx. personas</label>
+                    <input type="number" class="form-control" id="acc-maximumPerson" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" id="acc-state">
+                        <option value="Disponible">Disponible</option>
+                        <option value="Ocupado">Ocupado</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-control" id="acc-description" rows="3"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-dark" id="btn-accommodation">
+                        Registrar alojamiento
+                    </button>
+                </div>
+
             </form>
         </div>
 
-    </aside>
-
-    <!-- ══════════════════════════════════
-         CONTENIDO PRINCIPAL
-    ══════════════════════════════════ -->
-    <main class="fr-main">
-
-        <!-- Encabezado -->
-        <div class="fr-topbar">
-            <div>
-                <h1 class="fr-page-title" id="page-title">Resumen</h1>
-                <p class="fr-page-sub" id="page-sub">Panel de control general</p>
-            </div>
-            <div class="fr-search-wrap">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="buscador" class="fr-search" placeholder="Buscar por nombre, cédula o correo..." />
-            </div>
-        </div>
-
-        <!-- Banner de error -->
-        <div id="error-msg" class="alert alert-danger mx-4 mt-3 d-none" role="alert">
-            No se pudieron cargar los usuarios. Revisa la consola (F12) para más detalles.
-        </div>
-
-        <!-- ── SECCIÓN: RESUMEN ── -->
-        <div class="fr-section" id="sec-resumen">
-
-            <!-- Tarjetas de conteo -->
-            <div class="fr-stats-row">
-                <div class="fr-stat-card">
-                    <div class="fr-stat-icon ic-admin">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M19 8l1.5 1.5L23 7"/></svg>
-                    </div>
-                    <div>
-                        <p class="fr-stat-label">Administradores</p>
-                        <p class="fr-stat-val" id="s-admins">—</p>
-                    </div>
-                </div>
-                <div class="fr-stat-card">
-                    <div class="fr-stat-icon ic-customer">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    </div>
-                    <div>
-                        <p class="fr-stat-label">Clientes</p>
-                        <p class="fr-stat-val" id="s-customers">—</p>
-                    </div>
-                </div>
-                <div class="fr-stat-card">
-                    <div class="fr-stat-icon ic-total">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </div>
-                    <div>
-                        <p class="fr-stat-label">Total usuarios</p>
-                        <p class="fr-stat-val" id="s-total">—</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabla todos -->
-            <div class="fr-card">
-                <div class="fr-card-head">
-                    <h2 class="fr-card-title">Todos los usuarios</h2>
-                    <span class="fr-pill" id="lbl-resumen">cargando...</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table fr-table mb-0">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nombre completo</th>
-                                <th>Cédula</th>
-                                <th>Teléfono</th>
-                                <th>Correo electrónico</th>
-                                <th>Rol</th>
-                                <th>Fecha de registro</th><th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tb-resumen">
-                            <tr><td colspan="17" class="text-center text-muted py-4">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ── SECCIÓN: ADMINISTRADORES ── -->
-        <div class="fr-section d-none" id="sec-admins">
-            <div class="fr-card">
-                <div class="fr-card-head">
-                    <h2 class="fr-card-title">Administradores del sistema</h2>
-                    <span class="fr-pill fr-pill-admin" id="lbl-admins">0 registros</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table fr-table mb-0">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ID</th>
-                                <th>Nombre completo</th>
-                                <th>Cédula</th>
-                                <th>Teléfono</th>
-                                <th>Correo electrónico</th>
-                                <th>Fecha de registro</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tb-admins">
-                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── SECCIÓN: CLIENTES ── -->
-        <div class="fr-section d-none" id="sec-customers">
-            <div class="fr-card">
-                <div class="fr-card-head">
-                    <h2 class="fr-card-title">Clientes registrados</h2>
-                    <span class="fr-pill fr-pill-customer" id="lbl-customers">0 registros</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table fr-table mb-0">
-                        <thead>
-    <tr>
-        <th>#</th>
-        <th>ID</th>
-        <th>Nombre completo</th>
-        <th>Cédula</th>
-        <th>Teléfono</th>
-        <th>Correo electrónico</th>
-        <th>F. Nacimiento</th>
-        <th>Departamento</th>
-        <th>Municipio</th>
-        <th>Barrio</th>
-        <th>Dirección</th>
-        <th>Pregunta secreta</th>
-        <th>Respuesta secreta</th>
-        <th>Aut. Correo</th>
-        <th>Aut. Celular</th>
-        <th>Fecha de registro</th>
-        <th>Acciones</th>
-    </tr>
-</thead>
-                        <tbody id="tb-customers">
-                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── SECCIÓN: SEDES ── -->
-<div class="fr-section d-none" id="sec-sedes">
-    <div class="fr-card">
-        <div class="fr-card-head">
-            <h2 class="fr-card-title">Sedes registradas</h2>
-            <span class="fr-pill fr-pill-admin" id="lbl-sedes">0 registros</span>
-        </div>
-        
-        <!-- AQUÍ es el FORMULARIO -->
-        <div class="p-4 border-bottom">
-    <h5 class="mb-3">Agregar nueva sede</h5>
-
-    <form id="form-sede" class="row g-3">
-
-        <div class="col-md-4">
-            <label class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="name" required>
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Ciudad</label>
-            <input type="text" class="form-control" id="city" required>
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Región</label>
-            <input type="text" class="form-control" id="region">
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Tipo</label>
-            <select class="form-select" id="type">
-                <option value="Hotel">Sede Recreativa</option>
-                <option value="Apartamento">Apartamento</option>
-            </select>
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Capacidad máxima</label>
-            <input type="number" class="form-control" id="maximumCapacity">
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label">Precio lavandería</label>
-            <input type="number" class="form-control" id="priceLaundry">
-        </div>
-
-        <div class="col-12">
-            <label class="form-label">Descripción</label>
-            <textarea class="form-control" id="description" rows="3"></textarea>
-        </div>
-
-        <div class="col-12">
-            <button type="submit"class="btn btn-dark"id="btn-sede">
-            Registrar sede
-        </button>
-        </div>
-
-    </form>
-</div>
-
-
-
-
         <div class="table-responsive">
             <table class="table fr-table mb-0">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Ciudad</th>
-                        <th>Región</th>
-                        <th>Tipo</th>
-                        <th>Capacidad Maxima</th>
-                        <th>Precio Lavanderia</th>
-                        <th>Descripción</th>
-                    </tr>
-                </thead>
-                <tbody id="tb-sedes">
-                    <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- ── SECCIÓN: ALOJAMIENTOS ── -->
-<div class="fr-section d-none" id="sec-accommodation">
-
-    <div class="fr-card">
-
-        <div class="fr-card-head">
-            <h2 class="fr-card-title">
-                Alojamientos registrados
-            </h2>
-
-            <span class="fr-pill fr-pill-customer"
-                  id="lbl-accommodation">
-                0 registros
-            </span>
-        </div>
-
-        <div class="table-responsive">
-
-            <table class="table fr-table mb-0">
-
                 <thead>
                     <tr>
                         <th>#</th>
@@ -384,352 +581,284 @@
                         <th>Sede</th>
                         <th>Nombre</th>
                         <th>Número</th>
-                        <th>Máx. Personas</th>
+                        <th>Máx. personas</th>
                         <th>Estado</th>
                         <th>Descripción</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody id="tb-accommodation">
-                    <tr>
-                        <td colspan="8"
-                            class="text-center text-muted py-4">
-                            Cargando...
-                        </td>
-                    </tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
                 </tbody>
             </table>
         </div>
-    </div>
-    </div>
-
-    <!-- ── SECCIÓN: TEMPORADAS ── -->
-<div class="fr-section d-none" id="sec-seasons">
-
-    <div class="fr-card">
-
-        <div class="fr-card-head">
-            <h2 class="fr-card-title">
-                Temporadas registradas
-            </h2>
-
-            <span class="fr-pill fr-pill-admin"
-                  id="lbl-seasons">
-                0 registros
-            </span>
-        </div>
-
-        <!-- FORMULARIO -->
-        <div class="p-4 border-bottom">
-
-            <h5 class="mb-3">Agregar temporada</h5>
-
-            <form id="form-season" class="row g-3">
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Fecha inicio
-                    </label>
-
-                    <input type="date"
-                           class="form-control"
-                           id="dateStart"
-                           required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Fecha fin
-                    </label>
-
-                    <input type="date"
-                           class="form-control"
-                           id="dateFinish"
-                           required>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Tipo
-                    </label>
-
-                    <select class="form-select"
-                            id="seasonType">
-
-                        <option value="Alta">
-                            Temporada Alta
-                        </option>
-
-                        <option value="Baja">
-                            Temporada Baja
-                        </option>
-
-                        <option value="Especial">
-                            Temporada Especial
-                        </option>
-
-                    </select>
-                </div>
-
-                <div class="col-12">
-                    <button type="submit"
-                    class="btn btn-dark"id="btn-season">Registrar temporada
-                </button>
-                </div>
-
-            </form>
-
-        </div>
-
-        <!-- TABLA -->
-        <div class="table-responsive">
-
-            <table class="table fr-table mb-0">
-
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>ID</th>
-                        <th>Fecha inicio</th>
-                        <th>Fecha fin</th>
-                        <th>Tipo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tb-seasons">
-                    <tr>
-                        <td colspan="6"
-                            class="text-center text-muted py-4">
-                            Cargando...
-                        </td>
-                    </tr>
-                </tbody>
-
-            </table>
-
-        </div>
 
     </div>
-
-</div>
-
-</div>
-
-<!-- ── SECCIÓN: RATES ── -->
-<div class="fr-section d-none" id="sec-rates">
-
-    <div class="fr-card">
-
-        <div class="fr-card-head">
-            <h2 class="fr-card-title">
-                Tarifas registradas
-            </h2>
-
-            <span class="fr-pill fr-pill-admin"
-                  id="lbl-rates">
-                0 registros
-            </span>
-        </div>
-
-        <!-- FORMULARIO -->
-        <div class="p-4 border-bottom">
-
-            <h5 class="mb-3">Agregar tarifa</h5>
-
-            <form id="form-rate" class="row g-3">
-
-                <div class="col-md-3">
-    <label class="form-label">Alojamiento</label>
-    <select class="form-select" id="idAccommodation" required>
-        <option value="">Selecciona un alojamiento...</option>
-    </select>
-</div>
-
-<div class="col-md-3">
-    <label class="form-label">Temporada</label>
-    <select class="form-select" id="idSeason" required>
-        <option value="">Selecciona una temporada...</option>
-    </select>
-</div>
-
-               
-                <div class="col-md-3">
-                    <label class="form-label">
-                        Mínimo personas
-                    </label>
-
-                    <input type="number"
-                           class="form-control"
-                           id="minimumPerson"
-                           required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">
-                        Máximo personas
-                    </label>
-
-                    <input type="number"
-                           class="form-control"
-                           id="maximumPerson"
-                           required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">
-                        Precio noche
-                    </label>
-
-                    <input type="number"
-                           class="form-control"
-                           id="priceNight"
-                           required>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">
-                        Precio persona adicional
-                    </label>
-
-                    <input type="number"
-                           class="form-control"
-                           id="pricePersonAdditional"
-                           required>
-                </div>
-
-                <div class="col-12">
-                    <button type="submit"
-                            class="btn btn-dark"
-                            id="btn-rate">
-
-                        Registrar tarifa
-                    </button>
-                </div>
-
-            </form>
-
-        </div>
-
-        <!-- TABLA -->
-        <div class="table-responsive">
-
-            <table class="table fr-table mb-0">
-
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>ID</th>
-                        <th>Alojamiento</th>
-                        <th>Temporada</th>
-                        <th>Mínimo Personas</th>
-                        <th>Máximo Personas</th>
-                        <th>Precio Noche</th>
-                        <th>Precio Persona Adicional</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tb-rates">
-                    <tr>
-                        <td colspan="9"
-                            class="text-center text-muted py-4">
-                            Cargando...
-                        </td>
-                    </tr>
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</div>
+</div><!-- /sec-accommodation -->
 
 
+    <!-- ─────────────────────────────
+         SECCIÓN: TEMPORADAS
+    ───────────────────────────── -->
+    <div class="fr-section d-none" id="sec-seasons">
+        <div class="fr-card">
 
-    </main>
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Temporadas registradas</h2>
+                <span class="fr-pill fr-pill-admin" id="lbl-seasons">0 registros</span>
+            </div>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+            <!-- Formulario: agregar temporada -->
+            <div class="p-4 border-bottom">
+                <h5 class="mb-3">Agregar temporada</h5>
+                <form id="form-season" class="row g-3">
 
-        /* ══════════════════════════════
-           ESTADO GLOBAL
-        ══════════════════════════════ */
-        let allUsers = [];
-        
-
-        const SECTIONS = {
-            resumen:   { title: 'Resumen',          sub: 'Panel de control general' },
-            admins:    { title: 'Administradores',   sub: 'Usuarios con rol Admin' },
-            customers: { title: 'Clientes',          sub: 'Usuarios con rol Customer' },
-            sedes: { title: 'Sedes', sub: 'Sedes y apartamentos registrados' },
-            accommodation: {title: 'Alojamientos',sub: 'Habitaciones y apartamentos registrados'},
-            seasons: {title: 'Temporadas',sub: 'Temporadas altas, bajas y especiales'},
-            rates: {title: 'Tarifas',sub: 'Tarifas por temporada y alojamiento'}
-        };
-
-        /* ══════════════════════════════
-           HELPERS
-        ══════════════════════════════ */
-        function fmtFecha(str) {
-            if (!str) return '—';
-            try {
-                return new Date(str).toLocaleDateString('es-CO', {
-                    year: 'numeric', month: 'short', day: '2-digit'
-                });
-            } catch { return '—'; }
-        }
-
-        function rolPill(rol) {
-            if (rol === 'Admin')
-                return '<span class="fr-pill fr-pill-admin">Admin</span>';
-            return '<span class="fr-pill fr-pill-customer">Cliente</span>';
-        }
-
-        function iniciales(name, last) {
-            return ((name||'').charAt(0) + (last||'').charAt(0)).toUpperCase();
-        }
-
-        function avatarHtml(u) {
-            const cls = u.rol === 'Admin' ? 'av-admin' : 'av-customer';
-            return `<span class="fr-av ${cls}">${iniciales(u.name, u.lastname)}</span>`;
-        }
-
-        /* ══════════════════════════════
-           CONSTRUCCIÓN DE FILAS
-        ══════════════════════════════ */
-
-        // Fila para tabla de resumen (incluye columna Rol)
-        function filaResumen(u, i) {
-            return `<tr>
-                <td class="fr-mono text-muted">${i + 1}</td>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        ${avatarHtml(u)}
-                        <div>
-                            <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
-                            <div class="fr-sub-email">${u.email || ''}</div>
-                        </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha inicio</label>
+                        <input type="date" class="form-control" id="dateStart" required>
                     </div>
-                </td>
-                <td class="fr-mono">${u.cedula || '—'}</td>
-                <td>${u.phone || '—'}</td>
-                <td class="text-muted">${u.email || '—'}</td>
-                <td>${rolPill(u.rol)}</td>
-                <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
-                <td>
-                <button class="btn btn-sm btn-outline-danger"
+
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha fin</label>
+                        <input type="date" class="form-control" id="dateFinish" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="seasonType">
+                            <option value="Alta">Temporada Alta</option>
+                            <option value="Baja">Temporada Baja</option>
+                            <option value="Especial">Temporada Especial</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-dark" id="btn-season">
+                            Registrar temporada
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Tabla de temporadas -->
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Fecha inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Tipo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-seasons">
+                        <tr><td colspan="6" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div><!-- /sec-seasons -->
+
+
+    <!-- ─────────────────────────────
+         SECCIÓN: TARIFAS
+    ───────────────────────────── -->
+    <div class="fr-section d-none" id="sec-rates">
+        <div class="fr-card">
+
+            <div class="fr-card-head">
+                <h2 class="fr-card-title">Tarifas registradas</h2>
+                <span class="fr-pill fr-pill-admin" id="lbl-rates">0 registros</span>
+            </div>
+
+            <!-- Formulario: agregar tarifa -->
+            <div class="p-4 border-bottom">
+                <h5 class="mb-3">Agregar tarifa</h5>
+                <form id="form-rate" class="row g-3">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Alojamiento</label>
+                        <!-- Poblado dinámicamente con poblarSelectAccommodation() -->
+                        <select class="form-select" id="idAccommodation" required>
+                            <option value="">Selecciona un alojamiento...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Temporada</label>
+                        <!-- Poblado dinámicamente con poblarSelectSeason() -->
+                        <select class="form-select" id="idSeason" required>
+                            <option value="">Selecciona una temporada...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Mínimo personas</label>
+                        <input type="number" class="form-control" id="minimumPerson" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Máximo personas</label>
+                        <input type="number" class="form-control" id="maximumPerson" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Precio noche</label>
+                        <input type="number" class="form-control" id="priceNight" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Precio persona adicional</label>
+                        <input type="number" class="form-control" id="pricePersonAdditional" required>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-dark" id="btn-rate">
+                            Registrar tarifa
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Tabla de tarifas -->
+            <div class="table-responsive">
+                <table class="table fr-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Alojamiento</th>
+                            <th>Temporada</th>
+                            <th>Mín. personas</th>
+                            <th>Máx. personas</th>
+                            <th>Precio noche</th>
+                            <th>Precio pers. adicional</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-rates">
+                        <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div><!-- /sec-rates -->
+
+</main><!-- /fr-main -->
+
+
+<!-- ════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════ -->
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* ══════════════════════════════════════
+   ESTADO GLOBAL
+══════════════════════════════════════ */
+let allUsers         = [];
+let allSedes         = [];
+let allAccommodation = [];
+let allSeasons       = [];
+let allRates         = [];
+
+/* Títulos y subtítulos por sección */
+const SECTIONS = {
+    resumen:       { title: 'Resumen',        sub: 'Panel de control general'                },
+    admins:        { title: 'Administradores', sub: 'Usuarios con rol Admin'                 },
+    customers:     { title: 'Clientes',        sub: 'Usuarios con rol Customer'              },
+    sedes:         { title: 'Sedes',           sub: 'Sedes y apartamentos registrados'       },
+    accommodation: { title: 'Alojamientos',    sub: 'Habitaciones y apartamentos registrados'},
+    seasons:       { title: 'Temporadas',      sub: 'Temporadas altas, bajas y especiales'   },
+    rates:         { title: 'Tarifas',         sub: 'Tarifas por temporada y alojamiento'    }
+};
+
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+
+/* Formatea fecha ISO → "dd mmm yyyy" en español */
+function fmtFecha(str) {
+    if (!str) return '—';
+    try {
+        return new Date(str).toLocaleDateString('es-CO', {
+            year: 'numeric', month: 'short', day: '2-digit'
+        });
+    } catch { return '—'; }
+}
+
+/* Formatea número como moneda COP */
+function fmtPrecio(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('es-CO', {
+        style: 'currency', currency: 'COP', maximumFractionDigits: 0
+    });
+}
+
+/* Pill de rol (Admin / Customer) */
+function rolPill(rol) {
+    return rol === 'Admin'
+        ? '<span class="fr-pill fr-pill-admin">Admin</span>'
+        : '<span class="fr-pill fr-pill-customer">Cliente</span>';
+}
+
+/* Iniciales del nombre para el avatar */
+function iniciales(name, last) {
+    return ((name || '').charAt(0) + (last || '').charAt(0)).toUpperCase();
+}
+
+/* HTML del avatar con color según rol */
+function avatarHtml(u) {
+    const cls = u.rol === 'Admin' ? 'av-admin' : 'av-customer';
+    return `<span class="fr-av ${cls}">${iniciales(u.name, u.lastname)}</span>`;
+}
+
+/* Fila vacía con colspan y mensaje */
+function filaVacia(cols, msg) {
+    return `<tr><td colspan="${cols}" class="text-center text-muted py-4">${msg}</td></tr>`;
+}
+
+
+/* ══════════════════════════════════════
+   CONSTRUCCIÓN DE FILAS
+══════════════════════════════════════ */
+
+/* Fila para tabla RESUMEN (todos los usuarios, incluye Rol) */
+function filaResumen(u, i) {
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td>
+            <div class="d-flex align-items-center gap-2">
+                ${avatarHtml(u)}
+                <div>
+                    <div class="fw-500">${u.name || ''} ${u.lastname || ''}</div>
+                    <div class="fr-sub-email">${u.email || ''}</div>
+                </div>
+            </div>
+        </td>
+        <td class="fr-mono">${u.cedula   || '—'}</td>
+        <td>${u.phone || '—'}</td>
+        <td class="text-muted">${u.email || '—'}</td>
+        <td>${rolPill(u.rol)}</td>
+        <td class="fr-mono text-muted">${fmtFecha(u.createdAt)}</td>
+        <td>
+            <!-- Elimina usuario de la tabla users -->
+            <button class="btn btn-sm btn-outline-danger"
                 onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
                 Eliminar
-                </button>
-                </td>
-            </tr>`;
-        }
+            </button>
+        </td>
+    </tr>`;
+}
 
-        // Fila para tablas de Admin / Customer (incluye columna ID)
-        // Fila para ADMINISTRADORES (sin campos extra)
+/* Fila para tabla ADMINISTRADORES */
 function filaAdmin(u, i) {
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
@@ -741,16 +870,14 @@ function filaAdmin(u, i) {
             </div>
         </td>
         <td class="fr-mono">${u.cedula || '—'}</td>
-        <td>${u.phone || '—'}</td>
+        <td>${u.phone  || '—'}</td>
         <td class="text-muted">${u.email || '—'}</td>
-        <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+        <td class="fr-mono text-muted">${fmtFecha(u.createdAt)}</td>
     </tr>`;
 }
 
-// Fila para CLIENTES (con todos los campos nuevos)
+/* Fila para tabla CLIENTES — columnas esenciales, botón Ver abre modal */
 function filaCustomer(u, i) {
-    const si  = '<span class="badge bg-success">Sí</span>';
-    const no  = '<span class="badge bg-secondary">No</span>';
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${u.iduser}</td>
@@ -761,351 +888,77 @@ function filaCustomer(u, i) {
             </div>
         </td>
         <td class="fr-mono">${u.cedula || '—'}</td>
-        <td>${u.phone || '—'}</td>
+        <td>${u.phone  || '—'}</td>
         <td class="text-muted">${u.email || '—'}</td>
-        <td class="fr-mono">${fmtFecha(u.fechaNacimiento)}</td>
-        <td>${u.departamento || '—'}</td>
         <td>${u.municipio || '—'}</td>
-        <td>${u.barrio || '—'}</td>
-        <td>${u.direccion || '—'}</td>
-        <td>${u.preguntaSecreta || '—'}</td>
-        <td>${u.respuestaSecreta || '—'}</td>
-<td>${u.autorizaCorreo  === true ? si : u.autorizaCorreo === false ? no : '—'}</td>
-<td>${u.autorizaCelular === true ? si : u.autorizaCelular === false ? no : '—'}</td>
-        <td class="text-muted fr-mono">${fmtFecha(u.createdAt)}</td>
+        <td class="fr-mono text-muted">${fmtFecha(u.createdAt)}</td>
         <td>
-            <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
-                Eliminar
-            </button>
+            <div class="d-flex gap-2">
+                <!-- Abre modal con info completa del cliente -->
+                <button class="btn btn-sm fr-btn-ver"
+                    onclick="verCliente(${u.iduser})">
+                    Ver
+                </button>
+                <!-- Elimina cliente de la tabla users -->
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
+                    Eliminar
+                </button>
+            </div>
         </td>
     </tr>`;
 }
 
-        function filaVacia(cols, msg) {
-            return `<tr><td colspan="${cols}" class="text-center text-muted py-4">${msg}</td></tr>`;
-        }
+/* Abre el modal con toda la información del cliente seleccionado */
+function verCliente(id) {
+    const u = allUsers.find(u => u.iduser === id);
+    if (!u) return;
 
-        /* ══════════════════════════════
-           RENDER TABLAS
-        ══════════════════════════════ */
-        function render(users) {
-            const admins    = users.filter(u => u.rol === 'Admin');
-            const customers = users.filter(u => u.rol === 'Customer');
+    const si = '<span class="badge bg-success">Sí</span>';
+    const no = '<span class="badge bg-secondary">No</span>';
 
-            // Stat cards
-            document.getElementById('s-admins').textContent    = admins.length;
-            document.getElementById('s-customers').textContent  = customers.length;
-            document.getElementById('s-total').textContent      = users.length;
+    // Cabecera del modal
+    document.getElementById('modal-avatar').textContent = iniciales(u.name, u.lastname);
+    document.getElementById('modal-nombre').textContent = `${u.name || ''} ${u.lastname || ''}`;
 
-            // Badges sidebar
-            document.getElementById('cnt-admins').textContent    = admins.length;
-            document.getElementById('cnt-customers').textContent  = customers.length;
+    // Información personal
+    document.getElementById('md-id').textContent          = u.iduser;
+    document.getElementById('md-cedula').textContent      = u.cedula        || '—';
+    document.getElementById('md-nacimiento').textContent  = fmtFecha(u.fechaNacimiento);
+    document.getElementById('md-phone').textContent       = u.phone         || '—';
+    document.getElementById('md-email').textContent       = u.email         || '—';
 
-            // Labels cabecera de tabla
-            document.getElementById('lbl-resumen').textContent    = `${users.length} usuarios`;
-            document.getElementById('lbl-admins').textContent      = `${admins.length} registros`;
-            document.getElementById('lbl-customers').textContent   = `${customers.length} registros`;
+    // Ubicación
+    document.getElementById('md-departamento').textContent = u.departamento || '—';
+    document.getElementById('md-municipio').textContent    = u.municipio    || '—';
+    document.getElementById('md-barrio').textContent       = u.barrio       || '—';
+    document.getElementById('md-direccion').textContent    = u.direccion    || '—';
 
-            // Tabla resumen
-            document.getElementById('tb-resumen').innerHTML =
-                users.length
-                    ? users.map(filaResumen).join('')
-                    : filaVacia(7, 'No hay usuarios');
+    // Seguridad
+    document.getElementById('md-pregunta').textContent  = u.preguntaSecreta  || '—';
+    document.getElementById('md-respuesta').textContent = u.respuestaSecreta || '—';
 
-            // Tabla admins
-            document.getElementById('tb-admins').innerHTML =
-    admins.length
-        ? admins.map(filaAdmin).join('')
-        : filaVacia(7, 'No hay administradores');
+    // Autorizaciones
+    document.getElementById('md-aut-correo').innerHTML  = u.autorizaCorreo  === true ? si : u.autorizaCorreo  === false ? no : '—';
+    document.getElementById('md-aut-celular').innerHTML = u.autorizaCelular === true ? si : u.autorizaCelular === false ? no : '—';
+    document.getElementById('md-registro').textContent  = fmtFecha(u.createdAt);
 
-            // Tabla customers
-            document.getElementById('tb-customers').innerHTML =
-    customers.length
-        ? customers.map(filaCustomer).join('')
-        : filaVacia(17, 'No hay clientes registrados');
-        }
+    // Botón eliminar dentro del modal
+    document.getElementById('modal-btn-eliminar').onclick = () => {
+        bootstrap.Modal.getInstance(document.getElementById('modal-cliente')).hide();
+        eliminarUsuario(u.iduser, `${u.name} ${u.lastname}`);
+    };
 
-        /* ══════════════════════════════
-   SEDES
-══════════════════════════════ */
-let allSedes = [];
-
-/* ══════════════════════════════
-   ACCOMMODATION
-══════════════════════════════ */
-let allAccommodation = [];
-
-let allSeasons = [];
-
-let allRates = [];
-
-// ✅ Así debe quedar — usa el campo que ya viene del backend
-function filaAccommodation(a, i) {
-    const estado = a.state === 'Disponible'
-        ? '<span class="badge bg-success">Disponible</span>'
-        : `<span class="badge bg-secondary">${a.state || '—'}</span>`;
-
-    return `<tr>
-        <td class="fr-mono text-muted">${i + 1}</td>
-        <td class="fr-mono text-muted">${a.idAccommodation}</td>
-        <td><span class="fw-500">${a.sede || '—'}</span></td>  <!-- ✅ directo -->
-        <td>${a.name || '—'}</td>
-        <td class="fr-mono">${a.number || '—'}</td>
-        <td>${a.maximumPerson || '—'}</td>
-        <td>${estado}</td>
-        <td class="text-muted" style="max-width:260px;font-size:12.5px">${a.description || '—'}</td>
-    </tr>`;
+    new bootstrap.Modal(document.getElementById('modal-cliente')).show();
 }
 
-function renderAccommodation(accommodation) {
-
-    document.getElementById('cnt-accommodation').textContent =
-        accommodation.length;
-
-    document.getElementById('lbl-accommodation').textContent =
-        `${accommodation.length} registros`;
-
-    document.getElementById('tb-accommodation').innerHTML =
-        accommodation.length
-            ? accommodation.map(filaAccommodation).join('')
-            : `
-                <tr>
-                    <td colspan="8"
-                        class="text-center text-muted py-4">
-                        No hay alojamientos registrados
-                    </td>
-                </tr>
-            `;
-}
-
-function filaSeason(s, i) {
-
-    return `<tr>
-        <td class="fr-mono text-muted">${i + 1}</td>
-
-        <td class="fr-mono text-muted">
-            ${s.idSeason || '—'}
-        </td>
-
-        <td>
-            ${fmtFecha(s.dateStart)}
-        </td>
-
-        <td>
-            ${fmtFecha(s.dateFinish)}
-        </td>
-
-        <td>
-            <span class="fr-pill ${
-                s.type === 'Alta'
-                    ? 'fr-pill-admin'
-                    : s.type === 'Baja'
-                        ? 'fr-pill-customer'
-                        : 'fr-pill'
-            }">
-                ${s.type || '—'}
-            </span>
-        </td>
-
-        <td>
-            <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarTemporada(${s.idSeason}, '${s.type}')">
-                Eliminar
-            </button>
-        </td>
-    </tr>`;
-}
-
-function renderSeasons(seasons) {
-
-    document.getElementById('cnt-seasons').textContent =
-        seasons.length;
-
-    document.getElementById('lbl-seasons').textContent =
-        `${seasons.length} registros`;
-
-    document.getElementById('tb-seasons').innerHTML =
-        seasons.length
-            ? seasons.map(filaSeason).join('')
-            : `
-                <tr>
-                    <td colspan="6"
-                        class="text-center text-muted py-4">
-                        No hay temporadas registradas
-                    </td>
-                </tr>
-            `;
-}
-
-function filaRate(r, i) {
-
-    return `<tr>
-
-        <td class="fr-mono text-muted">${i + 1}</td>
-
-        <td class="fr-mono text-muted">
-            ${r.idPrice || '—'}
-        </td>
-
-        <td>
-            ${r.accommodationName || r.idAccommodation}
-        </td>
-
-        <td>
-            ${r.seasonType || r.idSeason}
-        </td>
-
-        <td>
-            ${r.minimumPerson || '—'}
-        </td>
-
-        <td>
-            ${r.maximumPerson || '—'}
-        </td>
-
-        <td class="fr-mono">
-            ${fmtPrecio(r.priceNight)}
-        </td>
-
-        <td class="fr-mono">
-            ${fmtPrecio(r.pricePersonAdditional)}
-        </td>
-        <td>
-    <button class="btn btn-sm btn-outline-danger"
-        onclick="eliminarRate(${r.idPrice})">
-
-        Eliminar
-    </button>
-</td>
-
-    </tr>`;
-}
-
-function renderRates(rates) {
-
-    document.getElementById('cnt-rates').textContent =
-        rates.length;
-
-    document.getElementById('lbl-rates').textContent =
-        `${rates.length} registros`;
-
-    document.getElementById('tb-rates').innerHTML =
-        rates.length
-            ? rates.map(filaRate).join('')
-            : `
-                <tr>
-                    <td colspan="8"
-                        class="text-center text-muted py-4">
-                        No hay tarifas registradas
-                    </td>
-                </tr>
-            `;
-}
-
-async function cargarRates() {
-
-    try {
-
-        const res = await fetch('/api/rates/all');
-
-        if (!res.ok)
-            throw new Error(`HTTP ${res.status}`);
-
-        allRates = await res.json();
-
-        console.log('[FoundReserves] Rates:', allRates);
-
-        renderRates(allRates);
-
-    } catch (err) {
-
-        console.error(
-            '[FoundReserves] Error rates:',
-            err
-        );
-
-        document.getElementById('tb-rates').innerHTML =
-            `
-            <tr>
-                <td colspan="8"
-                    class="text-center text-danger py-4">
-                    Error al cargar tarifas
-                </td>
-            </tr>
-            `;
-    }
-}
-
-/* ══════════════════════════════
-   POBLAR SELECTS DEL FORM RATE
-══════════════════════════════ */
-function poblarSelectAccommodation(accommodations) {
-    const sel = document.getElementById('idAccommodation');
-    const valorActual = sel.value;
-    sel.innerHTML = '<option value="">Selecciona un alojamiento...</option>';
-    accommodations.forEach(a => {
-        const nombre = a.name || '';
-        const numero = a.number ? ` — N° ${a.number}` : '';
-        const label  = `${nombre}${numero}` || `Alojamiento ${a.idAccommodation}`;
-        sel.innerHTML += `<option value="${a.idAccommodation}">${label}</option>`;
-    });
-    if (valorActual) sel.value = valorActual;
-}
-
-function poblarSelectSeason(seasons) {
-    const sel = document.getElementById('idSeason');
-    const valorActual = sel.value;
-    sel.innerHTML = '<option value="">Selecciona una temporada...</option>';
-    seasons.forEach(s => {
-        const inicio  = fmtFecha(s.dateStart);
-        const fin     = fmtFecha(s.dateFinish);
-        sel.innerHTML += `<option value="${s.idSeason}">${s.idSeason} — ${s.type} (${inicio} → ${fin})</option>`;
-    });
-    if (valorActual) sel.value = valorActual;
-}
-
-async function cargarSeasons() {
-    try {
-        const res = await fetch('/api/seasons/all');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        allSeasons = await res.json();
-        renderSeasons(allSeasons);
-        poblarSelectSeason(allSeasons); // ← agrega esto
-    } catch (err) {
-        console.error('[FoundReserves] Error seasons:', err);
-        document.getElementById('tb-seasons').innerHTML =
-            `<tr><td colspan="6" class="text-center text-danger py-4">Error al cargar temporadas</td></tr>`;
-    }
-}
-
-async function cargarAccommodation() {
-    try {
-        const res = await fetch('/api/accommodation/all');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        allAccommodation = await res.json();
-        renderAccommodation(allAccommodation);
-        poblarSelectAccommodation(allAccommodation); // ← agrega esto
-    } catch (err) {
-        console.error('[FoundReserves] Error accommodation:', err);
-        document.getElementById('tb-accommodation').innerHTML =
-            `<tr><td colspan="8" class="text-center text-danger py-4">Error al cargar alojamientos</td></tr>`;
-    }
-}
-
-function fmtPrecio(n) {
-    if (n == null) return '—';
-    return Number(n).toLocaleString('es-CO', {
-        style: 'currency', currency: 'COP', maximumFractionDigits: 0
-    });
-}
-
+/* Fila para tabla SEDES */
 function filaSede(s, i) {
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${s.idSede}</td>
         <td><span class="fw-500">${s.name || '—'}</span></td>
-        <td>${s.city || '—'}</td>
+        <td>${s.city   || '—'}</td>
         <td>${s.region || '—'}</td>
         <td>
             <span class="fr-pill ${s.type?.toLowerCase().includes('apart') ? 'fr-pill-customer' : 'fr-pill-admin'}">
@@ -1118,388 +971,485 @@ function filaSede(s, i) {
     </tr>`;
 }
 
-function renderSedes(sedes) {
-    document.getElementById('cnt-sedes').textContent  = sedes.length;
-    document.getElementById('lbl-sedes').textContent  = `${sedes.length} registros`;
-    document.getElementById('tb-sedes').innerHTML = sedes.length
-        ? sedes.map(filaSede).join('')
-        : `<tr><td colspan="9" class="text-center text-muted py-4">No hay sedes registradas</td></tr>`;
+/* Fila para tabla ALOJAMIENTOS */
+function filaAccommodation(a, i) {
+    const estado = a.state === 'Disponible'
+        ? '<span class="badge bg-success">Disponible</span>'
+        : a.state === 'Ocupado'
+            ? '<span class="badge bg-warning text-dark">Ocupado</span>'
+            : `<span class="badge bg-secondary">${a.state || '—'}</span>`;
+
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${a.idAccommodation}</td>
+        <td><span class="fw-500">${a.sede || '—'}</span></td>
+        <td>${a.name   || '—'}</td>
+        <td class="fr-mono">${a.number || '—'}</td>
+        <td>${a.maximumPerson || '—'}</td>
+        <td>${estado}</td>
+        <td class="text-muted" style="max-width:220px;font-size:12.5px">${a.description || '—'}</td>
+        <td>
+            <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarAccommodation(${a.idAccommodation}, '${a.name}')">
+                Eliminar
+            </button>
+        </td>
+    </tr>`;
 }
 
+/* Fila para tabla TEMPORADAS */
+function filaSeason(s, i) {
+    const pillCls = s.type === 'Alta' ? 'fr-pill-admin'
+                  : s.type === 'Baja' ? 'fr-pill-customer'
+                  : 'fr-pill';
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${s.idSeason || '—'}</td>
+        <td>${fmtFecha(s.dateStart)}</td>
+        <td>${fmtFecha(s.dateFinish)}</td>
+        <td><span class="fr-pill ${pillCls}">${s.type || '—'}</span></td>
+        <td>
+            <!-- Elimina temporada de la tabla seasons -->
+            <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarTemporada(${s.idSeason}, '${s.type}')">
+                Eliminar
+            </button>
+        </td>
+    </tr>`;
+}
+
+/* Fila para tabla TARIFAS */
+function filaRate(r, i) {
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${r.idPrice || '—'}</td>
+        <td>${r.accommodationName || r.idAccommodation}</td>
+        <td>${r.seasonType        || r.idSeason}</td>
+        <td>${r.minimumPerson     || '—'}</td>
+        <td>${r.maximumPerson     || '—'}</td>
+        <td class="fr-mono">${fmtPrecio(r.priceNight)}</td>
+        <td class="fr-mono">${fmtPrecio(r.pricePersonAdditional)}</td>
+        <td>
+            <!-- Elimina tarifa de la tabla rates -->
+            <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarRate(${r.idPrice})">
+                Eliminar
+            </button>
+        </td>
+    </tr>`;
+}
+
+
+/* ══════════════════════════════════════
+   RENDER TABLAS
+══════════════════════════════════════ */
+
+/* Renderiza todas las tablas de usuarios */
+function render(users) {
+    const admins    = users.filter(u => u.rol === 'Admin');
+    const customers = users.filter(u => u.rol === 'Customer');
+
+    // Stat cards
+    document.getElementById('s-admins').textContent   = admins.length;
+    document.getElementById('s-customers').textContent = customers.length;
+    document.getElementById('s-total').textContent     = users.length;
+
+    // Badges sidebar
+    document.getElementById('cnt-admins').textContent   = admins.length;
+    document.getElementById('cnt-customers').textContent = customers.length;
+
+    // Labels de cabecera
+    document.getElementById('lbl-resumen').textContent   = `${users.length} usuarios`;
+    document.getElementById('lbl-admins').textContent     = `${admins.length} registros`;
+    document.getElementById('lbl-customers').textContent  = `${customers.length} registros`;
+
+    // Cuerpos de tabla
+    document.getElementById('tb-resumen').innerHTML =
+        users.length ? users.map(filaResumen).join('') : filaVacia(8, 'No hay usuarios');
+
+    document.getElementById('tb-admins').innerHTML =
+        admins.length ? admins.map(filaAdmin).join('') : filaVacia(7, 'No hay administradores');
+
+    document.getElementById('tb-customers').innerHTML =
+        customers.length ? customers.map(filaCustomer).join('') : filaVacia(9, 'No hay clientes registrados');
+}
+
+/* Renderiza tabla de sedes */
+function renderSedes(sedes) {
+    document.getElementById('cnt-sedes').textContent = sedes.length;
+    document.getElementById('lbl-sedes').textContent = `${sedes.length} registros`;
+    document.getElementById('tb-sedes').innerHTML =
+        sedes.length ? sedes.map(filaSede).join('') : filaVacia(9, 'No hay sedes registradas');
+}
+
+/* Renderiza tabla de alojamientos */
+function renderAccommodation(accommodation) {
+    document.getElementById('cnt-accommodation').textContent = accommodation.length;
+    document.getElementById('lbl-accommodation').textContent = `${accommodation.length} registros`;
+    document.getElementById('tb-accommodation').innerHTML =
+        accommodation.length ? accommodation.map(filaAccommodation).join('') : filaVacia(8, 'No hay alojamientos registrados');
+}
+
+/* Renderiza tabla de temporadas */
+function renderSeasons(seasons) {
+    document.getElementById('cnt-seasons').textContent = seasons.length;
+    document.getElementById('lbl-seasons').textContent = `${seasons.length} registros`;
+    document.getElementById('tb-seasons').innerHTML =
+        seasons.length ? seasons.map(filaSeason).join('') : filaVacia(6, 'No hay temporadas registradas');
+}
+
+/* Renderiza tabla de tarifas */
+function renderRates(rates) {
+    document.getElementById('cnt-rates').textContent = rates.length;
+    document.getElementById('lbl-rates').textContent = `${rates.length} registros`;
+    document.getElementById('tb-rates').innerHTML =
+        rates.length ? rates.map(filaRate).join('') : filaVacia(9, 'No hay tarifas registradas');
+}
+
+
+/* ══════════════════════════════════════
+   SELECTS DINÁMICOS (form de tarifas)
+══════════════════════════════════════ */
+
+/* Llena el select de alojamientos en el form de tarifas */
+function poblarSelectAccommodation(accommodations) {
+    const sel = document.getElementById('idAccommodation');
+    const valorActual = sel.value;
+    sel.innerHTML = '<option value="">Selecciona un alojamiento...</option>';
+    accommodations.forEach(a => {
+        const label = `${a.name || ''}${a.number ? ` — N° ${a.number}` : ''}` || `Alojamiento ${a.idAccommodation}`;
+        sel.innerHTML += `<option value="${a.idAccommodation}">${label}</option>`;
+    });
+    if (valorActual) sel.value = valorActual;
+}
+
+/* Llena el select de temporadas en el form de tarifas */
+function poblarSelectSeason(seasons) {
+    const sel = document.getElementById('idSeason');
+    const valorActual = sel.value;
+    sel.innerHTML = '<option value="">Selecciona una temporada...</option>';
+    seasons.forEach(s => {
+        sel.innerHTML += `<option value="${s.idSeason}">${s.idSeason} — ${s.type} (${fmtFecha(s.dateStart)} → ${fmtFecha(s.dateFinish)})</option>`;
+    });
+    if (valorActual) sel.value = valorActual;
+}
+
+/* Llena el select de sedes en el form de alojamientos */
+function poblarSelectSede(sedes) {
+    const sel = document.getElementById('acc-idSede');
+    const valorActual = sel.value;
+    sel.innerHTML = '<option value="">Selecciona una sede...</option>';
+    sedes.forEach(s => {
+        sel.innerHTML += `<option value="${s.idSede}">${s.name}${s.city ? ' — ' + s.city : ''}</option>`;
+    });
+    if (valorActual) sel.value = valorActual;
+}
+
+
+/* ══════════════════════════════════════
+   CARGA DE DATOS (GET a la API)
+══════════════════════════════════════ */
+
+/* Carga usuarios desde /api/users/all */
+async function cargarUsuarios() {
+    try {
+        const res = await fetch('/api/users/all');
+        if (!res.ok) { mostrarError(); return; }
+        allUsers = await res.json();
+        console.log('[FR] Usuarios:', allUsers.length);
+        render(allUsers);
+    } catch (err) {
+        console.error('[FR] Error usuarios:', err);
+        mostrarError();
+    }
+}
+
+/* Carga sedes desde /api/sedes/all */
 async function cargarSedes() {
     try {
         const res = await fetch('/api/sedes/all');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         allSedes = await res.json();
         renderSedes(allSedes);
+        poblarSelectSede(allSedes); // ← agrega esta línea
     } catch (err) {
-        console.error('[FoundReserves] Error sedes:', err);
-        document.getElementById('tb-sedes').innerHTML =
-            `<tr><td colspan="9" class="text-center text-danger py-4">Error al cargar sedes</td></tr>`;
+        console.error('[FR] Error sedes:', err);
+        document.getElementById('tb-sedes').innerHTML = filaVacia(9, 'Error al cargar sedes');
     }
 }
 
-        /* ══════════════════════════════
-           CARGA DE DATOS
-        ══════════════════════════════ */
-        async function cargarUsuarios() {
-            try {
-                const res = await fetch('/api/users/all');
-
-                if (!res.ok) {
-                    console.error('Error HTTP:', res.status, res.statusText);
-                    mostrarError();
-                    return;
-                }
-
-                const data = await res.json();
-                console.log('[FoundReserves] Usuarios recibidos:', data.length, data);
-                allUsers = data;
-                render(allUsers);
-
-            } catch (err) {
-                console.error('[FoundReserves] Fetch error:', err);
-                mostrarError();
-            }
-        }
-
-        function mostrarError() {
-            document.getElementById('error-msg').classList.remove('d-none');
-            ['tb-resumen','tb-admins','tb-customers'].forEach(id => {
-                document.getElementById(id).innerHTML =
-                    `<tr><td colspan="7" class="text-center text-danger py-4">
-                        Error al cargar datos — abre F12 para ver detalles
-                    </td></tr>`;
-            });
-        }
-
-        /* ══════════════════════════════
-           NAVEGACIÓN SIDEBAR
-        ══════════════════════════════ */
-        document.querySelectorAll('.fr-nav-item').forEach(item => {
-            item.addEventListener('click', e => {
-                e.preventDefault();
-                const sec = item.dataset.section;
-
-                // Marca activo
-                document.querySelectorAll('.fr-nav-item')
-                    .forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-
-                // Muestra sección
-                document.querySelectorAll('.fr-section')
-                    .forEach(s => s.classList.add('d-none'));
-                document.getElementById('sec-' + sec).classList.remove('d-none');
-
-                // Título header
-                document.getElementById('page-title').textContent = SECTIONS[sec].title;
-                document.getElementById('page-sub').textContent   = SECTIONS[sec].sub;
-
-                // Limpia búsqueda y re-renderiza sin filtro
-                document.getElementById('buscador').value = '';
-                render(allUsers);
-            });
-        });
-
-        /* ══════════════════════════════
-           BÚSQUEDA EN TIEMPO REAL
-        ══════════════════════════════ */
-        document.getElementById('buscador').addEventListener('input', function () {
-            const q = this.value.toLowerCase().trim();
-            const filtrados = q
-                ? allUsers.filter(u =>
-                    (u.name     || '').toLowerCase().includes(q) ||
-                    (u.lastname || '').toLowerCase().includes(q) ||
-                    (u.cedula   || '').toLowerCase().includes(q) ||
-                    (u.email    || '').toLowerCase().includes(q) ||
-                    (u.phone    || '').includes(q))
-                : allUsers;
-            render(filtrados);
-        });
-
-       async function eliminarUsuario(id, nombre) {
-
-    const confirmar = confirm(
-        `¿Estás seguro de eliminar al usuario "${nombre}"?\n\n` +
-        `Esta acción es permanente y no se puede deshacer.`
-    );
-
-    if (!confirmar) return;
-
+/* Carga alojamientos desde /api/accommodation/all y puebla el select */
+async function cargarAccommodation() {
     try {
-        const res = await fetch(`/api/users/${id}`, {
-            method: 'DELETE'
-        });
+        const res = await fetch('/api/accommodation/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allAccommodation = await res.json();
+        renderAccommodation(allAccommodation);
+        poblarSelectAccommodation(allAccommodation); // select del form de tarifas
+    } catch (err) {
+        console.error('[FR] Error alojamientos:', err);
+        document.getElementById('tb-accommodation').innerHTML = filaVacia(8, 'Error al cargar alojamientos');
+    }
+}
 
-        if (!res.ok) {
-            const err = await res.json();
-            alert('Error: ' + (err.message || res.statusText));
-            return;
-        }
+/* Carga temporadas desde /api/seasons/all y puebla el select */
+async function cargarSeasons() {
+    try {
+        const res = await fetch('/api/seasons/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allSeasons = await res.json();
+        renderSeasons(allSeasons);
+        poblarSelectSeason(allSeasons); // select del form de tarifas
+    } catch (err) {
+        console.error('[FR] Error temporadas:', err);
+        document.getElementById('tb-seasons').innerHTML = filaVacia(6, 'Error al cargar temporadas');
+    }
+}
 
-        // Elimina del array local y re-renderiza
+/* Carga tarifas desde /api/rates/all */
+async function cargarRates() {
+    try {
+        const res = await fetch('/api/rates/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allRates = await res.json();
+        renderRates(allRates);
+    } catch (err) {
+        console.error('[FR] Error tarifas:', err);
+        document.getElementById('tb-rates').innerHTML = filaVacia(9, 'Error al cargar tarifas');
+    }
+}
+
+/* Muestra banner de error y rellena tablas de usuarios con mensaje */
+function mostrarError() {
+    document.getElementById('error-msg').classList.remove('d-none');
+    ['tb-resumen', 'tb-admins', 'tb-customers'].forEach(id => {
+        document.getElementById(id).innerHTML = filaVacia(8, 'Error al cargar datos — abre F12 para ver detalles');
+    });
+}
+
+
+/* ══════════════════════════════════════
+   ELIMINACIONES (DELETE a la API)
+══════════════════════════════════════ */
+
+/* Elimina un usuario por id → DELETE /api/users/:id */
+async function eliminarUsuario(id, nombre) {
+    if (!confirm(`¿Eliminar al usuario "${nombre}"?\nEsta acción es permanente.`)) return;
+    try {
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert((await res.json()).message || res.statusText); return; }
         allUsers = allUsers.filter(u => u.iduser !== id);
         render(allUsers);
-
         alert(`Usuario "${nombre}" eliminado correctamente`);
-
     } catch (err) {
-        console.error('[FoundReserves] Error al eliminar:', err);
-        alert('Error de conexión al intentar eliminar');
+        console.error('[FR] Error al eliminar usuario:', err);
+        alert('Error de conexión');
     }
 }
 
+/* Elimina una temporada por id → DELETE /api/seasons/:id */
 async function eliminarTemporada(id, tipo) {
-
-    const confirmar = confirm(
-        `¿Estás seguro de eliminar la temporada "${tipo}"?\n\n` +
-        `Esta acción no se puede deshacer.`
-    );
-
-    if (!confirmar) return;
-
+    if (!confirm(`¿Eliminar la temporada "${tipo}"?\nEsta acción no se puede deshacer.`)) return;
     try {
-
-        const res = await fetch(`/api/seasons/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (!res.ok) {
-
-            const err = await res.json();
-
-            alert(err.message || 'Error al eliminar temporada');
-
-            return;
-        }
-
-        // Actualizar lista local
+        const res = await fetch(`/api/seasons/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert((await res.json()).message || 'Error al eliminar temporada'); return; }
         allSeasons = allSeasons.filter(s => s.idSeason !== id);
-
         renderSeasons(allSeasons);
-
         alert('Temporada eliminada correctamente');
-
     } catch (err) {
-
-        console.error('[FoundReserves] Error eliminar temporada:', err);
-
+        console.error('[FR] Error al eliminar temporada:', err);
         alert('Error de conexión');
     }
 }
 
-
-/* ══════════════════════════════
-   REGISTRAR TEMPORADA
-══════════════════════════════ */
-document.getElementById('form-season').addEventListener('submit', async function(e) {
-
-
-    e.preventDefault();
-
-    const body = {
-        dateStart: document.getElementById('dateStart').value,
-        dateFinish: document.getElementById('dateFinish').value,
-        type: document.getElementById('seasonType').value
-    };
-
-    try {
-
-        const res = await fetch('/api/seasons/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(data.message || 'Error al registrar temporada');
-            return;
-        }
-
-        alert('Temporada registrada correctamente');
-
-        document.getElementById('form-season').reset();
-
-        cargarSeasons();
-
-    } catch(err) {
-
-        console.error(err);
-
-        alert('Error de conexión');
-    }
-});
-
-
-/* ══════════════════════════════
-   REGISTRAR SEDE
-══════════════════════════════ */
-document.getElementById('form-sede').addEventListener('submit', async function(e) {
-
-    e.preventDefault();
-
-    const body = {
-        name: document.getElementById('name').value,
-        city: document.getElementById('city').value,
-        region: document.getElementById('region').value,
-        type: document.getElementById('type').value,
-        maximumCapacity: parseInt(document.getElementById('maximumCapacity').value),
-        priceLaundry: parseFloat(document.getElementById('priceLaundry').value),
-        description: document.getElementById('description').value
-    };
-
-    try {
-
-        const res = await fetch('/api/sedes/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(data.message || 'Error al registrar sede');
-            return;
-        }
-
-        alert('Sede registrada correctamente');
-
-        document.getElementById('form-sede').reset();
-
-        cargarSedes();
-
-    } catch(err) {
-
-        console.error(err);
-
-        alert('Error de conexión');
-    }
-});
-
-/* ══════════════════════════════
-   REGISTRAR RATE
-══════════════════════════════ */
-document.getElementById('form-rate').addEventListener('submit', async function(e) {
-
-    e.preventDefault();
-
-    const body = {
-
-        idAccommodation: parseInt(
-            document.getElementById('idAccommodation').value
-        ),
-
-        idSeason: parseInt(
-            document.getElementById('idSeason').value
-        ),
-
-        minimumPerson: parseInt(
-            document.getElementById('minimumPerson').value
-        ),
-
-        maximumPerson: parseInt(
-            document.getElementById('maximumPerson').value
-        ),
-
-        priceNight: parseFloat(
-            document.getElementById('priceNight').value
-        ),
-
-        pricePersonAdditional: parseFloat(
-            document.getElementById('pricePersonAdditional').value
-        )
-    };
-
-    try {
-
-        const res = await fetch('/api/rates/create', {
-
-            method: 'POST',
-
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify(body)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-
-            alert(data.message || 'Error al registrar tarifa');
-
-            return;
-        }
-
-        alert('Tarifa registrada correctamente');
-
-        document.getElementById('form-rate').reset();
-
-        cargarRates();
-
-    } catch(err) {
-
-        console.error(err);
-
-        alert('Error de conexión');
-    }
-});
-
+/* Elimina una tarifa por id → DELETE /api/rates/:id */
 async function eliminarRate(id) {
-
-    const confirmar = confirm(
-        '¿Deseas eliminar esta tarifa?'
-    );
-
-    if (!confirmar) return;
-
+    if (!confirm('¿Deseas eliminar esta tarifa?')) return;
     try {
-
-        const res = await fetch(`/api/rates/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (!res.ok) {
-
-            const err = await res.json();
-
-            alert(err.message || 'Error al eliminar');
-
-            return;
-        }
-
+        const res = await fetch(`/api/rates/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert((await res.json()).message || 'Error al eliminar'); return; }
         allRates = allRates.filter(r => r.idPrice !== id);
-
         renderRates(allRates);
-
         alert('Tarifa eliminada correctamente');
+    } catch (err) {
+        console.error('[FR] Error al eliminar tarifa:', err);
+        alert('Error de conexión');
+    }
+}
 
-    } catch(err) {
-
-        console.error(err);
-
+/* Elimina un alojamiento por id → DELETE /api/accommodation/:id */
+async function eliminarAccommodation(id, nombre) {
+    if (!confirm(`¿Eliminar el alojamiento "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
+    try {
+        const res = await fetch(`/api/accommodation/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert((await res.json()).message || 'Error al eliminar'); return; }
+        allAccommodation = allAccommodation.filter(a => a.idAccommodation !== id);
+        renderAccommodation(allAccommodation);
+        poblarSelectAccommodation(allAccommodation); // refresca el select de tarifas
+        alert(`Alojamiento "${nombre}" eliminado correctamente`);
+    } catch (err) {
+        console.error('[FR] Error al eliminar alojamiento:', err);
         alert('Error de conexión');
     }
 }
 
 
-        /* ══════════════════════════════
-        INICIO
-        ══════════════════════════════ */
-        cargarUsuarios();
-        cargarSedes();
-        cargarAccommodation();
-        cargarSeasons();
-        cargarRates();
+/* ══════════════════════════════════════
+   FORMULARIOS (POST a la API)
+══════════════════════════════════════ */
 
-    </script>
+/* POST /api/sedes/create — registra una nueva sede */
+document.getElementById('form-sede').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        name:            document.getElementById('name').value,
+        city:            document.getElementById('city').value,
+        region:          document.getElementById('region').value,
+        type:            document.getElementById('type').value,
+        maximumCapacity: parseInt(document.getElementById('maximumCapacity').value),
+        priceLaundry:    parseFloat(document.getElementById('priceLaundry').value),
+        description:     document.getElementById('description').value
+    };
+    try {
+        const res  = await fetch('/api/sedes/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al registrar sede'); return; }
+        alert('Sede registrada correctamente');
+        this.reset();
+        cargarSedes();
+    } catch (err) {
+        console.error('[FR] Error registrar sede:', err);
+        alert('Error de conexión');
+    }
+});
+
+/* POST /api/seasons/create — registra una nueva temporada */
+document.getElementById('form-season').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        dateStart:  document.getElementById('dateStart').value,
+        dateFinish: document.getElementById('dateFinish').value,
+        type:       document.getElementById('seasonType').value
+    };
+    try {
+        const res  = await fetch('/api/seasons/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al registrar temporada'); return; }
+        alert('Temporada registrada correctamente');
+        this.reset();
+        cargarSeasons();
+    } catch (err) {
+        console.error('[FR] Error registrar temporada:', err);
+        alert('Error de conexión');
+    }
+});
+
+/* POST /api/rates/create — registra una nueva tarifa */
+document.getElementById('form-rate').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        idAccommodation:      parseInt(document.getElementById('idAccommodation').value),
+        idSeason:             parseInt(document.getElementById('idSeason').value),
+        minimumPerson:        parseInt(document.getElementById('minimumPerson').value),
+        maximumPerson:        parseInt(document.getElementById('maximumPerson').value),
+        priceNight:           parseFloat(document.getElementById('priceNight').value),
+        pricePersonAdditional:parseFloat(document.getElementById('pricePersonAdditional').value)
+    };
+    try {
+        const res  = await fetch('/api/rates/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al registrar tarifa'); return; }
+        alert('Tarifa registrada correctamente');
+        this.reset();
+        cargarRates();
+    } catch (err) {
+        console.error('[FR] Error registrar tarifa:', err);
+        alert('Error de conexión');
+    }
+});
+
+
+/* ══════════════════════════════════════
+   NAVEGACIÓN SIDEBAR
+══════════════════════════════════════ */
+document.querySelectorAll('.fr-nav-item').forEach(item => {
+    item.addEventListener('click', e => {
+        e.preventDefault();
+        const sec = item.dataset.section;
+
+        // Activa ítem del sidebar
+        document.querySelectorAll('.fr-nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+
+        // Muestra la sección correspondiente
+        document.querySelectorAll('.fr-section').forEach(s => s.classList.add('d-none'));
+        document.getElementById('sec-' + sec).classList.remove('d-none');
+
+        // Actualiza título del topbar
+        document.getElementById('page-title').textContent = SECTIONS[sec].title;
+        document.getElementById('page-sub').textContent   = SECTIONS[sec].sub;
+
+        // Limpia buscador y re-renderiza usuarios sin filtro
+        document.getElementById('buscador').value = '';
+        render(allUsers);
+    });
+});
+
+
+/* ══════════════════════════════════════
+   BÚSQUEDA EN TIEMPO REAL
+══════════════════════════════════════ */
+document.getElementById('buscador').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    const filtrados = q
+        ? allUsers.filter(u =>
+            (u.name     || '').toLowerCase().includes(q) ||
+            (u.lastname || '').toLowerCase().includes(q) ||
+            (u.cedula   || '').toLowerCase().includes(q) ||
+            (u.email    || '').toLowerCase().includes(q) ||
+            (u.phone    || '').includes(q))
+        : allUsers;
+    render(filtrados);
+});
+
+/* POST /api/accommodation/create — registra un nuevo alojamiento */
+document.getElementById('form-accommodation').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        idsede:        parseInt(document.getElementById('acc-idSede').value),
+        name:          document.getElementById('acc-name').value,
+        number:        document.getElementById('acc-number').value,
+        maximumPerson: parseInt(document.getElementById('acc-maximumPerson').value),
+        state:         document.getElementById('acc-state').value,
+        description:   document.getElementById('acc-description').value
+    };
+    try {
+        const res  = await fetch('/api/accommodation/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al registrar alojamiento'); return; }
+        alert('Alojamiento registrado correctamente');
+        this.reset();
+        cargarAccommodation();
+    } catch (err) {
+        console.error('[FR] Error registrar alojamiento:', err);
+        alert('Error de conexión');
+    }
+});
+
+
+/* ══════════════════════════════════════
+   INICIO — carga todos los datos
+══════════════════════════════════════ */
+cargarUsuarios();
+cargarSedes();
+cargarAccommodation();
+cargarSeasons();
+cargarRates();
+
+</script>
 </body>
 </html>

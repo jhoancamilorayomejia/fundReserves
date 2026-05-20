@@ -1,3 +1,49 @@
+
+
+/* ══════════════════════════
+   VARIABLES GLOBALES
+══════════════════════════ */
+:root {
+    --bg:        #0a0a0a;
+    --sidebar-w: 240px;
+
+    /* superficies */
+    --surface-0: #0a0a0a;
+    --surface-1: #111111;
+    --surface-2: #1a1a1a;
+    --surface-3: #242424;
+
+    /* bordes */
+    --border:    rgba(255,255,255,.07);
+    --border-md: rgba(255,255,255,.12);
+
+    /* texto */
+    --text-1:   #f2f2f2;
+    --text-2:   #a0a0a0;
+    --text-3:   #5a5a5a;
+
+    /* accent admin (índigo) */
+    --admin-bg:    rgba(99,91,255,.14);
+    --admin-color: #a69eff;
+
+    /* accent customer (esmeralda) */
+    --cust-bg:    rgba(16,185,129,.13);
+    --cust-color: #34d399;
+
+    /* peligro */
+    --danger-bg:    rgba(239,68,68,.12);
+    --danger-color: #f87171;
+
+    /* radio */
+    --r-sm:  7px;
+    --r-md: 11px;
+    --r-lg: 15px;
+
+    /* sombras */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.5);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.6);
+}
+
 body {
             background-color: #f0f2f5;
             display: flex;
