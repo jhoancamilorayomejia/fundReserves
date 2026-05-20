@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoundReserves.Data;
+using FoundReserves.Models;
 
 namespace FoundReserves.Controllers
 {
@@ -15,11 +16,12 @@ namespace FoundReserves.Controllers
             _context = context;
         }
 
-        // GET /api/sedes/all — accesible para cualquier usuario autenticado
+        // GET /api/sedes/all
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
             var rol = HttpContext.Session.GetString("UserRol");
+
             if (string.IsNullOrEmpty(rol))
                 return Unauthorized(new { message = "Debes iniciar sesión" });
 
@@ -39,6 +41,47 @@ namespace FoundReserves.Controllers
                 .ToListAsync();
 
             return Ok(sedes);
+        }
+
+        // POST /api/sedes/create
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] Sede model)
+        {
+            var rol = HttpContext.Session.GetString("UserRol");
+
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
+
+            // Solo administradores
+            if (rol != "Admin")
+                return Forbid();
+
+            // Validaciones básicas
+            if (string.IsNullOrWhiteSpace(model.name))
+                return BadRequest(new { message = "El nombre es obligatorio" });
+
+            if (string.IsNullOrWhiteSpace(model.city))
+                return BadRequest(new { message = "La ciudad es obligatoria" });
+
+            var sede = new Sede
+            {
+                name = model.name,
+                city = model.city,
+                region = model.region,
+                description = model.description,
+                maximumCapacity = model.maximumCapacity,
+                type = model.type,
+                priceLaundry = model.priceLaundry
+            };
+
+            _context.Sedes.Add(sede);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Sede registrada correctamente",
+                sede
+            });
         }
     }
 }

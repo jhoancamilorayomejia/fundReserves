@@ -39,6 +39,67 @@
                 Clientes
                 <span class="fr-badge fr-badge-customer" id="cnt-customers">0</span>
             </a>
+            <a href="#" class="fr-nav-item" data-section="sedes">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    Sedes
+    <span class="fr-badge fr-badge-admin" id="cnt-sedes">0</span>
+</a>
+
+  <!-- ══════════════════════════════════
+        Alojamiento
+    ══════════════════════════════════ -->
+
+<a href="#" class="fr-nav-item" data-section="accommodation">
+    <svg width="16" height="16" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="16" rx="2"/>
+        <path d="M7 12h10"/>
+        <path d="M7 8h4"/>
+    </svg>
+
+    Alojamientos
+
+    <span class="fr-badge fr-badge-customer"
+          id="cnt-accommodation">0</span>
+</a>
+
+  <!-- ══════════════════════════════════
+        Temporadas
+    ══════════════════════════════════ -->
+<a href="#" class="fr-nav-item" data-section="seasons">
+    <svg width="16" height="16" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 2v4"/>
+        <path d="M16 2v4"/>
+        <rect width="18" height="18" x="3" y="4" rx="2"/>
+        <path d="M3 10h18"/>
+    </svg>
+
+    Temporadas
+
+    <span class="fr-badge fr-badge-admin"
+          id="cnt-seasons">0</span>
+</a>
+
+
+<!-- ══════════════════════════════════
+        TARIFAS
+══════════════════════════════════ -->
+<a href="#" class="fr-nav-item" data-section="rates">
+    <svg width="16" height="16" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1v22"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+
+    Tarifas
+
+    <span class="fr-badge fr-badge-admin"
+          id="cnt-rates">0</span>
+</a>
         </nav>
 
         <div class="fr-sidebar-footer">
@@ -135,7 +196,7 @@
                             </tr>
                         </thead>
                         <tbody id="tb-resumen">
-                            <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
+                            <tr><td colspan="17" class="text-center text-muted py-4">Cargando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -209,6 +270,385 @@
             </div>
         </div>
 
+        <!-- ── SECCIÓN: SEDES ── -->
+<div class="fr-section d-none" id="sec-sedes">
+    <div class="fr-card">
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">Sedes registradas</h2>
+            <span class="fr-pill fr-pill-admin" id="lbl-sedes">0 registros</span>
+        </div>
+        
+        <!-- AQUÍ es el FORMULARIO -->
+        <div class="p-4 border-bottom">
+    <h5 class="mb-3">Agregar nueva sede</h5>
+
+    <form id="form-sede" class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Ciudad</label>
+            <input type="text" class="form-control" id="city" required>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Región</label>
+            <input type="text" class="form-control" id="region">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="type">
+                <option value="Hotel">Sede Recreativa</option>
+                <option value="Apartamento">Apartamento</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Capacidad máxima</label>
+            <input type="number" class="form-control" id="maximumCapacity">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Precio lavandería</label>
+            <input type="number" class="form-control" id="priceLaundry">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" id="description" rows="3"></textarea>
+        </div>
+
+        <div class="col-12">
+            <button type="submit"class="btn btn-dark"id="btn-sede">
+            Registrar sede
+        </button>
+        </div>
+
+    </form>
+</div>
+
+
+
+
+        <div class="table-responsive">
+            <table class="table fr-table mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Ciudad</th>
+                        <th>Región</th>
+                        <th>Tipo</th>
+                        <th>Capacidad Maxima</th>
+                        <th>Precio Lavanderia</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody id="tb-sedes">
+                    <tr><td colspan="9" class="text-center text-muted py-4">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ── SECCIÓN: ALOJAMIENTOS ── -->
+<div class="fr-section d-none" id="sec-accommodation">
+
+    <div class="fr-card">
+
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">
+                Alojamientos registrados
+            </h2>
+
+            <span class="fr-pill fr-pill-customer"
+                  id="lbl-accommodation">
+                0 registros
+            </span>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table fr-table mb-0">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Sede</th>
+                        <th>Nombre</th>
+                        <th>Número</th>
+                        <th>Máx. Personas</th>
+                        <th>Estado</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tb-accommodation">
+                    <tr>
+                        <td colspan="8"
+                            class="text-center text-muted py-4">
+                            Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+    <!-- ── SECCIÓN: TEMPORADAS ── -->
+<div class="fr-section d-none" id="sec-seasons">
+
+    <div class="fr-card">
+
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">
+                Temporadas registradas
+            </h2>
+
+            <span class="fr-pill fr-pill-admin"
+                  id="lbl-seasons">
+                0 registros
+            </span>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div class="p-4 border-bottom">
+
+            <h5 class="mb-3">Agregar temporada</h5>
+
+            <form id="form-season" class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">
+                        Fecha inicio
+                    </label>
+
+                    <input type="date"
+                           class="form-control"
+                           id="dateStart"
+                           required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">
+                        Fecha fin
+                    </label>
+
+                    <input type="date"
+                           class="form-control"
+                           id="dateFinish"
+                           required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">
+                        Tipo
+                    </label>
+
+                    <select class="form-select"
+                            id="seasonType">
+
+                        <option value="Alta">
+                            Temporada Alta
+                        </option>
+
+                        <option value="Baja">
+                            Temporada Baja
+                        </option>
+
+                        <option value="Especial">
+                            Temporada Especial
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit"
+                    class="btn btn-dark"id="btn-season">Registrar temporada
+                </button>
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-responsive">
+
+            <table class="table fr-table mb-0">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Fecha inicio</th>
+                        <th>Fecha fin</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tb-seasons">
+                    <tr>
+                        <td colspan="6"
+                            class="text-center text-muted py-4">
+                            Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<!-- ── SECCIÓN: RATES ── -->
+<div class="fr-section d-none" id="sec-rates">
+
+    <div class="fr-card">
+
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">
+                Tarifas registradas
+            </h2>
+
+            <span class="fr-pill fr-pill-admin"
+                  id="lbl-rates">
+                0 registros
+            </span>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div class="p-4 border-bottom">
+
+            <h5 class="mb-3">Agregar tarifa</h5>
+
+            <form id="form-rate" class="row g-3">
+
+                <div class="col-md-3">
+    <label class="form-label">Alojamiento</label>
+    <select class="form-select" id="idAccommodation" required>
+        <option value="">Selecciona un alojamiento...</option>
+    </select>
+</div>
+
+<div class="col-md-3">
+    <label class="form-label">Temporada</label>
+    <select class="form-select" id="idSeason" required>
+        <option value="">Selecciona una temporada...</option>
+    </select>
+</div>
+
+               
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Mínimo personas
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="minimumPerson"
+                           required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Máximo personas
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="maximumPerson"
+                           required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Precio noche
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="priceNight"
+                           required>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">
+                        Precio persona adicional
+                    </label>
+
+                    <input type="number"
+                           class="form-control"
+                           id="pricePersonAdditional"
+                           required>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit"
+                            class="btn btn-dark"
+                            id="btn-rate">
+
+                        Registrar tarifa
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-responsive">
+
+            <table class="table fr-table mb-0">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Alojamiento</th>
+                        <th>Temporada</th>
+                        <th>Mínimo Personas</th>
+                        <th>Máximo Personas</th>
+                        <th>Precio Noche</th>
+                        <th>Precio Persona Adicional</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tb-rates">
+                    <tr>
+                        <td colspan="9"
+                            class="text-center text-muted py-4">
+                            Cargando...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
     </main>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -218,11 +658,16 @@
            ESTADO GLOBAL
         ══════════════════════════════ */
         let allUsers = [];
+        
 
         const SECTIONS = {
             resumen:   { title: 'Resumen',          sub: 'Panel de control general' },
             admins:    { title: 'Administradores',   sub: 'Usuarios con rol Admin' },
-            customers: { title: 'Clientes',          sub: 'Usuarios con rol Customer' }
+            customers: { title: 'Clientes',          sub: 'Usuarios con rol Customer' },
+            sedes: { title: 'Sedes', sub: 'Sedes y apartamentos registrados' },
+            accommodation: {title: 'Alojamientos',sub: 'Habitaciones y apartamentos registrados'},
+            seasons: {title: 'Temporadas',sub: 'Temporadas altas, bajas y especiales'},
+            rates: {title: 'Tarifas',sub: 'Tarifas por temporada y alojamiento'}
         };
 
         /* ══════════════════════════════
@@ -382,6 +827,319 @@ function filaCustomer(u, i) {
         }
 
         /* ══════════════════════════════
+   SEDES
+══════════════════════════════ */
+let allSedes = [];
+
+/* ══════════════════════════════
+   ACCOMMODATION
+══════════════════════════════ */
+let allAccommodation = [];
+
+let allSeasons = [];
+
+let allRates = [];
+
+// ✅ Así debe quedar — usa el campo que ya viene del backend
+function filaAccommodation(a, i) {
+    const estado = a.state === 'Disponible'
+        ? '<span class="badge bg-success">Disponible</span>'
+        : `<span class="badge bg-secondary">${a.state || '—'}</span>`;
+
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${a.idAccommodation}</td>
+        <td><span class="fw-500">${a.sede || '—'}</span></td>  <!-- ✅ directo -->
+        <td>${a.name || '—'}</td>
+        <td class="fr-mono">${a.number || '—'}</td>
+        <td>${a.maximumPerson || '—'}</td>
+        <td>${estado}</td>
+        <td class="text-muted" style="max-width:260px;font-size:12.5px">${a.description || '—'}</td>
+    </tr>`;
+}
+
+function renderAccommodation(accommodation) {
+
+    document.getElementById('cnt-accommodation').textContent =
+        accommodation.length;
+
+    document.getElementById('lbl-accommodation').textContent =
+        `${accommodation.length} registros`;
+
+    document.getElementById('tb-accommodation').innerHTML =
+        accommodation.length
+            ? accommodation.map(filaAccommodation).join('')
+            : `
+                <tr>
+                    <td colspan="8"
+                        class="text-center text-muted py-4">
+                        No hay alojamientos registrados
+                    </td>
+                </tr>
+            `;
+}
+
+function filaSeason(s, i) {
+
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+
+        <td class="fr-mono text-muted">
+            ${s.idSeason || '—'}
+        </td>
+
+        <td>
+            ${fmtFecha(s.dateStart)}
+        </td>
+
+        <td>
+            ${fmtFecha(s.dateFinish)}
+        </td>
+
+        <td>
+            <span class="fr-pill ${
+                s.type === 'Alta'
+                    ? 'fr-pill-admin'
+                    : s.type === 'Baja'
+                        ? 'fr-pill-customer'
+                        : 'fr-pill'
+            }">
+                ${s.type || '—'}
+            </span>
+        </td>
+
+        <td>
+            <button class="btn btn-sm btn-outline-danger"
+                onclick="eliminarTemporada(${s.idSeason}, '${s.type}')">
+                Eliminar
+            </button>
+        </td>
+    </tr>`;
+}
+
+function renderSeasons(seasons) {
+
+    document.getElementById('cnt-seasons').textContent =
+        seasons.length;
+
+    document.getElementById('lbl-seasons').textContent =
+        `${seasons.length} registros`;
+
+    document.getElementById('tb-seasons').innerHTML =
+        seasons.length
+            ? seasons.map(filaSeason).join('')
+            : `
+                <tr>
+                    <td colspan="6"
+                        class="text-center text-muted py-4">
+                        No hay temporadas registradas
+                    </td>
+                </tr>
+            `;
+}
+
+function filaRate(r, i) {
+
+    return `<tr>
+
+        <td class="fr-mono text-muted">${i + 1}</td>
+
+        <td class="fr-mono text-muted">
+            ${r.idPrice || '—'}
+        </td>
+
+        <td>
+            ${r.accommodationName || r.idAccommodation}
+        </td>
+
+        <td>
+            ${r.seasonType || r.idSeason}
+        </td>
+
+        <td>
+            ${r.minimumPerson || '—'}
+        </td>
+
+        <td>
+            ${r.maximumPerson || '—'}
+        </td>
+
+        <td class="fr-mono">
+            ${fmtPrecio(r.priceNight)}
+        </td>
+
+        <td class="fr-mono">
+            ${fmtPrecio(r.pricePersonAdditional)}
+        </td>
+        <td>
+    <button class="btn btn-sm btn-outline-danger"
+        onclick="eliminarRate(${r.idPrice})">
+
+        Eliminar
+    </button>
+</td>
+
+    </tr>`;
+}
+
+function renderRates(rates) {
+
+    document.getElementById('cnt-rates').textContent =
+        rates.length;
+
+    document.getElementById('lbl-rates').textContent =
+        `${rates.length} registros`;
+
+    document.getElementById('tb-rates').innerHTML =
+        rates.length
+            ? rates.map(filaRate).join('')
+            : `
+                <tr>
+                    <td colspan="8"
+                        class="text-center text-muted py-4">
+                        No hay tarifas registradas
+                    </td>
+                </tr>
+            `;
+}
+
+async function cargarRates() {
+
+    try {
+
+        const res = await fetch('/api/rates/all');
+
+        if (!res.ok)
+            throw new Error(`HTTP ${res.status}`);
+
+        allRates = await res.json();
+
+        console.log('[FoundReserves] Rates:', allRates);
+
+        renderRates(allRates);
+
+    } catch (err) {
+
+        console.error(
+            '[FoundReserves] Error rates:',
+            err
+        );
+
+        document.getElementById('tb-rates').innerHTML =
+            `
+            <tr>
+                <td colspan="8"
+                    class="text-center text-danger py-4">
+                    Error al cargar tarifas
+                </td>
+            </tr>
+            `;
+    }
+}
+
+/* ══════════════════════════════
+   POBLAR SELECTS DEL FORM RATE
+══════════════════════════════ */
+function poblarSelectAccommodation(accommodations) {
+    const sel = document.getElementById('idAccommodation');
+    const valorActual = sel.value;
+    sel.innerHTML = '<option value="">Selecciona un alojamiento...</option>';
+    accommodations.forEach(a => {
+        const nombre = a.name || '';
+        const numero = a.number ? ` — N° ${a.number}` : '';
+        const label  = `${nombre}${numero}` || `Alojamiento ${a.idAccommodation}`;
+        sel.innerHTML += `<option value="${a.idAccommodation}">${label}</option>`;
+    });
+    if (valorActual) sel.value = valorActual;
+}
+
+function poblarSelectSeason(seasons) {
+    const sel = document.getElementById('idSeason');
+    const valorActual = sel.value;
+    sel.innerHTML = '<option value="">Selecciona una temporada...</option>';
+    seasons.forEach(s => {
+        const inicio  = fmtFecha(s.dateStart);
+        const fin     = fmtFecha(s.dateFinish);
+        sel.innerHTML += `<option value="${s.idSeason}">${s.idSeason} — ${s.type} (${inicio} → ${fin})</option>`;
+    });
+    if (valorActual) sel.value = valorActual;
+}
+
+async function cargarSeasons() {
+    try {
+        const res = await fetch('/api/seasons/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allSeasons = await res.json();
+        renderSeasons(allSeasons);
+        poblarSelectSeason(allSeasons); // ← agrega esto
+    } catch (err) {
+        console.error('[FoundReserves] Error seasons:', err);
+        document.getElementById('tb-seasons').innerHTML =
+            `<tr><td colspan="6" class="text-center text-danger py-4">Error al cargar temporadas</td></tr>`;
+    }
+}
+
+async function cargarAccommodation() {
+    try {
+        const res = await fetch('/api/accommodation/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allAccommodation = await res.json();
+        renderAccommodation(allAccommodation);
+        poblarSelectAccommodation(allAccommodation); // ← agrega esto
+    } catch (err) {
+        console.error('[FoundReserves] Error accommodation:', err);
+        document.getElementById('tb-accommodation').innerHTML =
+            `<tr><td colspan="8" class="text-center text-danger py-4">Error al cargar alojamientos</td></tr>`;
+    }
+}
+
+function fmtPrecio(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('es-CO', {
+        style: 'currency', currency: 'COP', maximumFractionDigits: 0
+    });
+}
+
+function filaSede(s, i) {
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${s.idSede}</td>
+        <td><span class="fw-500">${s.name || '—'}</span></td>
+        <td>${s.city || '—'}</td>
+        <td>${s.region || '—'}</td>
+        <td>
+            <span class="fr-pill ${s.type?.toLowerCase().includes('apart') ? 'fr-pill-customer' : 'fr-pill-admin'}">
+                ${s.type || '—'}
+            </span>
+        </td>
+        <td class="fr-mono">${s.maximumCapacity ?? '—'} <small class="text-muted">pers.</small></td>
+        <td class="fr-mono">${fmtPrecio(s.priceLaundry)}</td>
+        <td class="text-muted" style="max-width:260px;font-size:12.5px">${s.description || '—'}</td>
+    </tr>`;
+}
+
+function renderSedes(sedes) {
+    document.getElementById('cnt-sedes').textContent  = sedes.length;
+    document.getElementById('lbl-sedes').textContent  = `${sedes.length} registros`;
+    document.getElementById('tb-sedes').innerHTML = sedes.length
+        ? sedes.map(filaSede).join('')
+        : `<tr><td colspan="9" class="text-center text-muted py-4">No hay sedes registradas</td></tr>`;
+}
+
+async function cargarSedes() {
+    try {
+        const res = await fetch('/api/sedes/all');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allSedes = await res.json();
+        renderSedes(allSedes);
+    } catch (err) {
+        console.error('[FoundReserves] Error sedes:', err);
+        document.getElementById('tb-sedes').innerHTML =
+            `<tr><td colspan="9" class="text-center text-danger py-4">Error al cargar sedes</td></tr>`;
+    }
+}
+
+        /* ══════════════════════════════
            CARGA DE DATOS
         ══════════════════════════════ */
         async function cargarUsuarios() {
@@ -491,10 +1249,256 @@ function filaCustomer(u, i) {
     }
 }
 
+async function eliminarTemporada(id, tipo) {
+
+    const confirmar = confirm(
+        `¿Estás seguro de eliminar la temporada "${tipo}"?\n\n` +
+        `Esta acción no se puede deshacer.`
+    );
+
+    if (!confirmar) return;
+
+    try {
+
+        const res = await fetch(`/api/seasons/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) {
+
+            const err = await res.json();
+
+            alert(err.message || 'Error al eliminar temporada');
+
+            return;
+        }
+
+        // Actualizar lista local
+        allSeasons = allSeasons.filter(s => s.idSeason !== id);
+
+        renderSeasons(allSeasons);
+
+        alert('Temporada eliminada correctamente');
+
+    } catch (err) {
+
+        console.error('[FoundReserves] Error eliminar temporada:', err);
+
+        alert('Error de conexión');
+    }
+}
+
+
+/* ══════════════════════════════
+   REGISTRAR TEMPORADA
+══════════════════════════════ */
+document.getElementById('form-season').addEventListener('submit', async function(e) {
+
+
+    e.preventDefault();
+
+    const body = {
+        dateStart: document.getElementById('dateStart').value,
+        dateFinish: document.getElementById('dateFinish').value,
+        type: document.getElementById('seasonType').value
+    };
+
+    try {
+
+        const res = await fetch('/api/seasons/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || 'Error al registrar temporada');
+            return;
+        }
+
+        alert('Temporada registrada correctamente');
+
+        document.getElementById('form-season').reset();
+
+        cargarSeasons();
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert('Error de conexión');
+    }
+});
+
+
+/* ══════════════════════════════
+   REGISTRAR SEDE
+══════════════════════════════ */
+document.getElementById('form-sede').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const body = {
+        name: document.getElementById('name').value,
+        city: document.getElementById('city').value,
+        region: document.getElementById('region').value,
+        type: document.getElementById('type').value,
+        maximumCapacity: parseInt(document.getElementById('maximumCapacity').value),
+        priceLaundry: parseFloat(document.getElementById('priceLaundry').value),
+        description: document.getElementById('description').value
+    };
+
+    try {
+
+        const res = await fetch('/api/sedes/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || 'Error al registrar sede');
+            return;
+        }
+
+        alert('Sede registrada correctamente');
+
+        document.getElementById('form-sede').reset();
+
+        cargarSedes();
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert('Error de conexión');
+    }
+});
+
+/* ══════════════════════════════
+   REGISTRAR RATE
+══════════════════════════════ */
+document.getElementById('form-rate').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const body = {
+
+        idAccommodation: parseInt(
+            document.getElementById('idAccommodation').value
+        ),
+
+        idSeason: parseInt(
+            document.getElementById('idSeason').value
+        ),
+
+        minimumPerson: parseInt(
+            document.getElementById('minimumPerson').value
+        ),
+
+        maximumPerson: parseInt(
+            document.getElementById('maximumPerson').value
+        ),
+
+        priceNight: parseFloat(
+            document.getElementById('priceNight').value
+        ),
+
+        pricePersonAdditional: parseFloat(
+            document.getElementById('pricePersonAdditional').value
+        )
+    };
+
+    try {
+
+        const res = await fetch('/api/rates/create', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+
+            alert(data.message || 'Error al registrar tarifa');
+
+            return;
+        }
+
+        alert('Tarifa registrada correctamente');
+
+        document.getElementById('form-rate').reset();
+
+        cargarRates();
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert('Error de conexión');
+    }
+});
+
+async function eliminarRate(id) {
+
+    const confirmar = confirm(
+        '¿Deseas eliminar esta tarifa?'
+    );
+
+    if (!confirmar) return;
+
+    try {
+
+        const res = await fetch(`/api/rates/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) {
+
+            const err = await res.json();
+
+            alert(err.message || 'Error al eliminar');
+
+            return;
+        }
+
+        allRates = allRates.filter(r => r.idPrice !== id);
+
+        renderRates(allRates);
+
+        alert('Tarifa eliminada correctamente');
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert('Error de conexión');
+    }
+}
+
+
         /* ══════════════════════════════
-           INICIO
+        INICIO
         ══════════════════════════════ */
         cargarUsuarios();
+        cargarSedes();
+        cargarAccommodation();
+        cargarSeasons();
+        cargarRates();
 
     </script>
 </body>
