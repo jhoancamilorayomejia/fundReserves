@@ -103,6 +103,26 @@ public IActionResult DashboardCustomer()
     return View("~/Views/Customer/DashboardCustomer.cshtml");
 }
 
+public IActionResult ReservesCustomer(int? idSede)
+{
+    var email = HttpContext.Session.GetString("UserEmail");
+    var rol   = HttpContext.Session.GetString("UserRol");
+
+    if (email == null || rol != "Customer")
+        return RedirectToAction("Index");
+
+    ViewBag.Email    = email;
+    ViewBag.Rol      = rol;
+    ViewBag.IdUser   = HttpContext.Session.GetInt32("IdUser");
+    ViewBag.Cedula   = HttpContext.Session.GetString("UserCedula");
+    ViewBag.Name     = HttpContext.Session.GetString("UserName");
+    ViewBag.Lastname = HttpContext.Session.GetString("UserLastname");
+    ViewBag.Phone    = HttpContext.Session.GetString("UserPhone");
+    ViewBag.IdSede   = idSede;  // <-- nuevo
+
+    return View("~/Views/Customer/reservesCustomer.cshtml");
+}
+
     [HttpPost]
     public IActionResult Logout()
     {

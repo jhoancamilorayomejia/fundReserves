@@ -174,7 +174,9 @@
 
         <div class="fc-modal-footer">
             <button class="fc-btn-secondary" id="modal-btn-cerrar">Cerrar</button>
-            <button class="fc-btn-primary"   id="modal-btn-reservar">Reservar ahora</button>
+            <button class="fc-btn-primary" id="modal-btn-reservar"onclick="irAReserva()">
+                Reservar ahora
+            </button>
         </div>
 
     </div>
@@ -335,6 +337,7 @@ function abrirModal(idSede) {
     document.getElementById('modal-tipo-badge').textContent = s.type || '—';
 
     // Datos
+    document.getElementById('modal-btn-reservar').dataset.idSede = s.idSede;
     document.getElementById('modal-nombre').textContent     = s.name            || '—';
     document.getElementById('modal-ciudad').textContent     = s.city            || '—';
     document.getElementById('modal-desc').textContent       = s.description     || '—';
@@ -389,6 +392,12 @@ function activarTab(tab) {
 document.querySelectorAll('[data-tab]').forEach(el => {
     el.addEventListener('click', () => activarTab(el.dataset.tab));
 });
+
+function irAReserva() {
+    const btn    = document.getElementById('modal-btn-reservar');
+    const idSede = btn.dataset.idSede || '';
+    window.location.href = `/Home/ReservesCustomer?idSede=${idSede}`;
+}
 
 /* ══════════════════════════════════════
    BUSCADOR

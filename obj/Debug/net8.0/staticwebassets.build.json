@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "sLQaOCBuVfGOUpmBo0t9uYKl6TVkfahQT5L3a45VD5M=",
+  "Hash": "IJj7wu7lRXe7LjlKCwVSBZhsszzVgreGWnd2qKNIvpY=",
   "Source": "FoundReserves",
   "BasePath": "_content/FoundReserves",
   "Mode": "Default",
@@ -110,6 +110,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/login.css"
+    },
+    {
+      "Identity": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/reservesCustomer.css",
+      "SourceId": "FoundReserves",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/",
+      "BasePath": "_content/FoundReserves",
+      "RelativePath": "css/reservesCustomer.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/reservesCustomer.css"
     },
     {
       "Identity": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/site.css",

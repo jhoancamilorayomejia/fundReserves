@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets/css/login.css"
     },
     {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/reservesCustomer.css",
+      "PackagePath": "staticwebassets/css/reservesCustomer.css"
+    },
+    {
       "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },
