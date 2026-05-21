@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<!-- TOPBAR (reutiliza el mismo de dashboardCustomer) -->
+<!-- TOPBAR -->
 <header class="fc-topbar">
     <div class="fc-topbar-left">
         <div class="fc-brand">
@@ -45,7 +45,6 @@
 <!-- MAIN -->
 <main class="rv-main">
 
-    <!-- Cabecera -->
     <div class="rv-page-header">
         <button class="rv-back-btn" onclick="history.back()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -59,11 +58,9 @@
         </div>
     </div>
 
-    <!-- Card del formulario -->
     <div class="rv-card-wrap">
         <div class="rv-card">
 
-            <!-- Encabezado de la card -->
             <div class="rv-card-header">
                 <div class="fc-modal-close rv-card-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -79,20 +76,15 @@
                 </div>
             </div>
 
-            <!-- Formulario -->
             <div class="rv-form" id="rv-form">
 
-                <!-- ── Sección: Información del usuario ── -->
+                <!-- Información del usuario -->
                 <div>
                     <p class="rv-section-label">Información del usuario</p>
                     <div class="rv-grid-1">
                         <div class="rv-field">
                             <label for="idUser">ID de usuario</label>
-                            <input type="text"
-                                   id="idUser"
-                                   name="idUser"
-                                   value="@ViewBag.IdUser"
-                                   disabled />
+                            <input type="text" id="idUser" name="idUser" value="@ViewBag.IdUser" disabled />
                             <span class="rv-field-hint">Tu identificador de sesión — no editable</span>
                         </div>
                     </div>
@@ -100,19 +92,37 @@
 
                 <hr class="rv-divider" />
 
-                <!-- ── Sección: Alojamiento y fechas ── -->
+                <!-- Alojamiento y fechas -->
                 <div>
                     <p class="rv-section-label">Alojamiento y fechas</p>
                     <div class="rv-grid-2">
 
+                        <!-- Selector de habitaciones (multi) -->
                         <div class="rv-field" style="grid-column: 1 / -1;">
-                            <label>Alojamiento <span style="color:#ef4444">*</span></label>
-                            <input type="hidden" id="idAccommodation" name="idAccommodation" />
+                            <label>
+                                Alojamiento(s) <span style="color:#ef4444">*</span>
+                                <span style="font-weight:400;font-size:12px;color:var(--text-muted,#9ca3af);margin-left:6px;">
+                                    Puedes seleccionar varias habitaciones
+                                </span>
+                            </label>
+
                             <div class="rv-acc-grid" id="acc-grid">
-                            <div class="rv-acc-loading">Cargando alojamientos...</div>
-                        </div>
+                                <div class="rv-acc-loading">Cargando alojamientos...</div>
+                            </div>
+
+                            <!-- Resumen de selección -->
+                            <div id="selection-summary"></div>
+
+                            <!-- Tarifas del primer alojamiento seleccionado -->
+                            <div id="rates-panel" style="display:none; margin-top:16px;">
+                                <p class="rv-section-label" style="margin-bottom:8px;">
+                                    Tarifas disponibles
+                                </p>
+                                <div id="rates-table-wrap"></div>
+                            </div>
+
                             <span class="rv-field-hint" id="acc-hint" style="display:none;">
-                            Selecciona un alojamiento para continuar
+                                Selecciona al menos un alojamiento para continuar
                             </span>
                         </div>
 
@@ -127,56 +137,47 @@
                         </div>
 
                         <div class="rv-field">
-                            <label for="numberOfPersons">Número de personas <span style="color:#ef4444">*</span></label>
-                            <input type="number"
-                                   id="numberOfPersons"
-                                   name="numberOfPersons"
-                                   min="1"
-                                   placeholder="Ej: 2"
-                                   required />
-                        </div>
+    <label for="numberOfPersons">Número de personas <span style="color:#ef4444">*</span></label>
+    <input type="number" id="numberOfPersons" name="numberOfPersons"
+           min="1" placeholder="Ej: 2" required />
+    <span class="rv-field-hint" id="persons-hint">Selecciona un alojamiento para ver el máximo</span>
+</div>
+
+<!-- ✅ NUEVO: personas adicionales -->
+<div class="rv-field" id="extra-persons-field" style="display:none;">
+    <label for="extraPersons">¿Personas adicionales?</label>
+    <input type="number" id="extraPersons" name="extraPersons"
+           min="0" value="0" placeholder="0" />
+    <span class="rv-field-hint" id="extra-persons-hint"></span>
+</div>
 
                         <div class="rv-field">
                             <label for="status">Estado</label>
-                            <input type="text"
-                                   id="status"
-                                   name="status"
-                                   value="Pendiente"
-                                   readonly />
+                            <input type="text" id="status" name="status" value="Pendiente" readonly />
                             <span class="rv-field-hint">Asignado automáticamente</span>
                         </div>
 
                         <div class="rv-field" style="grid-column: 1 / -1;">
                             <label for="createdAt">Fecha de creación</label>
-                            <input type="text"
-                                   id="createdAt"
-                                   name="createdAt"
-                                   readonly />
+                            <input type="text" id="createdAt" name="createdAt" readonly />
                             <span class="rv-field-hint">Generada automáticamente al guardar</span>
                         </div>
-
                     </div>
                 </div>
 
                 <hr class="rv-divider" />
 
-                <!-- ── Sección: Servicio de lavandería (condicional) ── -->
+                <!-- Lavandería -->
                 <div id="laundry-section">
                     <p class="rv-section-label">Servicios adicionales</p>
-
                     <div class="rv-laundry-wrap" id="laundry-wrap">
-                        <input type="checkbox"
-                               class="rv-laundry-check"
-                               id="laundryService"
-                               name="laundryService" />
+                        <input type="checkbox" class="rv-laundry-check" id="laundryService" name="laundryService" />
                         <div class="rv-laundry-info">
                             <strong>Servicio de lavandería</strong>
                             <span>Incluye lavado y planchado de ropa durante tu estadía</span>
                         </div>
                         <span class="rv-laundry-price" id="laundry-price-label">—</span>
                     </div>
-
-                    <!-- Mensaje cuando no hay servicios disponibles -->
                     <p id="no-services-msg"
                        style="font-size:12px;color:var(--text-muted,#9ca3af);display:none;">
                         El alojamiento seleccionado no tiene servicios adicionales disponibles.
@@ -185,20 +186,18 @@
 
                 <hr class="rv-divider" />
 
-                <!-- ── Total calculado ── -->
+                <!-- Total -->
                 <div class="rv-total-box">
                     <div class="rv-total-label">
                         Total a pagar
-                        <small id="total-breakdown">Selecciona alojamiento y fechas para calcular</small>
+                        <small id="total-breakdown">Selecciona alojamientos y fechas para calcular</small>
                     </div>
                     <span class="rv-total-amount" id="total-amount">$ —</span>
                 </div>
 
-                <!-- ── Pie ── -->
+                <!-- Pie -->
                 <div class="rv-form-footer">
-                    <button type="button" class="rv-btn-cancel" onclick="history.back()">
-                        Cancelar
-                    </button>
+                    <button type="button" class="rv-btn-cancel" onclick="history.back()">Cancelar</button>
                     <button type="button" class="rv-btn-submit" id="btn-submit" disabled onclick="submitReserva()">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <polyline points="20 6 9 17 4 12"/>
@@ -208,31 +207,25 @@
                 </div>
 
             </div>
-            <!-- /rv-form -->
-
         </div>
     </div>
-    <!-- /rv-card-wrap -->
 
 </main>
 
-<!-- Toast -->
 <div class="rv-toast" id="rv-toast"></div>
 
-
-<!-- ════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════ SCRIPTS ════════════════════════════════════════ -->
 <script>
 
 /* ══════════════════════════════════════
-   ESTADO
+   ESTADO GLOBAL
 ══════════════════════════════════════ */
-const userId       = '@ViewBag.IdUser';
-let   allSedes     = [];      // datos completos de sedes (para obtener priceLaundry)
-let   selectedSede = null;    // sede del alojamiento seleccionado
-let   ratePerNight = 0;       // tarifa noche calculada por SP / API
-let   laundryPrice = 0;       // precio lavandería de la sede
+const userId = '@ViewBag.IdUser';
+
+let allSedes      = [];
+let allRatesCache = {};
+const selectedRooms = new Map();
+let laundryPrice  = 0;
 
 /* ══════════════════════════════════════
    HELPERS
@@ -245,10 +238,10 @@ function fmtCOP(n) {
 }
 
 function diffDays(start, end) {
-    const s = new Date(start);
-    const e = new Date(end);
-    const diff = (e - s) / (1000 * 60 * 60 * 24);
-    return diff > 0 ? diff : 0;
+    const s = new Date(start + 'T00:00:00');
+    const e = new Date(end   + 'T00:00:00');
+    const d = (e - s) / 86400000;
+    return d > 0 ? d : 0;
 }
 
 function showToast(msg, type = '') {
@@ -258,15 +251,12 @@ function showToast(msg, type = '') {
     setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-/* Fecha actual en formato YYYY-MM-DD */
-function today() {
-    return new Date().toISOString().split('T')[0];
-}
+function today() { return new Date().toISOString().split('T')[0]; }
 
 /* ══════════════════════════════════════
    CARGA DE ALOJAMIENTOS
 ══════════════════════════════════════ */
-const idSedeParam = '@ViewBag.IdSede'; // viene del controller
+const idSedeParam = '@ViewBag.IdSede';
 
 async function cargarAlojamientos() {
     try {
@@ -291,15 +281,15 @@ async function cargarAlojamientos() {
         grid.innerHTML = '';
 
         filtrados.forEach((a, i) => {
-            const nombre = a.name || `Alojamiento ${a.number}`;
-            const desc   = a.description || '';
+            const nombre    = a.name || `Alojamiento ${a.number}`;
+            const desc      = a.description || '';
             const descCorta = desc.length > 80 ? desc.substring(0, 80) + '…' : desc;
 
             const card = document.createElement('div');
-            card.className       = 'rv-acc-card';
-            card.dataset.id      = a.idAccommodation;
-            card.dataset.idSede  = a.idsede || '';
-            card.dataset.maxPersons = a.maximumPerson || 0;
+            card.className            = 'rv-acc-card';
+            card.dataset.id           = a.idAccommodation;
+            card.dataset.idSede       = a.idsede || '';
+            card.dataset.maxPersons   = a.maximumPerson || 0;
             card.style.animationDelay = `${i * 40}ms`;
 
             card.innerHTML = `
@@ -324,14 +314,16 @@ async function cargarAlojamientos() {
                 ${descCorta ? `<div class="rv-acc-desc">${descCorta}</div>` : ''}
             `;
 
-            card.addEventListener('click', () => seleccionarAlojamiento(card, a));
+            card.addEventListener('click', () => {
+                const delta = selectedRooms.has(String(a.idAccommodation)) ? -1 : +1;
+                cambiarCantidad(null, a.idAccommodation, delta, a);
+            });
+
             grid.appendChild(card);
         });
 
-        // Si solo hay uno, seleccionarlo automáticamente
         if (filtrados.length === 1) {
-            const unica = grid.querySelector('.rv-acc-card');
-            seleccionarAlojamiento(unica, filtrados[0]);
+            cambiarCantidad(null, filtrados[0].idAccommodation, +1, filtrados[0]);
         }
 
     } catch (err) {
@@ -340,78 +332,297 @@ async function cargarAlojamientos() {
     }
 }
 
-function seleccionarAlojamiento(card, a) {
-    // Quitar selección previa
-    document.querySelectorAll('.rv-acc-card').forEach(c => c.classList.remove('selected'));
+/* ══════════════════════════════════════
+   CAMBIAR CANTIDAD — máx 1 por alojamiento
+══════════════════════════════════════ */
+function cambiarCantidad(event, idAccommodation, delta, accommodationData) {
+    const id   = String(idAccommodation);
+    const card = document.querySelector(`.rv-acc-card[data-id="${id}"]`);
 
-    // Marcar nueva
-    card.classList.add('selected');
+    let entry = selectedRooms.get(id);
+    if (!entry) {
+        entry = { data: accommodationData || { idAccommodation }, qty: 0 };
+    }
 
-    // Actualizar input hidden
-    document.getElementById('idAccommodation').value = a.idAccommodation;
+    const nueva = entry.qty + delta;
+    if (nueva > 1 || nueva < 0) return;
 
-    // Actualizar sede y lavandería
-    selectedSede = allSedes.find(s => String(s.idSede) === String(a.idsede)) || null;
-    laundryPrice = selectedSede?.priceLaundry > 0 ? selectedSede.priceLaundry : 0;
+    entry.qty = nueva;
 
-    actualizarLaundry();
+    if (entry.qty === 1) {
+        selectedRooms.set(id, entry);
+        card.classList.add('selected');
+    } else {
+        selectedRooms.delete(id);
+        card.classList.remove('selected');
+    }
+
+    actualizarLaundryDesdeSedes();
+    actualizarMaxPersonas();
+
+    const primeraId = [...selectedRooms.keys()][0];
+    if (primeraId) cargarTarifas(primeraId);
+    else document.getElementById('rates-panel').style.display = 'none';
+
+    actualizarResumenSeleccion();
     calcularTotal();
 }
 
 /* ══════════════════════════════════════
-   EVENTO: CAMBIO DE ALOJAMIENTO
+   MÁX PERSONAS SEGÚN ALOJAMIENTOS
 ══════════════════════════════════════ */
-document.getElementById('idAccommodation').addEventListener('change', function () {
-    const opt    = this.options[this.selectedIndex];
-    const idSede = opt.dataset.idSede;
+function actualizarMaxPersonas() {
+    const input      = document.getElementById('numberOfPersons');
+    const hint       = document.getElementById('persons-hint');
+    const extraField = document.getElementById('extra-persons-field');
+    const extraHint  = document.getElementById('extra-persons-hint');
 
-    selectedSede = allSedes.find(s => String(s.idSede) === String(idSede)) || null;
-    laundryPrice = selectedSede?.priceLaundry > 0 ? selectedSede.priceLaundry : 0;
+    if (selectedRooms.size === 0) {
+        input.removeAttribute('max');
+        input.title      = '';
+        hint.textContent = 'Selecciona un alojamiento para ver el máximo';
+        extraField.style.display = 'none';
+        return;
+    }
 
-    actualizarLaundry();
-    calcularTotal();
-});
+    const maxPermitido = Math.min(
+        ...[...selectedRooms.values()].map(e => Number(e.data.maximumPerson) || 999)
+    );
+
+    input.max        = maxPermitido;
+    input.title      = `Máximo ${maxPermitido} personas`;
+    hint.textContent = `Máximo ${maxPermitido} personas para este alojamiento`;
+
+    extraField.style.display = 'block';
+    extraHint.textContent    = `Personas extra fuera de la capacidad máxima (${maxPermitido})`;
+
+    const actual = parseInt(input.value) || 0;
+    if (actual > maxPermitido) {
+        input.value = maxPermitido;
+        showToast(`Máximo ${maxPermitido} personas. Usa "Personas adicionales" para más.`, 'error');
+    }
+}
 
 /* ══════════════════════════════════════
-   LAVANDERÍA — mostrar / ocultar
+   LAVANDERÍA DESDE SEDES
+══════════════════════════════════════ */
+function actualizarLaundryDesdeSedes() {
+    if (selectedRooms.size === 0) {
+        laundryPrice = 0;
+        actualizarLaundry();
+        return;
+    }
+    const primeraEntry = [...selectedRooms.values()][0];
+    const idSede = primeraEntry.data.idsede;
+    const sede   = allSedes.find(s => String(s.idSede) === String(idSede));
+    laundryPrice = sede?.priceLaundry > 0 ? sede.priceLaundry : 0;
+    actualizarLaundry();
+}
+
+/* ══════════════════════════════════════
+   RESUMEN DE SELECCIÓN (chips)
+══════════════════════════════════════ */
+function actualizarResumenSeleccion() {
+    const summary = document.getElementById('selection-summary');
+    if (selectedRooms.size === 0) {
+        summary.className = '';
+        summary.innerHTML = '';
+        return;
+    }
+
+    let html = '<strong style="margin-right:4px;">Seleccionados:</strong>';
+    for (const [id, entry] of selectedRooms) {
+        const nombre = entry.data.name || `Aloj. ${entry.data.number || id}`;
+        html += `<span class="rv-sel-chip">${nombre}</span>`;
+    }
+    summary.className = 'visible';
+    summary.innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   TARIFAS (primer alojamiento seleccionado)
+══════════════════════════════════════ */
+async function cargarTarifas(idAccommodation) {
+    const panel = document.getElementById('rates-panel');
+    const wrap  = document.getElementById('rates-table-wrap');
+
+    panel.style.display = 'block';
+    wrap.innerHTML = '<p class="rv-rates-loading">Cargando tarifas...</p>';
+
+    try {
+        const rates = await fetchRates(idAccommodation);
+
+        if (!rates || !rates.length) {
+            wrap.innerHTML = '<p class="rv-rates-empty">No hay tarifas registradas para este alojamiento.</p>';
+            return;
+        }
+
+        const rows = rates.map(r => `
+            <tr>
+                <td>
+                    <span class="rv-rate-badge ${badgeClass(r.seasonType)}">${r.seasonName || '—'}</span>
+                    ${r.seasonType
+                        ? `<span style="font-size:11px;color:var(--text-muted,#9ca3af);margin-left:6px;">${r.seasonType}</span>`
+                        : ''}
+                </td>
+                <td>Mín. ${r.minimumPerson} – Máx. ${r.maximumPerson} pers.</td>
+                <td style="font-weight:600;">${fmtCOP(r.priceNight)}</td>
+                <td>${fmtCOP(r.pricePersonAdditional)}</td>
+            </tr>
+        `).join('');
+
+        wrap.innerHTML = `
+            <table class="rv-rates-table">
+                <thead>
+                    <tr>
+                        <th>Temporada</th>
+                        <th>Cant. Personas</th>
+                        <th>Precio / noche</th>
+                        <th>Pers. adicional</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+    } catch (err) {
+        console.error('[FR] Error tarifas:', err);
+        wrap.innerHTML = '<p class="rv-rates-empty">No se pudieron cargar las tarifas.</p>';
+    }
+}
+
+async function fetchRates(idAccommodation) {
+    if (allRatesCache[idAccommodation]) return allRatesCache[idAccommodation];
+    const res = await fetch(`/api/rates/byAccommodation/${idAccommodation}`);
+    if (res.status === 404) return [];
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rates = await res.json();
+    allRatesCache[idAccommodation] = rates;
+    return rates;
+}
+
+/* ══════════════════════════════════════
+   LAVANDERÍA
 ══════════════════════════════════════ */
 function actualizarLaundry() {
-    const wrap   = document.getElementById('laundry-wrap');
-    const noMsg  = document.getElementById('no-services-msg');
-    const label  = document.getElementById('laundry-price-label');
-    const check  = document.getElementById('laundryService');
+    const wrap  = document.getElementById('laundry-wrap');
+    const noMsg = document.getElementById('no-services-msg');
+    const label = document.getElementById('laundry-price-label');
+    const check = document.getElementById('laundryService');
 
     if (laundryPrice > 0) {
         wrap.classList.add('visible');
-        noMsg.style.display  = 'none';
-        label.textContent    = fmtCOP(laundryPrice);
+        noMsg.style.display = 'none';
+        label.textContent   = fmtCOP(laundryPrice);
     } else {
         wrap.classList.remove('visible');
-        check.checked        = false;
-        noMsg.style.display  = document.getElementById('idAccommodation').value ? 'block' : 'none';
-        label.textContent    = '—';
+        check.checked       = false;
+        noMsg.style.display = selectedRooms.size > 0 ? 'block' : 'none';
+        label.textContent   = '—';
     }
 }
 
 document.getElementById('laundryService').addEventListener('change', calcularTotal);
+document.getElementById('extraPersons').addEventListener('change', calcularTotal);
+document.getElementById('extraPersons').addEventListener('input', function () {
+    if (parseInt(this.value) < 0) this.value = 0;
+});
+
+/* ══════════════════════════════════════
+   TEMPORADAS COLOMBIA
+══════════════════════════════════════ */
+const FESTIVOS_FIJOS = [
+    '01-01','01-06','03-19','05-01','07-04','07-20',
+    '08-07','08-15','10-12','11-01','11-11','12-08','12-25'
+];
+
+const FESTIVOS_MOVILES = {
+    2025: ['04-17','04-18','06-02','06-23','06-30','08-18','10-20','11-03','11-17'],
+    2026: ['04-02','04-03','05-18','06-08','06-29','08-17','10-19','11-02','11-16'],
+    2027: ['03-25','03-26','05-10','05-31','06-28','08-16','10-18','11-01','11-15'],
+};
+
+const RECESOS = [
+    { label: 'Semana Santa',       start: '03-24', end: '04-13' },
+    { label: 'Mitad de año',       start: '06-16', end: '07-31' },
+    { label: 'Receso octubre',     start: '10-06', end: '10-17' },
+    { label: 'Vacaciones dic-ene', start: '12-01', end: '01-15' },
+];
+
+function esFestivo(date) {
+    const mm  = String(date.getMonth() + 1).padStart(2, '0');
+    const dd  = String(date.getDate()).padStart(2, '0');
+    const key = `${mm}-${dd}`;
+    if (FESTIVOS_FIJOS.includes(key)) return true;
+    const moviles = FESTIVOS_MOVILES[date.getFullYear()] || [];
+    return moviles.includes(key);
+}
+
+function esReceso(date) {
+    const mm  = String(date.getMonth() + 1).padStart(2, '0');
+    const dd  = String(date.getDate()).padStart(2, '0');
+    const key = `${mm}-${dd}`;
+    for (const r of RECESOS) {
+        if (r.start > r.end) {
+            if (key >= r.start || key <= r.end) return true;
+        } else {
+            if (key >= r.start && key <= r.end) return true;
+        }
+    }
+    return false;
+}
+
+function tipoTemporadaDia(date) {
+    const dow = date.getDay();
+    if (dow === 0 || dow === 5 || dow === 6) return 'Alta';
+    if (esFestivo(date) || esReceso(date))   return 'Alta';
+    return 'Baja';
+}
+
+function desglosarTemporadas(startDate, endDate) {
+    const conteo = {};
+    const cur = new Date(startDate + 'T00:00:00');
+    const fin = new Date(endDate   + 'T00:00:00');
+    while (cur < fin) {
+        const tipo = tipoTemporadaDia(new Date(cur));
+        conteo[tipo] = (conteo[tipo] || 0) + 1;
+        cur.setDate(cur.getDate() + 1);
+    }
+    return Object.entries(conteo).map(([type, nights]) => ({ type, nights }));
+}
+
+/* ══════════════════════════════════════
+   BADGE CLASS
+══════════════════════════════════════ */
+function badgeClass(type) {
+    if (!type) return '';
+    const t = type.toLowerCase();
+    if (t === 'alta')     return 'alta';
+    if (t === 'baja')     return 'baja';
+    if (t === 'especial') return 'especial';
+    return '';
+}
 
 /* ══════════════════════════════════════
    CÁLCULO DEL TOTAL
 ══════════════════════════════════════ */
 async function calcularTotal() {
-    const idAccommodation = document.getElementById('idAccommodation').value;
-    const startDate       = document.getElementById('startDate').value;
-    const endDate         = document.getElementById('endDate').value;
-    const persons         = parseInt(document.getElementById('numberOfPersons').value) || 0;
-    const withLaundry     = document.getElementById('laundryService').checked;
-    const breakdown       = document.getElementById('total-breakdown');
-    const totalEl         = document.getElementById('total-amount');
-    const btnSubmit       = document.getElementById('btn-submit');
+    const startDate    = document.getElementById('startDate').value;
+    const endDate      = document.getElementById('endDate').value;
+    const persons      = parseInt(document.getElementById('numberOfPersons').value) || 0;
+    const extraPersons = parseInt(document.getElementById('extraPersons').value) || 0;
+    const totalPersons = persons + extraPersons;
+    const withLaundry  = document.getElementById('laundryService').checked;
+    const breakdown    = document.getElementById('total-breakdown');
+    const totalEl      = document.getElementById('total-amount');
+    const btnSubmit    = document.getElementById('btn-submit');
 
-    if (!idAccommodation || !startDate || !endDate || !persons) {
-        totalEl.textContent    = '$ —';
-        breakdown.textContent  = 'Selecciona alojamiento, fechas y personas para calcular';
-        btnSubmit.disabled     = true;
+    const desgEl = document.getElementById('season-breakdown-panel');
+    if (desgEl) desgEl.remove();
+
+    if (selectedRooms.size === 0 || !startDate || !endDate || !persons) {
+        totalEl.textContent   = '$ —';
+        breakdown.textContent = 'Selecciona alojamientos, fechas y personas para calcular';
+        btnSubmit.disabled    = true;
         return;
     }
 
@@ -423,86 +634,260 @@ async function calcularTotal() {
         return;
     }
 
+    const desglose = desglosarTemporadas(startDate, endDate);
+    let grandTotal         = 0;
+    const laundryAmt       = withLaundry ? laundryPrice : 0;
+    const allDesgPanelRows = [];
+    const summaryParts     = [];
+
     try {
-        // Llama al SP de cálculo de tarifa via API
-        const res = await fetch(
-            `/api/rates/calculate?idAccommodation=${idAccommodation}&startDate=${startDate}&endDate=${endDate}&persons=${persons}`
-        );
+        for (const [idAcc, entry] of selectedRooms) {
+            const qty    = entry.qty;
+            const rates  = await fetchRates(idAcc);
+            const nombre = entry.data.name || `Aloj. ${entry.data.number || idAcc}`;
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+            let roomTotal  = 0;
+            const roomRows = [];
 
-        ratePerNight    = data.priceNight    || 0;
-        let totalNights = data.totalAmount   || (ratePerNight * nights);
-        let laundryAmt  = withLaundry ? laundryPrice : 0;
-        let grandTotal  = totalNights + laundryAmt;
+            for (const { type, nights: n } of desglose) {
+                const tarifa =
+    rates.find(r =>
+        r.seasonType === type &&
+        persons >= r.minimumPerson &&
+        persons <= r.maximumPerson
+    ) ||
+    rates.find(r => r.seasonType === type) ||
+    rates.find(r =>
+        (type === 'Baja' ? r.seasonType === 'Especial' : r.seasonType === 'Baja') &&
+        persons >= r.minimumPerson &&
+        persons <= r.maximumPerson
+    ) ||
+    rates.find(r =>
+        type === 'Baja' ? r.seasonType === 'Especial' : r.seasonType === 'Baja'
+    );
+
+                if (!tarifa) {
+                    roomRows.push({
+                        type, nights: n, qty, nombre,
+                        priceNight:            null,
+                        pricePersonAdditional: null,
+                        personasAdicionales:   0,
+                        persons:               totalPersons,
+                        precioNocheTotal:      0,
+                        subtotal:              0
+                    });
+                    continue;
+                }
+
+                // Adicionales = personas que superan el máximo de la tarifa
+                // 1. Personas que superan el máximo de la tarifa
+const personasAdd = extraPersons;
+
+// Precio base de las noches
+const precioNocheTotal = tarifa.priceNight;
+
+// Subtotal base
+const subtotalBase = precioNocheTotal * n * qty;
+
+// Costo adicional (solo una vez)
+const subtotalAdicional =
+    personasAdd * tarifa.pricePersonAdditional;
+
+// Total final
+const subtotal =
+    subtotalBase + subtotalAdicional;
+
+                roomTotal += subtotal;
+                roomRows.push({
+    type, nights: n, qty, nombre,
+    priceNight:            tarifa.priceNight,
+    pricePersonAdditional: tarifa.pricePersonAdditional,
+    personasAdicionales:   extraPersons,   // ← cantidad del input
+    persons:               persons,         // ← solo número de personas (informativo)
+    precioNocheTotal,
+    subtotal
+});
+            }
+
+            grandTotal += roomTotal;
+            allDesgPanelRows.push({ nombre, qty, rows: roomRows, roomTotal });
+            summaryParts.push(`${nombre} ${fmtCOP(roomTotal)}`);
+        }
+
+        grandTotal += laundryAmt;
 
         totalEl.textContent   = fmtCOP(grandTotal);
-        breakdown.textContent = `${nights} noche${nights !== 1 ? 's' : ''} × ${fmtCOP(ratePerNight)}${withLaundry ? ' + lavandería ' + fmtCOP(laundryPrice) : ''}`;
-        btnSubmit.disabled    = false;
+        breakdown.textContent = summaryParts.join(' + ') +
+            (withLaundry ? ` + lavandería ${fmtCOP(laundryPrice)}` : '');
+        btnSubmit.disabled = false;
+
+        renderDesglosePanel(allDesgPanelRows, grandTotal, laundryAmt, nights);
 
     } catch (err) {
         console.error('[FR] Error calculando tarifa:', err);
-        // Fallback: si la API no responde, mostramos aviso pero dejamos continuar
         totalEl.textContent   = '$ —';
-        breakdown.textContent = 'No se pudo calcular la tarifa. Verifica los datos.';
+        breakdown.textContent = 'No se pudo calcular. Verifica los datos.';
         btnSubmit.disabled    = true;
     }
 }
 
-/* Escuchar cambios en fechas y personas */
+/* ══════════════════════════════════════
+   PANEL DE DESGLOSE VISUAL
+══════════════════════════════════════ */
+function renderDesglosePanel(roomsData, grandTotal, laundryAmt, totalNights) {
+    const totalBox = document.querySelector('.rv-total-box');
+    if (!totalBox) return;
+
+    const prev = document.getElementById('season-breakdown-panel');
+    if (prev) prev.remove();
+
+    let sectionsHtml = '';
+
+    for (const room of roomsData) {
+        const filas = room.rows.map(r => {
+            if (r.priceNight === null) {
+                return `
+                <div class="rv-desg-row">
+                    <div class="rv-desg-left">
+                        <span class="rv-rate-badge ${badgeClass(r.type)}">${r.type}</span>
+                        <span class="rv-desg-nights">${r.nights} noche${r.nights > 1 ? 's' : ''}</span>
+                    </div>
+                    <span class="rv-desg-sub" style="color:#ef4444;">Sin tarifa</span>
+                </div>`;
+            }
+            return `
+            <div class="rv-desg-row">
+                <div class="rv-desg-left">
+                    <span class="rv-rate-badge ${badgeClass(r.type)}">${r.type}</span>
+                    <span class="rv-desg-nights">${r.nights} noche${r.nights > 1 ? 's' : ''}</span>
+                    <span class="rv-desg-detail">
+                        ${fmtCOP(r.priceNight)}/noche
+                        ${r.personasAdicionales > 0
+                            ? ` + ${r.personasAdicionales} pers. adicional × ${fmtCOP(r.pricePersonAdditional)} = ${fmtCOP(r.personasAdicionales * r.pricePersonAdditional)}`
+                            : ''}
+                        → Total/noche: ${fmtCOP(r.precioNocheTotal)}
+                    </span>
+                </div>
+                <span class="rv-desg-sub">${fmtCOP(r.subtotal)}</span>
+            </div>`;
+        }).join('');
+
+        sectionsHtml += `
+            <div style="padding:8px 14px 2px;font-size:12px;font-weight:600;
+                        color:var(--text-muted,#6b7280);border-bottom:1px solid var(--border,#e5e7eb);">
+                ${room.nombre}
+                <span style="float:right;font-weight:600;color:var(--text,#111);">${fmtCOP(room.roomTotal)}</span>
+            </div>
+            <div class="rv-desg-rows">${filas}</div>
+        `;
+    }
+
+    const laundryRow = laundryAmt > 0 ? `
+        <div class="rv-desg-row">
+            <div class="rv-desg-left">
+                <span class="rv-rate-badge" style="background:#f3e8ff;color:#7c3aed;">Lavandería</span>
+                <span class="rv-desg-nights">servicio adicional</span>
+            </div>
+            <span class="rv-desg-sub">${fmtCOP(laundryAmt)}</span>
+        </div>` : '';
+
+    const panel = document.createElement('div');
+    panel.id        = 'season-breakdown-panel';
+    panel.className = 'rv-desg-panel';
+    panel.innerHTML = `
+        <div class="rv-desg-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+                <line x1="8"  y1="2"  x2="8"  y2="6"/>
+                <line x1="16" y1="2"  x2="16" y2="6"/>
+            </svg>
+            Desglose por temporada — ${totalNights} noche${totalNights > 1 ? 's' : ''}
+            · ${selectedRooms.size} alojamiento${selectedRooms.size > 1 ? 's' : ''}
+        </div>
+        ${sectionsHtml}
+        ${laundryRow ? `<div class="rv-desg-rows" style="border-top:1px solid var(--border,#e5e7eb);">${laundryRow}</div>` : ''}
+        <div class="rv-desg-total">
+            <span>Total</span>
+            <strong>${fmtCOP(grandTotal)}</strong>
+        </div>
+    `;
+
+    totalBox.insertAdjacentElement('beforebegin', panel);
+}
+
+/* ══════════════════════════════════════
+   LISTENERS FECHAS / PERSONAS
+══════════════════════════════════════ */
 ['startDate', 'endDate', 'numberOfPersons'].forEach(id => {
     document.getElementById(id).addEventListener('change', calcularTotal);
 });
 
+document.getElementById('startDate').addEventListener('change', function () {
+    document.getElementById('endDate').min = this.value;
+    if (document.getElementById('endDate').value < this.value)
+        document.getElementById('endDate').value = '';
+    calcularTotal();
+});
+
 /* ══════════════════════════════════════
-   SUBMIT — CREAR RESERVA
+   SUBMIT
 ══════════════════════════════════════ */
 async function submitReserva() {
-    const idAccommodation = document.getElementById('idAccommodation').value;
-    const startDate       = document.getElementById('startDate').value;
-    const endDate         = document.getElementById('endDate').value;
-    const persons         = parseInt(document.getElementById('numberOfPersons').value) || 0;
-    const withLaundry     = document.getElementById('laundryService').checked;
-    const totalEl         = document.getElementById('total-amount');
-    const btnSubmit       = document.getElementById('btn-submit');
+    const startDate    = document.getElementById('startDate').value;
+    const endDate      = document.getElementById('endDate').value;
+    const persons      = parseInt(document.getElementById('numberOfPersons').value) || 0;
+    const extraPersons = parseInt(document.getElementById('extraPersons').value) || 0;
+    const totalPersons = persons + extraPersons;
+    const withLaundry  = document.getElementById('laundryService').checked;
+    const totalEl      = document.getElementById('total-amount');
+    const btnSubmit    = document.getElementById('btn-submit');
 
-    if (!idAccommodation || !startDate || !endDate || !persons) {
+    const maxInput = parseInt(document.getElementById('numberOfPersons').max) || 999;
+    if (persons > maxInput) {
+        showToast(`El número de personas no puede superar ${maxInput}.`, 'error');
+        return;
+    }
+
+    if (selectedRooms.size === 0 || !startDate || !endDate || !persons) {
         showToast('Por favor completa todos los campos obligatorios.', 'error');
         return;
     }
 
-    const nights     = diffDays(startDate, endDate);
-    const laundryAmt = withLaundry ? laundryPrice : 0;
-
-    // Construir payload
-    const payload = {
-        idUser:          userId,
-        idAccommodation: idAccommodation,
-        startDate:       startDate,
-        endDate:         endDate,
-        numberOfPersons: persons,
-        status:          'Pendiente',
-        laundryService:  withLaundry,
-        totalAmount:     parseFloat((totalEl.textContent || '0').replace(/[^0-9]/g, '')) || 0,
-        createdAt:       new Date().toISOString()
-    };
+    const totalAmount = parseFloat(
+        (totalEl.textContent || '0').replace(/[^\d,]/g, '').replace(',', '.')
+    ) || 0;
 
     btnSubmit.disabled    = true;
     btnSubmit.textContent = 'Guardando...';
 
     try {
-        const res = await fetch('/api/reservations/create', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload)
-        });
+        const promises = [];
+        for (const [idAcc] of selectedRooms) {
+            const payload = {
+                idUser:          userId,
+                idAccommodation: idAcc,
+                startDate,
+                endDate,
+                numberOfPersons: totalPersons,
+                status:          'Pendiente',
+                laundryService:  withLaundry,
+                totalAmount,
+                createdAt:       new Date().toISOString()
+            };
+            promises.push(
+                fetch('/api/reservations/create', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify(payload)
+                }).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); })
+            );
+        }
 
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        await Promise.all(promises);
 
-        showToast('¡Reserva creada exitosamente!', 'success');
-
-        // Mostrar fecha de creación
+        showToast('¡Reserva(s) creadas exitosamente!', 'success');
         document.getElementById('createdAt').value =
             new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
@@ -519,18 +904,8 @@ async function submitReserva() {
 /* ══════════════════════════════════════
    INICIO
 ══════════════════════════════════════ */
-
-// Fecha mínima = hoy
 document.getElementById('startDate').min = today();
 document.getElementById('endDate').min   = today();
-
-// Limitar endDate >= startDate
-document.getElementById('startDate').addEventListener('change', function () {
-    document.getElementById('endDate').min = this.value;
-    if (document.getElementById('endDate').value < this.value)
-        document.getElementById('endDate').value = '';
-    calcularTotal();
-});
 
 cargarAlojamientos();
 

@@ -672,3 +672,164 @@ html, body {
     padding: 20px 0;
     grid-column: 1 / -1;
 }
+
+/* ── Tabla de tarifas ── */
+.rv-rates-table { width:100%; border-collapse:collapse; font-size:13px; }
+.rv-rates-table thead tr { background:var(--surface-2,#f3f4f6); }
+.rv-rates-table th { text-align:left; padding:8px 12px; font-weight:600; color:var(--text-muted,#6b7280); font-size:11px; text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid var(--border,#e5e7eb); }
+.rv-rates-table td { padding:10px 12px; border-bottom:1px solid var(--border,#e5e7eb); color:var(--text,#111827); }
+.rv-rates-table tbody tr:last-child td { border-bottom:none; }
+.rv-rates-table tbody tr:hover { background:var(--surface-1,#f9fafb); }
+.rv-rate-badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; background:#dbeafe; color:#1d4ed8; }
+.rv-rate-badge.alta    { background:#fef3c7; color:#92400e; }
+.rv-rate-badge.baja    { background:#d1fae5; color:#065f46; }
+.rv-rate-badge.media   { background:#ede9fe; color:#5b21b6; }
+.rv-rates-loading, .rv-rates-empty { font-size:13px; color:var(--text-muted,#9ca3af); padding:12px 0; font-style:italic; }
+
+/* ── Panel desglose por temporada ── */
+.rv-desg-panel { background:var(--surface-1,#f9fafb); border:1px solid var(--border,#e5e7eb); border-radius:10px; padding:16px; margin-bottom:16px; }
+.rv-desg-header { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:var(--text-muted,#6b7280); text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; }
+.rv-desg-rows { display:flex; flex-direction:column; gap:8px; }
+.rv-desg-row { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+.rv-desg-left { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.rv-desg-nights { color:var(--text,#111827); font-weight:500; }
+.rv-desg-detail { font-size:11px; color:var(--text-muted,#9ca3af); }
+.rv-desg-sub { font-weight:600; color:var(--text,#111827); white-space:nowrap; }
+.rv-desg-total { display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid var(--border,#e5e7eb); font-size:14px; color:var(--text,#111827); }
+.rv-desg-total strong { font-size:16px; }
+
+/* ── Multi-select badge en cada card ── */
+        .rv-acc-card { position: relative; }
+
+        .rv-acc-counter {
+            position: absolute;
+            top: 8px; right: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .rv-acc-counter button {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary, #6366f1);
+            color: #fff;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background .15s, transform .1s;
+            padding: 0;
+        }
+        .rv-acc-counter button:hover { background: var(--primary-dark, #4f46e5); transform: scale(1.12); }
+        .rv-acc-counter button:active { transform: scale(.95); }
+        .rv-acc-counter .rv-acc-qty {
+            min-width: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text, #111);
+        }
+
+        /* card seleccionada con cantidad > 0 */
+        .rv-acc-card.selected {
+            border-color: var(--primary, #6366f1);
+            background: var(--primary-soft, #eef2ff);
+        }
+        .rv-acc-card.selected .rv-acc-check { opacity: 1; }
+
+        /* ── Resumen de selección ── */
+        #selection-summary {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: var(--primary-soft, #eef2ff);
+            border: 1px solid var(--primary, #6366f1);
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text, #111);
+        }
+        #selection-summary.visible { display: flex; }
+        .rv-sel-chip {
+            background: #fff;
+            border: 1px solid var(--primary, #6366f1);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary, #6366f1);
+        }
+
+        /* ── Tabla de desglose ── */
+        .rv-desg-panel {
+            border: 1px solid var(--border, #e5e7eb);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        .rv-desg-header {
+            background: var(--surface, #f9fafb);
+            padding: 10px 14px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted, #6b7280);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--border, #e5e7eb);
+        }
+        .rv-desg-rows { padding: 8px 0; }
+        .rv-desg-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 7px 14px;
+            gap: 10px;
+        }
+        .rv-desg-row:not(:last-child) { border-bottom: 1px dashed var(--border, #e5e7eb); }
+        .rv-desg-left { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .rv-desg-nights { font-size: 12px; color: var(--text-muted, #6b7280); }
+        .rv-desg-detail { font-size: 11px; color: var(--text-muted, #9ca3af); width: 100%; margin-top: 2px; padding-left: 2px; }
+        .rv-desg-sub { font-weight: 600; white-space: nowrap; }
+        .rv-desg-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--surface, #f9fafb);
+            border-top: 1px solid var(--border, #e5e7eb);
+            font-size: 14px;
+        }
+
+        /* Rate badges */
+        .rv-rate-badge {
+            display: inline-flex; align-items: center;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .rv-rate-badge.alta    { background: #fee2e2; color: #b91c1c; }
+        .rv-rate-badge.baja    { background: #d1fae5; color: #065f46; }
+        .rv-rate-badge.media,
+        .rv-rate-badge.especial { background: #fef3c7; color: #92400e; }
+
+        /* Rates table */
+        .rv-rates-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .rv-rates-table th, .rv-rates-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border, #e5e7eb);
+        }
+        .rv-rates-table th { font-weight:600; color:var(--text-muted,#6b7280); font-size:11px; text-transform:uppercase; }
+        .rv-rates-loading, .rv-rates-empty {
+            font-size: 13px; color: var(--text-muted,#9ca3af);
+            padding: 10px 0; margin: 0;
+        }

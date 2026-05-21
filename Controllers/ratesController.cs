@@ -137,5 +137,38 @@ namespace FoundReserves.Controllers
 
             return Ok(new { message = "Tarifa eliminada correctamente" });
         }
+
+        // GET: api/rates/byAccommodation/{idAccommodation}
+[HttpGet("byAccommodation/{idAccommodation}")]
+public async Task<IActionResult> GetByAccommodation(int idAccommodation)
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol))
+        return Unauthorized(new { message = "Debes iniciar sesión" });
+
+    var rates = await _context.Rates
+        .Where(r => r.idAccommodation == idAccommodation)
+        .Join(_context.Seasons,
+            r => r.idSeason,
+            s => s.idSeason,
+            (r, s) => new
+            {
+                r.idPrice,
+                r.idSeason,
+                seasonName            = s.name,
+                seasonType            = s.type,
+                r.minimumPerson,
+                r.maximumPerson,
+                r.priceNight,
+                r.pricePersonAdditional
+            })
+        .OrderBy(r => r.idSeason)
+        .ToListAsync();
+
+    if (!rates.Any())
+        return NotFound(new { message = "No hay tarifas para este alojamiento" });
+
+    return Ok(rates);
+}
     }
 }
