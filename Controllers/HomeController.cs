@@ -42,7 +42,7 @@ public class HomeController : Controller
             return View("Index");
         }
 
-        HttpContext.Session.SetString("UserId", user.iduser.ToString());
+        HttpContext.Session.SetInt32("IdUser", user.iduser);
         HttpContext.Session.SetString("UserEmail", user.email);
         HttpContext.Session.SetString("UserRol", user.rol);
         HttpContext.Session.SetString("UserCedula", user.cedula);
@@ -94,6 +94,7 @@ public IActionResult DashboardCustomer()
 
     ViewBag.Email = email;
     ViewBag.Rol = rol;
+    ViewBag.IdUser = HttpContext.Session.GetInt32("IdUser");
     ViewBag.Cedula = HttpContext.Session.GetString("UserCedula");
     ViewBag.Name = HttpContext.Session.GetString("UserName");
     ViewBag.Lastname = HttpContext.Session.GetString("UserLastname");

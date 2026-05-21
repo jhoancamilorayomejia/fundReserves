@@ -49,7 +49,6 @@ html, body {
 .fc-topbar-left  { display: flex; align-items: center; gap: 32px; }
 .fc-topbar-right { display: flex; align-items: center; gap: 14px; }
 
-/* Brand */
 .fc-brand { display: flex; align-items: center; gap: 8px; }
 
 .fc-brand-icon {
@@ -67,7 +66,6 @@ html, body {
     letter-spacing: -.01em;
 }
 
-/* Top nav links */
 .fc-top-nav { display: flex; gap: 2px; }
 
 .fc-top-link {
@@ -81,10 +79,9 @@ html, body {
     border: none; background: transparent;
 }
 
-.fc-top-link:hover { color: var(--text); background: rgba(255,255,255,.04); }
+.fc-top-link:hover  { color: var(--text); background: rgba(255,255,255,.04); }
 .fc-top-link.active { color: #fff; background: rgba(255,255,255,.07); font-weight: 500; }
 
-/* User chip */
 .fc-user-chip {
     display: flex; align-items: center; gap: 8px;
     padding: 5px 10px;
@@ -104,7 +101,6 @@ html, body {
 
 .fc-user-label { font-size: 12.5px; color: var(--text-sub); }
 
-/* Logout */
 .fc-btn-logout {
     padding: 6px 14px;
     border-radius: var(--radius-sm);
@@ -122,7 +118,6 @@ html, body {
 /* ══ MAIN ══ */
 .fc-main { padding: 28px 32px; max-width: 1280px; margin: 0 auto; }
 
-/* ══ PAGE HEADER ══ */
 .fc-page-header { margin-bottom: 20px; }
 
 .fc-page-title {
@@ -139,7 +134,6 @@ html, body {
     gap: 4px;
     margin-bottom: 16px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 0;
 }
 
 .fc-subtab {
@@ -207,7 +201,7 @@ html, body {
     white-space: nowrap;
 }
 
-.fc-table thead th.col-img { width: 72px; }
+.fc-table thead th.col-img { width: 90px; }
 
 .fc-row {
     border-bottom: 1px solid var(--border);
@@ -229,9 +223,18 @@ html, body {
     color: var(--text);
 }
 
-/* Imagen placeholder */
+/* ══ IMAGEN SEDE ══ */
+.fc-sede-img {
+    width: 72px; height: 52px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--border);
+    display: block;
+    background: #252525;
+}
+
 .fc-img-placeholder {
-    width: 58px; height: 48px;
+    width: 72px; height: 52px;
     background: #252525;
     border-radius: var(--radius-sm);
     display: flex; align-items: center; justify-content: center;
@@ -239,13 +242,11 @@ html, body {
     border: 1px solid var(--border);
 }
 
-/* Nombre */
 .fc-sede-name {
     font-weight: 600; font-size: 13.5px;
     color: var(--text);
 }
 
-/* Descripción */
 .fc-td-desc {
     color: var(--text-sub);
     font-size: 12.5px;
@@ -253,14 +254,11 @@ html, body {
     line-height: 1.5;
 }
 
-/* Ciudad */
 .fc-td-city { color: var(--text-sub); font-size: 13px; }
 
-/* Capacidad */
 .fc-cap { font-weight: 500; }
 .fc-cap small { font-size: 11px; color: var(--text-muted); }
 
-/* Precio */
 .fc-td-price {
     font-family: 'DM Mono', monospace;
     font-size: 13px; font-weight: 500;
@@ -268,7 +266,7 @@ html, body {
     white-space: nowrap;
 }
 
-/* Badges tipo */
+/* ══ BADGES TIPO ══ */
 .fc-badge {
     display: inline-flex; align-items: center;
     padding: 3px 10px; border-radius: 20px;
@@ -279,7 +277,7 @@ html, body {
 .badge-sede  { background: rgba(232,53,90,.15); color: #f06080; border: 1px solid rgba(232,53,90,.25); }
 .badge-apart { background: rgba(80,140,255,.12); color: #7eb0ff; border: 1px solid rgba(80,140,255,.2); }
 
-/* Botón seleccionar */
+/* ══ BOTÓN SELECCIONAR ══ */
 .fc-btn-select {
     padding: 7px 18px;
     border-radius: var(--radius-sm);
@@ -306,7 +304,6 @@ html, body {
 
 .fc-error { color: #f06080 !important; }
 
-/* ══ EMPTY STATE (tab fechas) ══ */
 .fc-empty-state {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -316,7 +313,7 @@ html, body {
     font-size: 13px;
 }
 
-/* ══ MODAL ══ */
+/* ══ MODAL SEDE ══ */
 .fc-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.75);
@@ -335,13 +332,16 @@ html, body {
     border: 1px solid var(--border-mid);
     border-radius: var(--radius-lg);
     width: 100%;
-    max-width: 520px;
+    max-width: 560px;
     position: relative;
     animation: slideModal .22s ease;
     overflow: hidden;
 }
 
-@keyframes slideModal { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideModal {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+}
 
 .fc-modal-close {
     position: absolute; top: 14px; right: 16px;
@@ -352,21 +352,33 @@ html, body {
     cursor: pointer; font-size: 13px;
     display: flex; align-items: center; justify-content: center;
     transition: background .13s, color .13s;
+    z-index: 10;
 }
 
 .fc-modal-close:hover { background: rgba(232,53,90,.2); color: var(--accent); }
 
-.fc-modal-body { padding: 28px 28px 20px; }
-
-.fc-modal-img {
-    width: 100%; height: 140px;
+.fc-modal-img-wrap {
+    width: 100%; height: 190px;
+    overflow: hidden;
+    position: relative;
     background: #252525;
-    border-radius: var(--radius-md);
+}
+
+.fc-modal-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.fc-modal-img-placeholder {
+    width: 100%; height: 190px;
+    background: #252525;
     display: flex; align-items: center; justify-content: center;
     color: var(--text-muted);
-    margin-bottom: 20px;
-    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
+
+.fc-modal-body { padding: 24px 28px 20px; }
 
 .fc-modal-title {
     font-size: 20px; font-weight: 700;
@@ -399,8 +411,15 @@ html, body {
     padding: 12px 14px;
 }
 
-.fc-info-label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.fc-info-label {
+    display: block;
+    font-size: 11px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 4px;
+}
+
 .fc-info-val   { font-size: 16px; font-weight: 600; color: var(--text); }
+.fc-info-val.mono { font-family: 'DM Mono', monospace; font-size: 14px; }
 
 .fc-modal-footer {
     display: flex; justify-content: flex-end; gap: 10px;

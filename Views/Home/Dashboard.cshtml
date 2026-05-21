@@ -614,13 +614,8 @@
                 <form id="form-season" class="row g-3">
 
                     <div class="col-md-4">
-                        <label class="form-label">Fecha inicio</label>
-                        <input type="date" class="form-control" id="dateStart" required>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label">Fecha fin</label>
-                        <input type="date" class="form-control" id="dateFinish" required>
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="seasonName" required>
                     </div>
 
                     <div class="col-md-4">
@@ -648,8 +643,7 @@
                         <tr>
                             <th>#</th>
                             <th>ID</th>
-                            <th>Fecha inicio</th>
-                            <th>Fecha fin</th>
+                            <th>Nombre</th>
                             <th>Tipo</th>
                             <th>Acciones</th>
                         </tr>
@@ -972,6 +966,7 @@ function filaSede(s, i) {
 }
 
 /* Fila para tabla ALOJAMIENTOS */
+/* Fila para tabla ALOJAMIENTOS */
 function filaAccommodation(a, i) {
     const estado = a.state === 'Disponible'
         ? '<span class="badge bg-success">Disponible</span>'
@@ -982,7 +977,7 @@ function filaAccommodation(a, i) {
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${a.idAccommodation}</td>
-        <td><span class="fw-500">${a.sede || '—'}</span></td>
+        <td><span class="fw-500">${a.sedeName || '—'}</span></td>  <!-- ← era a.sede -->
         <td>${a.name   || '—'}</td>
         <td class="fr-mono">${a.number || '—'}</td>
         <td>${a.maximumPerson || '—'}</td>
@@ -1002,16 +997,15 @@ function filaSeason(s, i) {
     const pillCls = s.type === 'Alta' ? 'fr-pill-admin'
                   : s.type === 'Baja' ? 'fr-pill-customer'
                   : 'fr-pill';
+
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${s.idSeason || '—'}</td>
-        <td>${fmtFecha(s.dateStart)}</td>
-        <td>${fmtFecha(s.dateFinish)}</td>
+        <td>${s.name || '—'}</td>
         <td><span class="fr-pill ${pillCls}">${s.type || '—'}</span></td>
         <td>
-            <!-- Elimina temporada de la tabla seasons -->
             <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarTemporada(${s.idSeason}, '${s.type}')">
+                onclick="eliminarTemporada(${s.idSeason}, '${s.name}')">
                 Eliminar
             </button>
         </td>
@@ -1095,7 +1089,7 @@ function renderSeasons(seasons) {
     document.getElementById('cnt-seasons').textContent = seasons.length;
     document.getElementById('lbl-seasons').textContent = `${seasons.length} registros`;
     document.getElementById('tb-seasons').innerHTML =
-        seasons.length ? seasons.map(filaSeason).join('') : filaVacia(6, 'No hay temporadas registradas');
+        seasons.length ? seasons.map(filaSeason).join('') : filaVacia(5, 'No hay temporadas registradas');
 }
 
 /* Renderiza tabla de tarifas */
@@ -1117,7 +1111,11 @@ function poblarSelectAccommodation(accommodations) {
     const valorActual = sel.value;
     sel.innerHTML = '<option value="">Selecciona un alojamiento...</option>';
     accommodations.forEach(a => {
-        const label = `${a.name || ''}${a.number ? ` — N° ${a.number}` : ''}` || `Alojamiento ${a.idAccommodation}`;
+        const sede  = a.sedeName || `Sede ${a.idsede}`;  // ← idsede en minúsculas
+        const city  = a.city ? ` — ${a.city}` : '';      // ← ciudad de la sede
+        const name  = a.name || '';
+        const num   = a.number ? ` — N° ${a.number}` : '';
+        const label = `[${sede}${city}] ${name}${num}`;
         sel.innerHTML += `<option value="${a.idAccommodation}">${label}</option>`;
     });
     if (valorActual) sel.value = valorActual;
@@ -1129,7 +1127,7 @@ function poblarSelectSeason(seasons) {
     const valorActual = sel.value;
     sel.innerHTML = '<option value="">Selecciona una temporada...</option>';
     seasons.forEach(s => {
-        sel.innerHTML += `<option value="${s.idSeason}">${s.idSeason} — ${s.type} (${fmtFecha(s.dateStart)} → ${fmtFecha(s.dateFinish)})</option>`;
+        sel.innerHTML += `<option value="${s.idSeason}">${s.name} — ${s.type}</option>`;
     });
     if (valorActual) sel.value = valorActual;
 }
@@ -1248,8 +1246,8 @@ async function eliminarUsuario(id, nombre) {
 }
 
 /* Elimina una temporada por id → DELETE /api/seasons/:id */
-async function eliminarTemporada(id, tipo) {
-    if (!confirm(`¿Eliminar la temporada "${tipo}"?\nEsta acción no se puede deshacer.`)) return;
+async function eliminarTemporada(id, nombre) {
+    if (!confirm(`¿Eliminar la temporada "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
     try {
         const res = await fetch(`/api/seasons/${id}`, { method: 'DELETE' });
         if (!res.ok) { alert((await res.json()).message || 'Error al eliminar temporada'); return; }
@@ -1327,9 +1325,8 @@ document.getElementById('form-sede').addEventListener('submit', async function(e
 document.getElementById('form-season').addEventListener('submit', async function(e) {
     e.preventDefault();
     const body = {
-        dateStart:  document.getElementById('dateStart').value,
-        dateFinish: document.getElementById('dateFinish').value,
-        type:       document.getElementById('seasonType').value
+        name: document.getElementById('seasonName').value,
+        type: document.getElementById('seasonType').value
     };
     try {
         const res  = await fetch('/api/seasons/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

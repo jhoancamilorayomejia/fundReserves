@@ -192,13 +192,9 @@ namespace FoundReserves.Data
                 entity.Property(e => e.idSeason)
                     .ValueGeneratedOnAdd();
 
-                entity.Property(e => e.dateStart)
-                    .HasColumnType("date")
-                    .IsRequired();
-
-                entity.Property(e => e.dateFinish)
-                    .HasColumnType("date")
-                    .IsRequired();
+                entity.Property(e => e.name)
+                .IsRequired()
+                .HasMaxLength(100);
 
                 entity.Property(e => e.type)
                     .IsRequired()

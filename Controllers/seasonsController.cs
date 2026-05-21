@@ -31,12 +31,10 @@ namespace FoundReserves.Controllers
             }
 
             var seasons = await _context.Seasons
-                .OrderBy(s => s.dateStart)
                 .Select(s => new
                 {
                     s.idSeason,
-                    s.dateStart,
-                    s.dateFinish,
+                    s.name,
                     s.type
                 })
                 .ToListAsync();
@@ -69,20 +67,11 @@ namespace FoundReserves.Controllers
             }
 
             // Validaciones
-            if (season.dateStart == default ||
-                season.dateFinish == default)
+            if (string.IsNullOrWhiteSpace(season.name))
             {
                 return BadRequest(new
                 {
-                    message = "Las fechas son obligatorias"
-                });
-            }
-
-            if (season.dateFinish < season.dateStart)
-            {
-                return BadRequest(new
-                {
-                    message = "La fecha final no puede ser menor a la inicial"
+                    message = "El nombre es obligatorio"
                 });
             }
 
@@ -96,8 +85,7 @@ namespace FoundReserves.Controllers
 
             var newSeason = new Season
             {
-                dateStart = season.dateStart,
-                dateFinish = season.dateFinish,
+                name = season.name,
                 type = season.type
             };
 
@@ -111,8 +99,7 @@ namespace FoundReserves.Controllers
                 season = new
                 {
                     newSeason.idSeason,
-                    newSeason.dateStart,
-                    newSeason.dateFinish,
+                    newSeason.name,
                     newSeason.type
                 }
             });

@@ -17,123 +17,103 @@ namespace FoundReserves.Controllers
         }
 
         // GET: api/rates/all
-[HttpGet("all")]
-public async Task<IActionResult> GetAll()
-{
-    var rol = HttpContext.Session.GetString("UserRol");
-    if (string.IsNullOrEmpty(rol))
-        return Unauthorized(new { message = "Debes iniciar sesión" });
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var rol = HttpContext.Session.GetString("UserRol");
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
 
-    var rates = await _context.Rates
-        .Join(_context.Accommodations,
-            r => r.idAccommodation,
-            a => a.idAccommodation,
-            (r, a) => new { rate = r, accommodation = a })
-        .Join(_context.Seasons,
-            ra => ra.rate.idSeason,
-            s => s.idSeason,
-            (ra, s) => new
-{
-    ra.rate.idPrice,
-    ra.rate.idAccommodation,
-    accommodationName = (ra.accommodation.name ?? "") + 
-                        (ra.accommodation.number != null ? " — N° " + ra.accommodation.number : ""),
-    ra.rate.idSeason,
-    seasonType = s.type + " (" + s.dateStart.ToString("dd/MM/yyyy") + " - " + s.dateFinish.ToString("dd/MM/yyyy") + ")",
-    ra.rate.minimumPerson,
-    ra.rate.maximumPerson,
-    ra.rate.priceNight,
-    ra.rate.pricePersonAdditional
-})
-        .OrderBy(r => r.idPrice)
-        .ToListAsync();
+            var rates = await _context.Rates
+                .Join(_context.Accommodations,
+                    r => r.idAccommodation,
+                    a => a.idAccommodation,
+                    (r, a) => new { rate = r, accommodation = a })
+                .Join(_context.Seasons,
+                    ra => ra.rate.idSeason,
+                    s => s.idSeason,
+                    (ra, s) => new { ra.rate, ra.accommodation, season = s })
+                // ← JOIN nuevo: trae el nombre de la sede
+                .Join(_context.Sedes,
+                    ras => ras.accommodation.idsede,
+                    sede => sede.idSede,
+                    (ras, sede) => new
+                    {
+                        ras.rate.idPrice,
+                        ras.rate.idAccommodation,
 
-    return Ok(rates);
-}
+                        // Ahora incluye [NombreSede] delante
+                        accommodationName =
+    "[" + (sede.name ?? "") + " — " + (sede.city ?? "") + "] " +
+    (ras.accommodation.name ?? "") +
+    (ras.accommodation.number != null
+        ? " — N° " + ras.accommodation.number
+        : ""),
+
+                        ras.rate.idSeason,
+                        seasonName = ras.season.name,
+                        seasonType = ras.season.type,
+
+                        ras.rate.minimumPerson,
+                        ras.rate.maximumPerson,
+                        ras.rate.priceNight,
+                        ras.rate.pricePersonAdditional
+                    })
+                .OrderBy(r => r.idPrice)
+                .ToListAsync();
+
+            return Ok(rates);
+        }
 
         // POST: api/rates/create
-[HttpPost("create")]
-public async Task<IActionResult> Create(
-    [FromBody] Rate rate)
-{
-    var rol = HttpContext.Session.GetString("UserRol");
-
-    if (string.IsNullOrEmpty(rol))
-    {
-        return Unauthorized(new
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] Rate rate)
         {
-            message = "Debes iniciar sesión"
-        });
-    }
+            var rol = HttpContext.Session.GetString("UserRol");
 
-    if (rol != "Admin")
-    {
-        return StatusCode(403, new
-        {
-            message = "No autorizado"
-        });
-    }
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
 
-    // Validar precios
-    if (rate.priceNight < 0 || rate.pricePersonAdditional < 0)
-    {
-        return BadRequest(new
-        {
-            message = "Los precios no pueden ser negativos"
-        });
-    }
+            if (rol != "Admin")
+                return StatusCode(403, new { message = "No autorizado" });
 
-    // Validar personas
-    if (rate.minimumPerson > rate.maximumPerson)
-    {
-        return BadRequest(new
-        {
-            message = "El mínimo de personas no puede ser mayor al máximo"
-        });
-    }
+            if (rate.priceNight < 0 || rate.pricePersonAdditional < 0)
+                return BadRequest(new { message = "Los precios no pueden ser negativos" });
 
-    var accommodationExists = await _context.Accommodations
-        .AnyAsync(a => a.idAccommodation == rate.idAccommodation);
+            if (rate.minimumPerson > rate.maximumPerson)
+                return BadRequest(new { message = "El mínimo de personas no puede ser mayor al máximo" });
 
-    if (!accommodationExists)
-    {
-        return BadRequest(new
-        {
-            message = "El alojamiento no existe"
-        });
-    }
+            var accommodationExists = await _context.Accommodations
+                .AnyAsync(a => a.idAccommodation == rate.idAccommodation);
 
-    var seasonExists = await _context.Seasons
-        .AnyAsync(s => s.idSeason == rate.idSeason);
+            if (!accommodationExists)
+                return BadRequest(new { message = "El alojamiento no existe" });
 
-    if (!seasonExists)
-    {
-        return BadRequest(new
-        {
-            message = "La temporada no existe"
-        });
-    }
+            var seasonExists = await _context.Seasons
+                .AnyAsync(s => s.idSeason == rate.idSeason);
 
-    var newRate = new Rate
-    {
-        idAccommodation = rate.idAccommodation,
-        idSeason = rate.idSeason,
-        minimumPerson = rate.minimumPerson,
-        maximumPerson = rate.maximumPerson,
-        priceNight = rate.priceNight,
-        pricePersonAdditional = rate.pricePersonAdditional
-    };
+            if (!seasonExists)
+                return BadRequest(new { message = "La temporada no existe" });
 
-    _context.Rates.Add(newRate);
+            var newRate = new Rate
+            {
+                idAccommodation       = rate.idAccommodation,
+                idSeason              = rate.idSeason,
+                minimumPerson         = rate.minimumPerson,
+                maximumPerson         = rate.maximumPerson,
+                priceNight            = rate.priceNight,
+                pricePersonAdditional = rate.pricePersonAdditional
+            };
 
-    await _context.SaveChangesAsync();
+            _context.Rates.Add(newRate);
+            await _context.SaveChangesAsync();
 
-    return Ok(new
-    {
-        message = "Tarifa registrada correctamente",
-        rate = newRate
-    });
-}
+            return Ok(new
+            {
+                message = "Tarifa registrada correctamente",
+                rate = newRate
+            });
+        }
 
         // DELETE: api/rates/{id}
         [HttpDelete("{id}")]
@@ -142,39 +122,20 @@ public async Task<IActionResult> Create(
             var rol = HttpContext.Session.GetString("UserRol");
 
             if (string.IsNullOrEmpty(rol))
-            {
-                return Unauthorized(new
-                {
-                    message = "Debes iniciar sesión"
-                });
-            }
+                return Unauthorized(new { message = "Debes iniciar sesión" });
 
             if (rol != "Admin")
-            {
-                return StatusCode(403, new
-                {
-                    message = "No autorizado"
-                });
-            }
+                return StatusCode(403, new { message = "No autorizado" });
 
             var rate = await _context.Rates.FindAsync(id);
 
             if (rate == null)
-            {
-                return NotFound(new
-                {
-                    message = "Tarifa no encontrada"
-                });
-            }
+                return NotFound(new { message = "Tarifa no encontrada" });
 
             _context.Rates.Remove(rate);
-
             await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                message = "Tarifa eliminada correctamente"
-            });
+            return Ok(new { message = "Tarifa eliminada correctamente" });
         }
     }
 }

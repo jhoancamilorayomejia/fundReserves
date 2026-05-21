@@ -30,7 +30,8 @@ namespace FoundReserves.Controllers
                 {
                     a.idAccommodation,
                     a.idsede,
-                    sede        = a.Sede != null ? a.Sede.name : "—",
+                    sedeName = a.Sede != null ? a.Sede.name : "—",  // ← renombra a sedeName
+                    city     = a.Sede != null ? a.Sede.city : "—",  // ← agrega city
                     a.name,
                     a.number,
                     a.maximumPerson,

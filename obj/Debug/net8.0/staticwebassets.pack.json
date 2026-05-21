@@ -25,6 +25,38 @@
       "PackagePath": "staticwebassets/favicon.ico"
     },
     {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/Bogota.jpg",
+      "PackagePath": "staticwebassets/images/Bogota.jpg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/Chinchina.jpeg",
+      "PackagePath": "staticwebassets/images/Chinchina.jpeg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/Medellin.jpg",
+      "PackagePath": "staticwebassets/images/Medellin.jpg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/SantaFeAntioquia.jpeg",
+      "PackagePath": "staticwebassets/images/SantaFeAntioquia.jpeg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/SantaMarta.jpg",
+      "PackagePath": "staticwebassets/images/SantaMarta.jpg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/fusagasuga.jpeg",
+      "PackagePath": "staticwebassets/images/fusagasuga.jpeg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/palmira.jpeg",
+      "PackagePath": "staticwebassets/images/palmira.jpeg"
+    },
+    {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/images/villeta.jpg",
+      "PackagePath": "staticwebassets/images/villeta.jpg"
+    },
+    {
       "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/js/site.js",
       "PackagePath": "staticwebassets/js/site.js"
     },

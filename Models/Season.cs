@@ -9,10 +9,7 @@ namespace FoundReserves.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int idSeason { get; set; }
-
-        public DateTime dateStart { get; set; }
-
-        public DateTime dateFinish { get; set; }
+        public string name { get; set; } = string.Empty;
 
         public required string type { get; set; }
     }

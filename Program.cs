@@ -10,6 +10,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession();
 builder.Services.AddControllers();
 
 // Session
