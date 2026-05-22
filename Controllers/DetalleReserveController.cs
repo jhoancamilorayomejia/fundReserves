@@ -181,7 +181,51 @@ namespace FoundReserves.Controllers
             return Ok(new { message = "Eliminado correctamente" });
         }
 
-    }  
+        // ════════════════════════════════════════
+// OBTENER TODOS CON DETALLES
+// GET: /api/detalleReserve/allWithDetails
+// ════════════════════════════════════════
+[HttpGet("allWithDetails")]
+public async Task<IActionResult> GetAllWithDetails()
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol) || rol != "Admin")
+        return Unauthorized(new { message = "Acceso no autorizado" });
+
+    var lista = await _db.DetalleReserves
+        .Join(_db.Users,
+              d => d.IdUser,
+              u => u.iduser,
+              (d, u) => new { d, u })
+        .Join(_db.Sedes,
+              du => du.d.IdSede,
+              s => s.idSede,
+              (du, s) => new {
+                  du.d.IdDetalleReserve,
+                  du.d.IdUser,
+                  userName     = du.u.name,
+                  userLastname = du.u.lastname,
+                  userCedula   = du.u.cedula,
+                  du.d.IdSede,
+                  sedeName     = s.name,
+                  du.d.DateStart,
+                  du.d.DateFinish,
+                  du.d.NumberPerson,
+                  du.d.NumberRooms,
+                  du.d.TotalCal,
+                  du.d.PaymentProof,
+                  du.d.CreatedAt
+              })
+        .OrderByDescending(d => d.CreatedAt)
+        .ToListAsync();
+
+    return Ok(lista);
+}
+
+    }
+
+
+    
     
 
     // ════════════════════════════════════════

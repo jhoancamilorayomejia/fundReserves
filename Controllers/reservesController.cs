@@ -15,25 +15,36 @@ namespace FoundReserves.Controllers
             _context = context;
         }
 
-        // POST: api/reservations/create
         [HttpPost("create")]
-        public async Task<ActionResult> CreateReservation([FromBody] Reserve reserve)
-        {
-            var rol = HttpContext.Session.GetString("UserRol");
-            if (string.IsNullOrEmpty(rol))
-                return Unauthorized(new { message = "Debes iniciar sesión" });
+public async Task<ActionResult> CreateReservation([FromBody] Reserve reserve)
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol))
+        return Unauthorized(new { message = "Debes iniciar sesión" });
 
-            if (reserve == null)
-                return BadRequest(new { message = "Datos inválidos" });
+    if (reserve == null)
+        return BadRequest(new { message = "Datos inválidos" });
 
-            reserve.State        = "Pendiente";
-            reserve.DateCreation = DateTime.Now;
+    // ── Verificar disponibilidad ──────────────────────────────────────
+    var ocupado = _context.Reserves.Any(r =>
+        r.IdAccommodation == reserve.IdAccommodation &&
+        r.State           != "Cancelada"             &&
+        r.DateStart       <  reserve.DateFinish      &&
+        r.DateFinish      >  reserve.DateStart);
 
-            _context.Reserves.Add(reserve);
-            await _context.SaveChangesAsync();
+    if (ocupado)
+        return Conflict(new {
+            message = $"El alojamiento ya está reservado en ese rango de fechas."
+        });
 
-            return Ok(new { message = "Reserva creada exitosamente", data = reserve });
-        }
+    reserve.State        = "Pendiente";
+    reserve.DateCreation = DateTime.Now;
+
+    _context.Reserves.Add(reserve);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Reserva creada exitosamente", data = reserve });
+}
 
         // GET: api/reservations/my
         [HttpGet("my")]

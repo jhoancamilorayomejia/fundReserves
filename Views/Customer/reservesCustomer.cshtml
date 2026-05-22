@@ -997,60 +997,95 @@ async function submitReserva() {
         return;
     }
 
+    // ── Mensaje de confirmación ───────────────────────────────────────
+    const habitaciones = [...selectedRooms.values()]
+        .map(e => e.data.name || `N° ${e.data.number}`)
+        .join(', ');
+
+    const confirmar = confirm(
+        `¿Confirmar reserva?\n\n` +
+        `Habitación(es): ${habitaciones}\n` +
+        `Check-in:       ${new Date(startDate + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' })}\n` +
+        `Check-out:      ${new Date(endDate   + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'long', year:'numeric' })}\n` +
+        `Personas:       ${totalPersons}\n` +
+        `Total:          ${fmtCOP(currentTotal)}\n` +
+        (withLaundry ? `Lavandería:     incluida\n` : '') +
+        `\nEsta acción creará la reserva en estado Pendiente.`
+    );
+
+    if (!confirmar) return;
+
     btnSubmit.disabled  = true;
     btnSubmit.innerHTML = 'Guardando...';
 
     try {
-        // ── 1. Crear reservas individuales (tabla reserves) ──────────────
-        const promises = [];
+        // ── 1. Verificar disponibilidad antes de crear ────────────────
+        const ids = [...selectedRooms.keys()];
+        const checkUrl = `/api/reservations/available?idSede=${idSedeParam}&dateStart=${startDate}&dateFinish=${endDate}&persons=${persons}`;
+        const checkRes = await fetch(checkUrl);
+        if (checkRes.ok) {
+            const disponibles = await checkRes.json();
+            const dispIds     = disponibles.map(a => String(a.idAccommodation));
+            const noDisp      = ids.filter(id => !dispIds.includes(String(id)));
 
-        for (const [idAcc] of selectedRooms) {
-            const payload = {
-                idUser:          parseInt(userId),
-                idAccommodation: parseInt(idAcc),
-                dateStart:       startDate,
-                dateFinish:      endDate,
-                numberPerson:    totalPersons,
-                totalCal:        currentTotal,
-                serviceLaundry:  withLaundry
-            };
+            if (noDisp.length > 0) {
+                const nombres = noDisp.map(id => {
+                    const e = selectedRooms.get(id);
+                    return e?.data?.name || `Aloj. ${id}`;
+                }).join(', ');
+                showToast(`No disponible en esas fechas: ${nombres}`, 'error');
+                btnSubmit.disabled  = false;
+                btnSubmit.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Crear reserva`;
+                return;
+            }
+        }
 
-            promises.push(
+        // ── 2. Crear reservas individuales ────────────────────────────
+        const resultados = await Promise.allSettled(
+            ids.map(idAcc =>
                 fetch('/api/reservations/create', {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify(payload)
+                    body: JSON.stringify({
+                        idUser:          parseInt(userId),
+                        idAccommodation: parseInt(idAcc),
+                        dateStart:       startDate,
+                        dateFinish:      endDate,
+                        numberPerson:    totalPersons,
+                        totalCal:        currentTotal,
+                        serviceLaundry:  withLaundry
+                    })
                 }).then(async r => {
-                    if (!r.ok) {
-                        const err = await r.json().catch(() => ({}));
-                        throw new Error(err.message || `HTTP ${r.status}`);
-                    }
+                    const data = await r.json().catch(() => ({}));
+                    if (!r.ok) throw new Error(data.message || `HTTP ${r.status}`);
+                    return data;
                 })
-            );
+            )
+        );
+
+        const fallidos = resultados.filter(r => r.status === 'rejected');
+        if (fallidos.length > 0) {
+            const msgs = fallidos.map(f => f.reason?.message || 'Error').join(', ');
+            showToast(`Error al crear: ${msgs}`, 'error');
+            btnSubmit.disabled  = false;
+            btnSubmit.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Crear reserva`;
+            return;
         }
 
-        await Promise.all(promises);
-
-        // ── 2. Crear detalle de reserva (tabla detalleReserve) ────────────
-        // Tomar el idSede del primer alojamiento seleccionado
+        // ── 3. Crear detalle de reserva ───────────────────────────────
         const primeraEntry = [...selectedRooms.values()][0];
-        const idSede = primeraEntry.data.idsede;
-
-        const detallePayload = {
-            idUser:      parseInt(userId),
-            idSede:      parseInt(idSede),
-            dateStart:   startDate,
-            dateFinish:  endDate,
-            numberPerson: totalPersons,
-            numberRooms:  selectedRooms.size,   // cantidad de alojamientos seleccionados
-            totalCal:    currentTotal
-            // paymentProof se omite → quedará NULL hasta que el cliente suba el PDF
-        };
-
-        const detalleRes = await fetch('/api/detalleReserve/create', {
+        const detalleRes   = await fetch('/api/detalleReserve/create', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(detallePayload)
+            body: JSON.stringify({
+                idUser:       parseInt(userId),
+                idSede:       parseInt(primeraEntry.data.idsede),
+                dateStart:    startDate,
+                dateFinish:   endDate,
+                numberPerson: totalPersons,
+                numberRooms:  selectedRooms.size,
+                totalCal:     currentTotal
+            })
         });
 
         if (!detalleRes.ok) {
@@ -1058,19 +1093,15 @@ async function submitReserva() {
             throw new Error(err.message || `HTTP ${detalleRes.status}`);
         }
 
-        // ── 3. Éxito ──────────────────────────────────────────────────────
-        showToast('¡Reserva(s) creadas exitosamente!', 'success');
-        setTimeout(() => history.back(), 1800);
+        // ── 4. Éxito ──────────────────────────────────────────────────
+        showToast('¡Reserva creada exitosamente! Redirigiendo...', 'success');
+        setTimeout(() => history.back(), 2000);
 
     } catch (err) {
         console.error('[FR] Error creando reserva:', err);
-        showToast(`Error al crear la reserva: ${err.message}`, 'error');
+        showToast(`Error: ${err.message}`, 'error');
         btnSubmit.disabled  = false;
-        btnSubmit.innerHTML = `
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            Crear reserva`;
+        btnSubmit.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Crear reserva`;
     }
 }
 

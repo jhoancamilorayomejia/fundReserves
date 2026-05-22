@@ -98,6 +98,17 @@
             <span class="fr-badge fr-badge-admin" id="cnt-rates">0</span>
         </a>
 
+        <a href="#" class="fr-nav-item" data-section="reservas">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+    </svg>
+    Reservas
+    <span class="fr-badge fr-badge-customer" id="cnt-reservas">0</span>
+</a>
+
     </nav>
 
     <!-- Usuario activo + cerrar sesión -->
@@ -789,6 +800,42 @@
     </div>
 </div>
 
+
+<!-- ─────────────────────────────
+     SECCIÓN: RESERVAS
+───────────────────────────── -->
+<div class="fr-section d-none" id="sec-reservas">
+    <div class="fr-card">
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">Reservas de clientes</h2>
+            <span class="fr-pill fr-pill-customer" id="lbl-reservas">0 registros</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table fr-table mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Cédula</th>
+                        <th>Sede</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Personas</th>
+                        <th>Habitaciones</th>
+                        <th>Total</th>
+                        <th>Creado</th>
+                        <th>Comprobante</th>
+                    </tr>
+                </thead>
+                <tbody id="tb-reservas">
+                    <tr><td colspan="12" class="text-center text-muted py-4">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 </main><!-- /fr-main -->
 
 
@@ -815,7 +862,8 @@ const SECTIONS = {
     sedes:         { title: 'Sedes',           sub: 'Sedes y apartamentos registrados'       },
     accommodation: { title: 'Alojamientos',    sub: 'Habitaciones y apartamentos registrados'},
     seasons:       { title: 'Temporadas',      sub: 'Temporadas altas, bajas y especiales'   },
-    rates:         { title: 'Tarifas',         sub: 'Tarifas por temporada y alojamiento'    }
+    rates:         { title: 'Tarifas',         sub: 'Tarifas por temporada y alojamiento'    },
+    reservas: { title: 'Reservas', sub: 'Solicitudes de reserva de clientes' }
 };
 
 
@@ -1534,6 +1582,59 @@ async function guardarEditRate() {
     }
 }
 
+/* ══════════════════════════════════════
+   RESERVAS
+══════════════════════════════════════ */
+let allReservas = [];
+
+function filaReserva(r, i) {
+    const comprobante = r.paymentProof
+        ? `<a href="${r.paymentProof}" target="_blank" class="btn btn-sm btn-outline-secondary">
+               Ver PDF
+           </a>`
+        : `<span class="text-muted" style="font-size:12px;">Sin comprobante</span>`;
+
+    return `<tr>
+        <td class="fr-mono text-muted">${i + 1}</td>
+        <td class="fr-mono text-muted">${r.idDetalleReserve}</td>
+        <td>
+            <div style="font-weight:500;">${r.userName} ${r.userLastname}</div>
+            <div style="font-size:11px;color:#888;">ID: ${r.idUser}</div>
+        </td>
+        <td class="fr-mono">${r.userCedula}</td>
+        <td><span class="fw-500">${r.sedeName}</span></td>
+        <td class="fr-mono">${fmtFecha(r.dateStart)}</td>
+        <td class="fr-mono">${fmtFecha(r.dateFinish)}</td>
+        <td>${r.numberPerson} pers.</td>
+        <td style="text-align:center;">${r.numberRooms}</td>
+        <td class="fr-mono">${fmtPrecio(r.totalCal)}</td>
+        <td class="fr-mono text-muted">${fmtFecha(r.createdAt)}</td>
+        <td>${comprobante}</td>
+    </tr>`;
+}
+
+function renderReservas(reservas) {
+    document.getElementById('cnt-reservas').textContent = reservas.length;
+    document.getElementById('lbl-reservas').textContent = `${reservas.length} registros`;
+    document.getElementById('tb-reservas').innerHTML =
+        reservas.length
+            ? reservas.map(filaReserva).join('')
+            : filaVacia(12, 'No hay reservas registradas');
+}
+
+async function cargarReservas() {
+    try {
+        const res = await fetch('/api/detalleReserve/allWithDetails');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allReservas = await res.json();
+        renderReservas(allReservas);
+    } catch (err) {
+        console.error('[FR] Error reservas:', err);
+        document.getElementById('tb-reservas').innerHTML =
+            filaVacia(12, 'Error al cargar reservas');
+    }
+}
+
 
 /* ══════════════════════════════════════
    INICIO — carga todos los datos
@@ -1543,6 +1644,7 @@ cargarSedes();
 cargarAccommodation();
 cargarSeasons();
 cargarRates();
+cargarReservas();
 
 </script>
 </body>
