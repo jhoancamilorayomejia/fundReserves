@@ -33,6 +33,8 @@ namespace FoundReserves.Models
         [MaxLength(255)]
         public string? PaymentProof { get; set; }
 
+        public DateTime? CreatedAt { get; set; }
+
         
     }
 }

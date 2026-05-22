@@ -336,6 +336,9 @@ builder.Entity<DetalleReserve>(entity =>
         .IsRequired(false)
         .HasMaxLength(255);
 
+        entity.Property(e => e.CreatedAt)
+    .HasDefaultValueSql("GETDATE()");
+
     // FK → users
     entity.HasOne<User>()
         .WithMany()

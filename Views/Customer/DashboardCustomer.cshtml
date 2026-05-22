@@ -155,8 +155,9 @@
         <th>Check-out</th>
         <th>Total</th>
         <th>Habitaciones</th>
-        <th>Estado</th>
+        <th>Fecha y hora de creacion</th>
         <th>Comprobante</th>
+        <th>Acciones</th>
     </tr>
 </thead>
             <tbody id="tb-misreservas">
@@ -227,6 +228,46 @@
         </div>
 
     </div>
+
+</div>
+
+ <!-- MODAL: INFO RESERVAS -->
+<div class="fc-modal-overlay d-none" id="modal-reservas-overlay">
+    <div class="fc-modal" style="max-width:720px" role="dialog" aria-modal="true">
+
+        <button class="fc-modal-close" onclick="cerrarModalReservas()" aria-label="Cerrar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+
+        <div class="fc-modal-body">
+            <h3 class="fc-modal-title">Detalle de habitaciones reservadas</h3>
+            <p style="font-size:12px;color:var(--text-muted,#9ca3af);margin-bottom:12px">
+                Habitaciones individuales asociadas a esta reserva
+            </p>
+            <div class="fc-table-wrap">
+                <table class="fc-table">
+                    <thead>
+    <tr>
+        <th>Habitación</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+    </tr>
+</thead>
+                    <tbody id="tb-modal-reservas">
+                        <tr><td colspan="6" class="fc-empty">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="fc-modal-footer">
+            <button class="fc-btn-secondary" onclick="cerrarModalReservas()">Cerrar</button>
+        </div>
+
+    </div>
 </div>
 
 
@@ -237,7 +278,6 @@
 
 /* ══════════════════════════════════════
    MAPA: nombre de ciudad → archivo de imagen
-   Las imágenes deben estar en ~/images/sedes/
 ══════════════════════════════════════ */
 const IMG_MAP = {
     'sede recreativa villeta': 'villeta.jpg',
@@ -250,17 +290,9 @@ const IMG_MAP = {
     'sede federman': 'Bogota.jpg'
 };
 
-/* Devuelve la ruta de imagen para una sede según su nombre o ciudad */
 function resolverImagen(sede) {
-
-    const nombre = (sede.name || '')
-        .toLowerCase()
-        .trim();
-
-    if (IMG_MAP[nombre]) {
-        return `/images/${IMG_MAP[nombre]}`;
-    }
-
+    const nombre = (sede.name || '').toLowerCase().trim();
+    if (IMG_MAP[nombre]) return `/images/${IMG_MAP[nombre]}`;
     return null;
 }
 
@@ -268,7 +300,7 @@ function resolverImagen(sede) {
    ESTADO GLOBAL
 ══════════════════════════════════════ */
 let allSedes   = [];
-let filtroTipo = 'sedes'; // 'sedes' | 'apartamentos'
+let filtroTipo = 'sedes';
 
 /* ══════════════════════════════════════
    HELPERS
@@ -280,8 +312,25 @@ function fmtPrecio(n) {
     });
 }
 
-function esSede(s)       { return (s.type || '').toLowerCase().includes('hotel') || (s.type || '').toLowerCase().includes('recreativ'); }
-function esApartamento(s){ return (s.type || '').toLowerCase().includes('apart'); }
+function fmtFecha(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    return isNaN(d) ? val : d.toLocaleDateString('es-CO', {
+        day: '2-digit', month: 'short', year: 'numeric'
+    });
+}
+
+function fmtFechaHora(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+    const fecha = d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hora  = d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${fecha}, ${hora}`;
+}
+
+function esSede(s)        { return (s.type || '').toLowerCase().includes('hotel') || (s.type || '').toLowerCase().includes('recreativ'); }
+function esApartamento(s) { return (s.type || '').toLowerCase().includes('apart'); }
 
 function tipoPill(tipo) {
     if (!tipo) return '<span class="fc-badge badge-sede">—</span>';
@@ -294,35 +343,13 @@ function tipoPill(tipo) {
 /* ══════════════════════════════════════
    MIS RESERVAS
 ══════════════════════════════════════ */
-
-// Mapea el texto de estado a clases CSS
-function estadoBadge(estado) {
-    const e = (estado || '').toLowerCase();
-    if (e.includes('confirm'))   return ['fc-badge fc-badge-conf', '✓ Confirmada'];
-    if (e.includes('cancel'))    return ['fc-badge fc-badge-can',  '✕ Cancelada'];
-    if (e.includes('complet'))   return ['fc-badge fc-badge-comp', '● Completada'];
-    return ['fc-badge fc-badge-pend', '◌ Pendiente'];
-}
-
-function fmtFecha(val) {
-    if (!val) return '—';
-    const d = new Date(val);
-    return isNaN(d) ? val : d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
-}
-
 function renderMisReservas(reservas) {
     const tbody = document.getElementById('tb-misreservas');
 
-    // ── Estadísticas reales ──────────────────────────────────────
-    const total     = reservas.length;
-    const pendientes  = reservas.filter(r => (r.state || '').toLowerCase().includes('pend') || !r.state).length;
-    const confirmadas = reservas.filter(r => (r.state || '').toLowerCase().includes('confirm')).length;
-    const completadas = reservas.filter(r => (r.state || '').toLowerCase().includes('complet')).length;
-
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-pend').textContent  = pendientes;
-    document.getElementById('stat-conf').textContent  = confirmadas;
-    document.getElementById('stat-comp').textContent  = completadas;
+    document.getElementById('stat-total').textContent = reservas.length;
+    document.getElementById('stat-pend').textContent  = 0;
+    document.getElementById('stat-conf').textContent  = 0;
+    document.getElementById('stat-comp').textContent  = 0;
 
     if (!reservas.length) {
         tbody.innerHTML = `<tr><td colspan="9" class="fc-empty">No tienes reservas aún</td></tr>`;
@@ -330,7 +357,9 @@ function renderMisReservas(reservas) {
     }
 
     tbody.innerHTML = reservas.map((r, i) => {
-        const [badgeCls, badgeText] = estadoBadge(r.state);
+
+        const sedeObj    = allSedes.find(s => s.idSede === r.idSede);
+        const sedeNombre = sedeObj ? sedeObj.name : `Sede #${r.idSede ?? '—'}`;
 
         const comprobanteCell = r.paymentProof
             ? `<a href="${r.paymentProof}" target="_blank" class="fc-btn-select">Ver PDF</a>`
@@ -343,48 +372,45 @@ function renderMisReservas(reservas) {
         return `
         <tr class="fc-row">
             <td style="font-weight:600;color:var(--text-muted,#9ca3af)">${i + 1}</td>
-            <td><span class="fc-sede-name">Sede #${r.idSede ?? '—'}</span></td>
+            <td><span class="fc-sede-name">${sedeNombre}</span></td>
             <td style="font-size:12px;color:#888">${r.numberPerson ?? '—'} pers.</td>
             <td>${fmtFecha(r.dateStart)}</td>
             <td>${fmtFecha(r.dateFinish)}</td>
             <td class="fc-td-price">${fmtPrecio(r.totalCal)}</td>
             <td style="text-align:center">${r.numberRooms ?? '—'}</td>
-            <td><span class="${badgeCls}">${badgeText}</span></td>
+            <td style="font-size:12px;color:var(--text-muted,#9ca3af)">${fmtFechaHora(r.createdAt)}</td>
             <td>${comprobanteCell}</td>
+            <td>
+    <button class="fc-btn-select"
+            onclick="verInfoReserva(${r.idUser}, '${r.dateStart}', '${r.dateFinish}')"
+            ${!r.createdAt ? 'disabled title="Sin fecha de creación"' : ''}>
+        Ver info
+    </button>
+    <button class="fc-btn-select" style="background:#e53e3e;margin-top:4px"
+            onclick="eliminarReserva(${r.idDetalleReserve})">
+        Eliminar
+    </button>
+</td>
         </tr>`;
     }).join('');
 }
 
 async function cargarMisReservas() {
-
     const idUser = @ViewBag.IdUser;
-
     try {
-
         const res = await fetch(`/api/detalleReserve/byUser/${idUser}`);
-
-        if (!res.ok)
-            throw new Error(`HTTP ${res.status}`);
-
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-
         renderMisReservas(data);
-
     } catch (err) {
-
         console.error('[FR] Error detalleReserve:', err);
-
         document.getElementById('tb-misreservas').innerHTML =
-            `<tr>
-                <td colspan="9" class="fc-empty fc-error">
-                    Error al cargar reservas
-                </td>
-            </tr>`;
+            `<tr><td colspan="9" class="fc-empty fc-error">Error al cargar reservas</td></tr>`;
     }
 }
 
 /* ══════════════════════════════════════
-   RENDER TABLA
+   RENDER TABLA SEDES
 ══════════════════════════════════════ */
 function renderSedes(sedes) {
     const tbody = document.getElementById('tb-sedes');
@@ -432,7 +458,7 @@ function filtrarYRender() {
     const q = (document.getElementById('buscador').value || '').toLowerCase().trim();
 
     let lista = filtroTipo === 'sedes'
-        ? allSedes.filter(s => !esApartamento(s))   // Sede Recreativa (y cualquier otro tipo que no sea Apartamento)
+        ? allSedes.filter(s => !esApartamento(s))
         : allSedes.filter(s =>  esApartamento(s));
 
     if (q) {
@@ -453,8 +479,7 @@ function abrirModal(idSede) {
     const s = allSedes.find(x => x.idSede === idSede);
     if (!s) return;
 
-    // Imagen
-    const wrap = document.getElementById('modal-img-wrap');
+    const wrap   = document.getElementById('modal-img-wrap');
     const imgSrc = resolverImagen(s);
     if (imgSrc) {
         wrap.innerHTML = `<img src="${imgSrc}" alt="${s.name || ''}"
@@ -469,13 +494,10 @@ function abrirModal(idSede) {
         </div>`;
     }
 
-    // Badge tipo
-    const lower = (s.type || '').toLowerCase();
+    const lower    = (s.type || '').toLowerCase();
     const badgeCls = lower.includes('apart') ? 'badge-apart' : 'badge-sede';
-    document.getElementById('modal-tipo-badge').className = `fc-badge ${badgeCls}`;
+    document.getElementById('modal-tipo-badge').className   = `fc-badge ${badgeCls}`;
     document.getElementById('modal-tipo-badge').textContent = s.type || '—';
-
-    // Datos
     document.getElementById('modal-btn-reservar').dataset.idSede = s.idSede;
     document.getElementById('modal-nombre').textContent     = s.name            || '—';
     document.getElementById('modal-ciudad').textContent     = s.city            || '—';
@@ -501,9 +523,8 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 });
 
 /* ══════════════════════════════════════
-   TABS (topbar + subtabs sincronizan)
+   TABS
 ══════════════════════════════════════ */
-// Dentro de activarTab(tab) — reemplaza la función existente
 const TABS_META = {
     sedes:        { title: 'Sedes disponibles',        sub: 'Explora nuestras sedes recreativas' },
     apartamentos: { title: 'Apartamentos disponibles', sub: 'Explora nuestros apartamentos'      },
@@ -520,11 +541,10 @@ function activarTab(tab) {
     document.getElementById('page-sub').textContent   = TABS_META[tab]?.sub   ?? '';
     document.getElementById('buscador').value = '';
 
-    // Mostrar/ocultar paneles
     const esMisReservas = tab === 'misreservas';
-    document.querySelector('.fc-subtabs').style.display  = esMisReservas ? 'none' : '';
+    document.querySelector('.fc-subtabs').style.display    = esMisReservas ? 'none' : '';
     document.querySelector('.fc-search-bar').style.display = esMisReservas ? 'none' : '';
-    document.getElementById('wrap-sedes').style.display = esMisReservas ? 'none' : '';
+    document.getElementById('wrap-sedes').style.display    = esMisReservas ? 'none' : '';
     document.getElementById('panel-misreservas').style.display = esMisReservas ? '' : 'none';
 
     if (esMisReservas) {
@@ -567,40 +587,75 @@ async function cargarSedes() {
 }
 
 async function subirPDF(idDetalleReserve, input) {
-
     const file = input.files[0];
-
-    if (!file)
-        return;
+    if (!file) return;
 
     const formData = new FormData();
-
-    formData.append("file", file);
+    formData.append('file', file);
 
     try {
-
-        const res = await fetch(
-            `/api/detalleReserve/uploadProof/${idDetalleReserve}`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
+        const res  = await fetch(`/api/detalleReserve/uploadProof/${idDetalleReserve}`, {
+            method: 'POST',
+            body:   formData
+        });
         const data = await res.json();
-
-        if (!res.ok)
-            throw new Error(data.message || "Error");
-
-        alert("PDF subido correctamente");
-
+        if (!res.ok) throw new Error(data.message || 'Error');
+        alert('PDF subido correctamente');
         cargarMisReservas();
-
     } catch (err) {
-
         console.error(err);
+        alert('Error al subir PDF');
+    }
+}
 
-        alert("Error al subir PDF");
+/* ══════════════════════════════════════
+   MODAL: INFO RESERVAS
+══════════════════════════════════════ */
+async function verInfoReserva(idUser, dateStart, dateFinish) {
+    try {
+        const url = `/api/reservations/byUserAndDate?idUser=${idUser}&dateStart=${encodeURIComponent(dateStart)}&dateFinish=${encodeURIComponent(dateFinish)}`;
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderModalReservas(data);
+        document.getElementById('modal-reservas-overlay').classList.remove('d-none');
+        document.body.style.overflow = 'hidden';
+    } catch (err) {
+        console.error('[FR] Error reservas:', err);
+        alert('Error al cargar información de reservas');
+    }
+}
+
+function renderModalReservas(reservas) {
+    const tbody = document.getElementById('tb-modal-reservas');
+    if (!reservas.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="fc-empty">Sin reservas asociadas</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = reservas.map(r => `
+        <tr class="fc-row">
+            <td><span class="fc-sede-name">${r.accommodationName ?? '—'}</span></td>
+            <td class="fc-td-desc">${r.accommodationDescription ?? '—'}</td>
+            <td><span class="fc-badge">${r.state ?? '—'}</span></td>
+        </tr>
+    `).join('');
+}
+
+function cerrarModalReservas() {
+    document.getElementById('modal-reservas-overlay').classList.add('d-none');
+    document.body.style.overflow = '';
+}
+
+async function eliminarReserva(idDetalleReserve) {
+    if (!confirm('¿Seguro que deseas eliminar esta reserva?')) return;
+    try {
+        const res = await fetch(`/api/detalleReserve/${idDetalleReserve}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        alert('Reserva eliminada');
+        cargarMisReservas();
+    } catch (err) {
+        console.error(err);
+        alert('Error al eliminar');
     }
 }
 

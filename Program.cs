@@ -11,7 +11,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+.AddJsonOptions(opt =>
+        opt.JsonSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase);
 
 // Session
 builder.Services.AddDistributedMemoryCache();

@@ -162,7 +162,27 @@ namespace FoundReserves.Controllers
 
             return Ok(lista);
         }
-    }
+
+    
+    
+    // ════════════════════════════════════════
+        // ELIMINAR DETALLE RESERVA
+        // DELETE: /api/detalleReserve/{id}
+        // ════════════════════════════════════════
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var detalle = await _db.DetalleReserves.FindAsync(id);
+            if (detalle == null)
+                return NotFound(new { message = "No encontrado" });
+
+            _db.DetalleReserves.Remove(detalle);
+            await _db.SaveChangesAsync();
+            return Ok(new { message = "Eliminado correctamente" });
+        }
+
+    }  
+    
 
     // ════════════════════════════════════════
     // DTO

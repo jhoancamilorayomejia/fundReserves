@@ -515,3 +515,47 @@ html, body {
     color: var(--text-muted, #9ca3af);
     font-style: italic;
 }
+
+/* ══ MODAL RESERVAS ══ */
+#modal-reservas-overlay .fc-modal {
+    max-width: 95vw;
+    width: 950px;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#modal-reservas-overlay .fc-modal-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 16px 20px;
+}
+
+#modal-reservas-overlay .fc-modal-title {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+#modal-reservas-overlay p {
+    margin-bottom: 8px !important;
+}
+
+#modal-reservas-overlay .fc-table-wrap {
+    overflow-y: auto;
+    max-height: 50vh;
+}
+
+#modal-reservas-overlay .fc-table thead th {
+    padding: 8px 10px;
+    font-size: 10px;
+}
+
+#modal-reservas-overlay .fc-table tbody td {
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+#modal-reservas-overlay .fc-modal-footer {
+    padding: 10px 20px;
+}
