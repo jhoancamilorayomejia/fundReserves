@@ -744,6 +744,51 @@
         </div>
     </div><!-- /sec-rates -->
 
+    <!-- MODAL: EDITAR TARIFA -->
+<div class="modal fade" id="modal-edit-rate" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Editar tarifa</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fr-modal-body">
+                <input type="hidden" id="edit-rate-id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Mínimo personas</label>
+                        <input type="number" class="form-control" id="edit-minPerson" min="1" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Máximo personas</label>
+                        <input type="number" class="form-control" id="edit-maxPerson" min="1" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Precio noche</label>
+                        <input type="number" class="form-control" id="edit-priceNight" min="0" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Precio persona adicional</label>
+                        <input type="number" class="form-control" id="edit-priceAdditional" min="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-dark"
+                        onclick="guardarEditRate()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </main><!-- /fr-main -->
 
 
@@ -1014,21 +1059,26 @@ function filaSeason(s, i) {
 
 /* Fila para tabla TARIFAS */
 function filaRate(r, i) {
-    return `<tr>
+    return `<tr id="fila-rate-${r.idPrice}">
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${r.idPrice || '—'}</td>
         <td>${r.accommodationName || r.idAccommodation}</td>
         <td>${r.seasonType        || r.idSeason}</td>
-        <td>${r.minimumPerson     || '—'}</td>
-        <td>${r.maximumPerson     || '—'}</td>
-        <td class="fr-mono">${fmtPrecio(r.priceNight)}</td>
-        <td class="fr-mono">${fmtPrecio(r.pricePersonAdditional)}</td>
+        <td class="fr-mono" id="minP-${r.idPrice}">${r.minimumPerson || '—'}</td>
+        <td class="fr-mono" id="maxP-${r.idPrice}">${r.maximumPerson || '—'}</td>
+        <td class="fr-mono" id="pN-${r.idPrice}">${fmtPrecio(r.priceNight)}</td>
+        <td class="fr-mono" id="pA-${r.idPrice}">${fmtPrecio(r.pricePersonAdditional)}</td>
         <td>
-            <!-- Elimina tarifa de la tabla rates -->
-            <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarRate(${r.idPrice})">
-                Eliminar
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="abrirEditRate(${r.idPrice}, ${r.minimumPerson}, ${r.maximumPerson}, ${r.priceNight}, ${r.pricePersonAdditional})">
+                    Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarRate(${r.idPrice})">
+                    Eliminar
+                </button>
+            </div>
         </td>
     </tr>`;
 }
@@ -1436,6 +1486,53 @@ document.getElementById('form-accommodation').addEventListener('submit', async f
         alert('Error de conexión');
     }
 });
+
+/* ══════════════════════════════════════
+   EDITAR TARIFA
+══════════════════════════════════════ */
+function abrirEditRate(id, minP, maxP, pN, pA) {
+    document.getElementById('edit-rate-id').value        = id;
+    document.getElementById('edit-minPerson').value      = minP;
+    document.getElementById('edit-maxPerson').value      = maxP;
+    document.getElementById('edit-priceNight').value     = pN;
+    document.getElementById('edit-priceAdditional').value = pA;
+    new bootstrap.Modal(document.getElementById('modal-edit-rate')).show();
+}
+
+async function guardarEditRate() {
+    const id   = parseInt(document.getElementById('edit-rate-id').value);
+    const body = {
+        minimumPerson:         parseInt(document.getElementById('edit-minPerson').value),
+        maximumPerson:         parseInt(document.getElementById('edit-maxPerson').value),
+        priceNight:            parseFloat(document.getElementById('edit-priceNight').value),
+        pricePersonAdditional: parseFloat(document.getElementById('edit-priceAdditional').value)
+    };
+
+    if (body.minimumPerson > body.maximumPerson) {
+        alert('El mínimo no puede ser mayor al máximo.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/rates/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-rate')
+        ).hide();
+
+        alert('Tarifa actualizada correctamente');
+        cargarRates();
+    } catch (err) {
+        console.error('[FR] Error actualizando tarifa:', err);
+        alert('Error de conexión');
+    }
+}
 
 
 /* ══════════════════════════════════════

@@ -74,5 +74,58 @@ public ActionResult GetByUserAndDate(
 
     return Ok(reservas);
 }
+
+    // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04
+    // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04&persons=3
+[HttpGet("available")]
+public ActionResult GetAvailable(
+    [FromQuery] int idSede,
+    [FromQuery] DateTime dateStart,
+    [FromQuery] DateTime dateFinish,
+    [FromQuery] int persons = 1)
+{
+    var ocupados = _context.Reserves
+        .Where(r => r.DateStart  < dateFinish &&
+                    r.DateFinish > dateStart  &&
+                    r.State != "Cancelada")
+        .Select(r => r.IdAccommodation)
+        .Distinct()
+        .ToList();
+
+    var disponibles = _context.Accommodations
+        .Where(a => a.idsede == idSede &&
+                    !ocupados.Contains(a.idAccommodation) &&
+                    a.maximumPerson >= persons)
+        .Select(a => new {
+            a.idAccommodation,
+            a.name,
+            a.number,
+            a.maximumPerson,
+            a.description,
+            a.state,
+            tarifas = _context.Rates
+                .Where(r => r.idAccommodation == a.idAccommodation &&
+                            r.minimumPerson   <= persons &&
+                            r.maximumPerson   >= persons)
+                .Join(_context.Seasons,
+                      r => r.idSeason,
+                      s => s.idSeason,
+                      (r, s) => new {
+                          r.idPrice,
+                          seasonName   = s.name,
+                          seasonType   = s.type,
+                          r.priceNight,
+                          r.pricePersonAdditional,
+                          r.minimumPerson,
+                          r.maximumPerson
+                      })
+                .ToList()
+        })
+        .ToList();
+
+    return Ok(disponibles);
+}
+
+
     }
 }

@@ -92,6 +92,101 @@
 
                 <hr class="rv-divider" />
 
+                <!-- ══ BUSCADOR DE DISPONIBILIDAD ══ -->
+<div>
+    <p class="rv-section-label">Buscar disponibilidad</p>
+    <p style="font-size:12px;color:var(--text-muted,#9ca3af);margin-bottom:16px;">
+        Consulta habitaciones libres, tarifas y calcula el costo total antes de reservar
+    </p>
+
+    <!-- Filtros -->
+    <div class="rv-grid-2" style="margin-bottom:12px;">
+        <div class="rv-field">
+            <label for="avail-start">Fecha de inicio <span style="color:#ef4444">*</span></label>
+            <input type="date" id="avail-start" />
+        </div>
+        <div class="rv-field">
+            <label for="avail-end">Fecha de fin <span style="color:#ef4444">*</span></label>
+            <input type="date" id="avail-end" />
+        </div>
+        <div class="rv-field">
+            <label for="avail-persons">Número de personas <span style="color:#ef4444">*</span></label>
+            <input type="number" id="avail-persons" min="1" value="1" placeholder="Ej: 2" />
+        </div>
+        <div class="rv-field" style="display:flex;align-items:flex-end;">
+            <button type="button" id="btn-check-avail" onclick="verificarDisponibilidad()"
+                    style="width:100%;padding:10px;background:var(--accent);color:#fff;
+                           border:none;border-radius:8px;font-family:inherit;font-size:13px;
+                           font-weight:500;cursor:pointer;">
+                Consultar disponibilidad
+            </button>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div id="avail-result" style="display:none;margin-top:8px;">
+
+        <p id="avail-summary" style="font-size:12px;color:var(--text-muted,#9ca3af);margin-bottom:12px;"></p>
+
+        <!-- Tarjetas de habitaciones -->
+        <div id="avail-cards" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+        <!-- Calculadora -->
+        <div id="calc-panel" style="display:none;margin-top:20px;
+             background:var(--bg-card,#181818);border:1px solid var(--border);
+             border-radius:12px;padding:20px;">
+
+            <p class="rv-section-label" style="margin-bottom:14px;">
+                Calcular tarifa
+            </p>
+
+            <div class="rv-grid-2" style="margin-bottom:14px;">
+                <div class="rv-field">
+                    <label>Habitación seleccionada</label>
+                    <input type="text" id="calc-acc-name" disabled
+                           style="background:transparent;color:var(--text);" />
+                </div>
+                <div class="rv-field">
+                    <label for="calc-rooms">Número de habitaciones</label>
+                    <input type="number" id="calc-rooms" min="1" value="1"
+                           oninput="calcularTarifaBuscador()" />
+                </div>
+                <div class="rv-field">
+                    <label for="calc-persons">Personas</label>
+                    <input type="number" id="calc-persons" min="1"
+                           oninput="calcularTarifaBuscador()" />
+                </div>
+                <div class="rv-field">
+                    <label for="calc-extra">Personas adicionales</label>
+                    <input type="number" id="calc-extra" min="0" value="0"
+                           oninput="calcularTarifaBuscador()" />
+                </div>
+            </div>
+
+            <!-- Tarifas disponibles -->
+            <div id="calc-rates-wrap" style="margin-bottom:14px;"></div>
+
+            <!-- Resultado -->
+            <div style="background:#111;border-radius:8px;padding:14px 18px;
+                        display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-size:11px;color:var(--text-muted,#9ca3af);
+                                text-transform:uppercase;letter-spacing:.06em;">
+                        Total estimado
+                    </div>
+                    <div id="calc-breakdown"
+                         style="font-size:11px;color:var(--text-muted,#9ca3af);margin-top:2px;"></div>
+                </div>
+                <span id="calc-total"
+                      style="font-size:24px;font-weight:700;color:var(--accent,#e8355a);
+                             font-family:'DM Mono',monospace;">
+                    $ —
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
                 <!-- Alojamiento y fechas -->
                 <div>
                     <p class="rv-section-label">Alojamiento y fechas</p>
@@ -977,6 +1072,233 @@ async function submitReserva() {
             </svg>
             Crear reserva`;
     }
+}
+
+/* ══════════════════════════════════════
+   VERIFICAR DISPONIBILIDAD
+══════════════════════════════════════ */
+async function verificarDisponibilidad() {
+    const dateStart = document.getElementById('avail-start').value;
+    const dateEnd   = document.getElementById('avail-end').value;
+    const tbody     = document.getElementById('tb-avail');
+    const result    = document.getElementById('avail-result');
+
+    if (!dateStart || !dateEnd || dateEnd <= dateStart) {
+        showToast('Selecciona un rango de fechas válido.', 'error');
+        return;
+    }
+
+    tbody.innerHTML = `<tr><td colspan="5" class="fc-empty">Consultando...</td></tr>`;
+    result.style.display = 'block';
+
+    try {
+        const url = `/api/reservations/available?idSede=${idSedeParam}&dateStart=${dateStart}&dateFinish=${dateEnd}`;
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (!data.length) {
+            tbody.innerHTML = `<tr><td colspan="5" class="fc-empty">No hay habitaciones disponibles en ese rango.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.map(a => `
+            <tr class="fc-row">
+                <td style="font-weight:600;">N° ${a.number ?? '—'}</td>
+                <td><span class="fc-sede-name">${a.name ?? '—'}</span></td>
+                <td>${a.maximumPerson ?? '—'} pers.</td>
+                <td class="fc-td-desc">${a.description ?? '—'}</td>
+                <td><span class="fc-badge badge-sede">${a.state ?? 'Disponible'}</span></td>
+            </tr>
+        `).join('');
+
+    } catch (err) {
+        console.error('[FR] Error disponibilidad:', err);
+        tbody.innerHTML = `<tr><td colspan="5" class="fc-empty fc-error">Error al consultar.</td></tr>`;
+    }
+}
+
+/* ══════════════════════════════════════
+   BUSCADOR DE DISPONIBILIDAD
+══════════════════════════════════════ */
+let availData      = [];   // resultados actuales
+let calcAccId      = null; // alojamiento seleccionado en calculadora
+let calcRates      = [];   // tarifas del alojamiento seleccionado
+
+async function verificarDisponibilidad() {
+    const dateStart = document.getElementById('avail-start').value;
+    const dateEnd   = document.getElementById('avail-end').value;
+    const persons   = parseInt(document.getElementById('avail-persons').value) || 1;
+    const cards     = document.getElementById('avail-cards');
+    const result    = document.getElementById('avail-result');
+    const summary   = document.getElementById('avail-summary');
+    const calcPanel = document.getElementById('calc-panel');
+
+    if (!dateStart || !dateEnd || dateEnd <= dateStart) {
+        showToast('Selecciona un rango de fechas válido.', 'error');
+        return;
+    }
+
+    cards.innerHTML          = `<p style="color:var(--text-muted,#9ca3af);font-size:13px;">Consultando...</p>`;
+    result.style.display     = 'block';
+    calcPanel.style.display  = 'none';
+
+    try {
+        const nights = diffDays(dateStart, dateEnd);
+        const url    = `/api/reservations/available?idSede=${idSedeParam}&dateStart=${dateStart}&dateFinish=${dateEnd}&persons=${persons}`;
+        const res    = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        availData = await res.json();
+
+        summary.textContent = availData.length
+            ? `${availData.length} habitación(es) disponible(s) · ${nights} noche(s) · ${persons} persona(s)`
+            : '';
+
+        if (!availData.length) {
+            cards.innerHTML = `
+                <div style="text-align:center;padding:32px;color:var(--text-muted,#9ca3af);font-size:13px;">
+                    No hay habitaciones disponibles para ese rango y número de personas.
+                </div>`;
+            return;
+        }
+
+        cards.innerHTML = availData.map(a => {
+            const tarifasBadges = a.tarifas.length
+                ? a.tarifas.map(t => `
+                    <span class="rv-rate-badge ${badgeClass(t.seasonType)}"
+                          style="margin-right:4px;">
+                        ${t.seasonName} — ${fmtCOP(t.priceNight)}/noche
+                    </span>`).join('')
+                : `<span style="font-size:12px;color:var(--text-muted,#9ca3af);">Sin tarifas registradas</span>`;
+
+            return `
+            <div style="background:var(--bg-card,#181818);border:1px solid var(--border);
+                        border-radius:10px;padding:16px;display:flex;
+                        justify-content:space-between;align-items:flex-start;gap:16px;">
+                <div style="flex:1;">
+                    <div style="font-weight:600;font-size:14px;margin-bottom:4px;">
+                        N° ${a.number ?? '—'} — ${a.name ?? '—'}
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted,#9ca3af);margin-bottom:8px;">
+                        Máx. ${a.maximumPerson} personas
+                        ${a.description ? ' · ' + a.description : ''}
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        ${tarifasBadges}
+                    </div>
+                </div>
+                <button type="button" onclick="abrirCalculadora(${a.idAccommodation})"
+                        style="white-space:nowrap;padding:8px 16px;background:var(--accent);
+                               color:#fff;border:none;border-radius:8px;font-family:inherit;
+                               font-size:12px;font-weight:500;cursor:pointer;">
+                    Calcular tarifa
+                </button>
+            </div>`;
+        }).join('');
+
+    } catch (err) {
+        console.error('[FR] Error disponibilidad:', err);
+        cards.innerHTML = `<p style="color:#f06080;font-size:13px;">Error al consultar disponibilidad.</p>`;
+    }
+}
+
+/* ══════════════════════════════════════
+   CALCULADORA DE TARIFA
+══════════════════════════════════════ */
+function abrirCalculadora(idAccommodation) {
+    const acc       = availData.find(a => a.idAccommodation === idAccommodation);
+    if (!acc) return;
+
+    calcAccId = idAccommodation;
+    calcRates = acc.tarifas || [];
+
+    const dateStart = document.getElementById('avail-start').value;
+    const dateEnd   = document.getElementById('avail-end').value;
+    const persons   = document.getElementById('avail-persons').value;
+
+    document.getElementById('calc-acc-name').value  = `N° ${acc.number} — ${acc.name ?? ''}`;
+    document.getElementById('calc-persons').value   = persons;
+    document.getElementById('calc-rooms').value     = 1;
+    document.getElementById('calc-extra').value     = 0;
+
+    // Mostrar tarifas disponibles
+    const wrap = document.getElementById('calc-rates-wrap');
+    if (calcRates.length) {
+        wrap.innerHTML = `
+            <p style="font-size:11px;font-weight:600;color:var(--text-muted,#9ca3af);
+                      text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">
+                Tarifas aplicables
+            </p>
+            <table class="rv-rates-table">
+                <thead>
+                    <tr>
+                        <th>Temporada</th>
+                        <th>Personas</th>
+                        <th>Precio/noche</th>
+                        <th>Pers. adicional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${calcRates.map(t => `
+                        <tr>
+                            <td><span class="rv-rate-badge ${badgeClass(t.seasonType)}">${t.seasonName}</span></td>
+                            <td>${t.minimumPerson} – ${t.maximumPerson} pers.</td>
+                            <td style="font-weight:600;">${fmtCOP(t.priceNight)}</td>
+                            <td>${fmtCOP(t.pricePersonAdditional)}</td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>`;
+    } else {
+        wrap.innerHTML = `<p style="font-size:12px;color:var(--text-muted,#9ca3af);">Sin tarifas registradas.</p>`;
+    }
+
+    document.getElementById('calc-panel').style.display = 'block';
+    document.getElementById('calc-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    calcularTarifaBuscador();
+}
+
+function calcularTarifaBuscador() {
+    const dateStart = document.getElementById('avail-start').value;
+    const dateEnd   = document.getElementById('avail-end').value;
+    const persons   = parseInt(document.getElementById('calc-persons').value)  || 1;
+    const rooms     = parseInt(document.getElementById('calc-rooms').value)    || 1;
+    const extra     = parseInt(document.getElementById('calc-extra').value)    || 0;
+    const totalEl   = document.getElementById('calc-total');
+    const breakEl   = document.getElementById('calc-breakdown');
+
+    if (!dateStart || !dateEnd || !calcRates.length) {
+        totalEl.textContent = '$ —';
+        breakEl.textContent = '';
+        return;
+    }
+
+    const nights   = diffDays(dateStart, dateEnd);
+    const desglose = desglosarTemporadas(dateStart, dateEnd);
+
+    let total      = 0;
+    let extraTotal = 0;
+    const parts    = [];
+
+    for (const { type, nights: n } of desglose) {
+        const tarifa = buscarTarifa(calcRates, type, persons);
+        if (!tarifa) continue;
+
+        const sub = tarifa.priceNight * n * rooms;
+        total += sub;
+        parts.push(`${type} ${n}n × ${fmtCOP(tarifa.priceNight)} × ${rooms} hab. = ${fmtCOP(sub)}`);
+
+        if (extra > 0 && tarifa.pricePersonAdditional) {
+            const subExtra = extra * tarifa.pricePersonAdditional * n;
+            extraTotal += subExtra;
+        }
+    }
+
+    total += extraTotal;
+    if (extraTotal > 0) parts.push(`${extra} pers. adicionales = ${fmtCOP(extraTotal)}`);
+
+    totalEl.textContent = fmtCOP(total);
+    breakEl.textContent = parts.join(' · ');
 }
 
 /* ══════════════════════════════════════

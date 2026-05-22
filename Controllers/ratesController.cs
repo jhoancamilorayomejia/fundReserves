@@ -170,5 +170,41 @@ public async Task<IActionResult> GetByAccommodation(int idAccommodation)
 
     return Ok(rates);
 }
+
+    
+    // PUT: api/rates/update/{id}
+[HttpPut("update/{id}")]
+public async Task<IActionResult> Update(int id, [FromBody] RateUpdateDto dto)
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol))
+        return Unauthorized(new { message = "Debes iniciar sesión" });
+    if (rol != "Admin")
+        return StatusCode(403, new { message = "No autorizado" });
+
+    var rate = await _context.Rates.FindAsync(id);
+    if (rate == null)
+        return NotFound(new { message = "Tarifa no encontrada" });
+
+    if (dto.MinimumPerson > dto.MaximumPerson)
+        return BadRequest(new { message = "El mínimo no puede ser mayor al máximo" });
+
+    rate.minimumPerson         = dto.MinimumPerson;
+    rate.maximumPerson         = dto.MaximumPerson;
+    rate.priceNight            = dto.PriceNight;
+    rate.pricePersonAdditional = dto.PricePersonAdditional;
+
+    await _context.SaveChangesAsync();
+    return Ok(new { message = "Tarifa actualizada correctamente" });
+}
+
+public class RateUpdateDto
+{
+    public int     MinimumPerson         { get; set; }
+    public int     MaximumPerson         { get; set; }
+    public decimal PriceNight            { get; set; }
+    public decimal PricePersonAdditional { get; set; }
+}
+
     }
 }
