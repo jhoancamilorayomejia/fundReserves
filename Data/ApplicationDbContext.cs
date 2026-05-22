@@ -18,6 +18,8 @@ namespace FoundReserves.Data
         public DbSet<Season> Seasons { get; set; }
 
         public DbSet<Rate> Rates { get; set; }
+         public DbSet<Reserve> Reserves { get; set; }
+         public DbSet<DetalleReserve> DetalleReserves { get; set; }
 
         protected override void OnModelCreating(
             ModelBuilder builder
@@ -243,6 +245,111 @@ namespace FoundReserves.Data
                     .HasForeignKey(e => e.idSeason)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            // ─────────────────────────────
+            // TABLA RESERVES
+            // ─────────────────────────────
+            builder.Entity<Reserve>(entity =>
+            {
+                entity.ToTable("reserves");
+
+                entity.HasKey(e => e.IdReserve);
+
+                entity.Property(e => e.IdReserve)
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.IdUser)
+                    .IsRequired();
+
+                entity.Property(e => e.IdAccommodation)
+                    .IsRequired();
+
+                entity.Property(e => e.DateStart)
+                    .IsRequired();
+
+                entity.Property(e => e.DateFinish)
+                    .IsRequired();
+
+                entity.Property(e => e.NumberPerson)
+                    .IsRequired();
+
+                entity.Property(e => e.TotalCal)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.State)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(e => e.DateCreation)
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(e => e.ServiceLaundry)
+                    .IsRequired();
+
+                // FK → USERS
+                entity.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.IdUser)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // FK → ACCOMMODATION
+                entity.HasOne<Accommodation>()
+                    .WithMany()
+                    .HasForeignKey(e => e.IdAccommodation)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ── DetalleReserves ──
+builder.Entity<DetalleReserve>(entity =>
+{
+    entity.ToTable("detalleReserve");
+
+    entity.HasKey(e => e.IdDetalleReserve);
+
+    entity.Property(e => e.IdDetalleReserve)
+        .ValueGeneratedOnAdd();
+
+    entity.Property(e => e.IdUser)
+        .IsRequired();
+
+    entity.Property(e => e.IdSede)
+        .IsRequired();
+
+    entity.Property(e => e.DateStart)
+        .IsRequired();
+
+    entity.Property(e => e.DateFinish)
+        .IsRequired();
+
+    entity.Property(e => e.NumberPerson)
+        .IsRequired();
+
+    entity.Property(e => e.NumberRooms)
+        .IsRequired();
+
+    entity.Property(e => e.TotalCal)
+        .HasColumnType("decimal(18,2)")
+        .IsRequired();
+
+    entity.Property(e => e.PaymentProof)
+        .IsRequired(false)
+        .HasMaxLength(255);
+
+    // FK → users
+    entity.HasOne<User>()
+        .WithMany()
+        .HasForeignKey(e => e.IdUser)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    // FK → sedes
+    entity.HasOne<Sede>()
+        .WithMany()
+        .HasForeignKey(e => e.IdSede)
+        .OnDelete(DeleteBehavior.Cascade);
+
+        
+});
         }
     }
 }

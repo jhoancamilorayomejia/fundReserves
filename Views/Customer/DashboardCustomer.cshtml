@@ -29,6 +29,7 @@
         <nav class="fc-top-nav">
             <button class="fc-top-link active" data-tab="sedes">Sedes</button>
             <button class="fc-top-link"        data-tab="apartamentos">Apartamentos</button>
+            <button class="fc-top-link"        data-tab="misreservas">Mis reservas</button>
         </nav>
     </div>
 
@@ -96,7 +97,7 @@
     </div>
 
     <!-- Tabla -->
-    <div class="fc-table-wrap">
+    <div class="fc-table-wrap" id="wrap-sedes">
         <table class="fc-table">
             <thead>
                 <tr>
@@ -118,6 +119,52 @@
             </tbody>
         </table>
     </div>
+
+    <!-- ════════ PANEL: MIS RESERVAS ════════ -->
+<div id="panel-misreservas" style="display:none">
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="fc-stats-grid">
+        <div class="fc-stat-card">
+            <span class="fc-stat-label">Total</span>
+            <span class="fc-stat-val" id="stat-total">—</span>
+        </div>
+        <div class="fc-stat-card">
+            <span class="fc-stat-label">Pendientes</span>
+            <span class="fc-stat-val fc-stat-warn" id="stat-pend">—</span>
+        </div>
+        <div class="fc-stat-card">
+            <span class="fc-stat-label">Confirmadas</span>
+            <span class="fc-stat-val fc-stat-ok" id="stat-conf">—</span>
+        </div>
+        <div class="fc-stat-card">
+            <span class="fc-stat-label">Completadas</span>
+            <span class="fc-stat-val fc-stat-info" id="stat-comp">—</span>
+        </div>
+    </div>
+
+    <!-- Tabla de reservas -->
+    <div class="fc-table-wrap">
+        <table class="fc-table">
+            <thead>
+    <tr>
+        <th>#</th>
+        <th>Sede</th>
+        <th>Personas</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Total</th>
+        <th>Habitaciones</th>
+        <th>Estado</th>
+        <th>Comprobante</th>
+    </tr>
+</thead>
+            <tbody id="tb-misreservas">
+                <tr><td colspan="9" class="fc-empty">Cargando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 </main>
 
@@ -245,6 +292,98 @@ function tipoPill(tipo) {
 }
 
 /* ══════════════════════════════════════
+   MIS RESERVAS
+══════════════════════════════════════ */
+
+// Mapea el texto de estado a clases CSS
+function estadoBadge(estado) {
+    const e = (estado || '').toLowerCase();
+    if (e.includes('confirm'))   return ['fc-badge fc-badge-conf', '✓ Confirmada'];
+    if (e.includes('cancel'))    return ['fc-badge fc-badge-can',  '✕ Cancelada'];
+    if (e.includes('complet'))   return ['fc-badge fc-badge-comp', '● Completada'];
+    return ['fc-badge fc-badge-pend', '◌ Pendiente'];
+}
+
+function fmtFecha(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    return isNaN(d) ? val : d.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function renderMisReservas(reservas) {
+    const tbody = document.getElementById('tb-misreservas');
+
+    // ── Estadísticas reales ──────────────────────────────────────
+    const total     = reservas.length;
+    const pendientes  = reservas.filter(r => (r.state || '').toLowerCase().includes('pend') || !r.state).length;
+    const confirmadas = reservas.filter(r => (r.state || '').toLowerCase().includes('confirm')).length;
+    const completadas = reservas.filter(r => (r.state || '').toLowerCase().includes('complet')).length;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-pend').textContent  = pendientes;
+    document.getElementById('stat-conf').textContent  = confirmadas;
+    document.getElementById('stat-comp').textContent  = completadas;
+
+    if (!reservas.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="fc-empty">No tienes reservas aún</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = reservas.map((r, i) => {
+        const [badgeCls, badgeText] = estadoBadge(r.state);
+
+        const comprobanteCell = r.paymentProof
+            ? `<a href="${r.paymentProof}" target="_blank" class="fc-btn-select">Ver PDF</a>`
+            : `<label class="fc-btn-select" style="cursor:pointer;">
+                   Subir PDF
+                   <input type="file" accept="application/pdf" style="display:none"
+                          onchange="subirPDF(${r.idDetalleReserve}, this)" />
+               </label>`;
+
+        return `
+        <tr class="fc-row">
+            <td style="font-weight:600;color:var(--text-muted,#9ca3af)">${i + 1}</td>
+            <td><span class="fc-sede-name">Sede #${r.idSede ?? '—'}</span></td>
+            <td style="font-size:12px;color:#888">${r.numberPerson ?? '—'} pers.</td>
+            <td>${fmtFecha(r.dateStart)}</td>
+            <td>${fmtFecha(r.dateFinish)}</td>
+            <td class="fc-td-price">${fmtPrecio(r.totalCal)}</td>
+            <td style="text-align:center">${r.numberRooms ?? '—'}</td>
+            <td><span class="${badgeCls}">${badgeText}</span></td>
+            <td>${comprobanteCell}</td>
+        </tr>`;
+    }).join('');
+}
+
+async function cargarMisReservas() {
+
+    const idUser = @ViewBag.IdUser;
+
+    try {
+
+        const res = await fetch(`/api/detalleReserve/byUser/${idUser}`);
+
+        if (!res.ok)
+            throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+
+        renderMisReservas(data);
+
+    } catch (err) {
+
+        console.error('[FR] Error detalleReserve:', err);
+
+        document.getElementById('tb-misreservas').innerHTML =
+            `<tr>
+                <td colspan="9" class="fc-empty fc-error">
+                    Error al cargar reservas
+                </td>
+            </tr>`;
+    }
+}
+
+/* ══════════════════════════════════════
    RENDER TABLA
 ══════════════════════════════════════ */
 function renderSedes(sedes) {
@@ -364,29 +503,35 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 /* ══════════════════════════════════════
    TABS (topbar + subtabs sincronizan)
 ══════════════════════════════════════ */
+// Dentro de activarTab(tab) — reemplaza la función existente
 const TABS_META = {
-    sedes:        { title: 'Sedes disponibles',       sub: 'Explora nuestras sedes recreativas' },
-    apartamentos: { title: 'Apartamentos disponibles', sub: 'Explora nuestros apartamentos'     }
+    sedes:        { title: 'Sedes disponibles',        sub: 'Explora nuestras sedes recreativas' },
+    apartamentos: { title: 'Apartamentos disponibles', sub: 'Explora nuestros apartamentos'      },
+    misreservas:  { title: 'Mis reservas',             sub: 'Historial y estado de tus reservas' }
 };
 
 function activarTab(tab) {
     filtroTipo = tab;
 
-    // Topbar
-    document.querySelectorAll('.fc-top-link').forEach(l =>
+    document.querySelectorAll('.fc-top-link, .fc-subtab').forEach(l =>
         l.classList.toggle('active', l.dataset.tab === tab));
 
-    // Subtabs
-    document.querySelectorAll('.fc-subtab').forEach(b =>
-        b.classList.toggle('active', b.dataset.tab === tab));
-
-    // Título
-    document.getElementById('page-title').textContent = TABS_META[tab].title;
-    document.getElementById('page-sub').textContent   = TABS_META[tab].sub;
-
-    // Limpiar búsqueda y re-renderizar
+    document.getElementById('page-title').textContent = TABS_META[tab]?.title ?? '';
+    document.getElementById('page-sub').textContent   = TABS_META[tab]?.sub   ?? '';
     document.getElementById('buscador').value = '';
-    filtrarYRender();
+
+    // Mostrar/ocultar paneles
+    const esMisReservas = tab === 'misreservas';
+    document.querySelector('.fc-subtabs').style.display  = esMisReservas ? 'none' : '';
+    document.querySelector('.fc-search-bar').style.display = esMisReservas ? 'none' : '';
+    document.getElementById('wrap-sedes').style.display = esMisReservas ? 'none' : '';
+    document.getElementById('panel-misreservas').style.display = esMisReservas ? '' : 'none';
+
+    if (esMisReservas) {
+        cargarMisReservas();
+    } else {
+        filtrarYRender();
+    }
 }
 
 document.querySelectorAll('[data-tab]').forEach(el => {
@@ -418,6 +563,44 @@ async function cargarSedes() {
         document.getElementById('error-msg').style.display = 'block';
         document.getElementById('tb-sedes').innerHTML =
             `<tr><td colspan="9" class="fc-empty fc-error">Error al cargar datos</td></tr>`;
+    }
+}
+
+async function subirPDF(idDetalleReserve, input) {
+
+    const file = input.files[0];
+
+    if (!file)
+        return;
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    try {
+
+        const res = await fetch(
+            `/api/detalleReserve/uploadProof/${idDetalleReserve}`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok)
+            throw new Error(data.message || "Error");
+
+        alert("PDF subido correctamente");
+
+        cargarMisReservas();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Error al subir PDF");
     }
 }
 
