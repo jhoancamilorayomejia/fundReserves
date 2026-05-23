@@ -293,6 +293,10 @@
       "PackagePath": "staticwebassets/lib/jquery/dist/jquery.min.map"
     },
     {
+      "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/uploads/comprobantes/81116fcc-8114-42ac-8e82-aff24f6b016d.pdf",
+      "PackagePath": "staticwebassets/uploads/comprobantes/81116fcc-8114-42ac-8e82-aff24f6b016d.pdf"
+    },
+    {
       "Id": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/uploads/comprobantes/9acc85ad-24a0-4664-9a79-6df9a52dd159.pdf",
       "PackagePath": "staticwebassets/uploads/comprobantes/9acc85ad-24a0-4664-9a79-6df9a52dd159.pdf"
     },

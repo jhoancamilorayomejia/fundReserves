@@ -682,3 +682,87 @@ body {
     border-top: 1px solid var(--border);
     background: var(--surface-2);
 }
+
+/* ══════════════════════════
+   BOTÓN OUTLINE SECONDARY (modal, cancelar)
+══════════════════════════ */
+.btn-outline-secondary {
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: var(--r-sm) !important;
+    color: var(--text-2) !important;
+    border: 1px solid var(--border-md) !important;
+    background: transparent !important;
+    transition: background .15s, border-color .15s, color .15s;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--surface-3) !important;
+    border-color: rgba(255,255,255,.2) !important;
+    color: var(--text-1) !important;
+}
+
+/* ══════════════════════════
+   BOTÓN OUTLINE PRIMARY (Ver habitaciones)
+══════════════════════════ */
+.btn-outline-primary {
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: var(--r-sm) !important;
+    color: var(--admin-color) !important;
+    border: 1px solid rgba(99,91,255,.35) !important;
+    background: var(--admin-bg) !important;
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+}
+
+.btn-outline-primary:hover {
+    background: rgba(99,91,255,.22) !important;
+    border-color: rgba(99,91,255,.55) !important;
+    color: var(--admin-color) !important;
+}
+
+/* ══════════════════════════
+   BADGE WARNING (estado Pendiente)
+══════════════════════════ */
+.badge.bg-warning {
+    background: rgba(234,179,8,.15) !important;
+    color: #fcd34d !important;
+    font-weight: 500;
+}
+
+/* badge danger (Cancelado) */
+.badge.bg-danger {
+    background: var(--danger-bg) !important;
+    color: var(--danger-color) !important;
+    font-weight: 500;
+}
+
+/* ══════════════════════════
+   FORM SELECT SM (dentro del modal)
+══════════════════════════ */
+.form-select-sm {
+    font-size: 12px !important;
+    padding: 4px 28px 4px 10px !important;
+    min-height: 30px;
+}
+
+/* ══════════════════════════
+   MODAL BOOTSTRAP — fondo oscuro
+══════════════════════════ */
+.modal-backdrop.show { opacity: .7; }
+
+.modal .fr-modal-body {
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+/* tabla dentro del modal */
+.modal .fr-table tbody td {
+    padding: 9px 12px;
+    font-size: 12.5px;
+}
+
+.modal .fr-table thead th {
+    padding: 8px 12px;
+}

@@ -382,10 +382,10 @@ function renderMisReservas(reservas) {
             <td>${comprobanteCell}</td>
             <td>
     <button class="fc-btn-select"
-            onclick="verInfoReserva(${r.idUser}, '${r.dateStart}', '${r.dateFinish}')"
-            ${!r.createdAt ? 'disabled title="Sin fecha de creación"' : ''}>
-        Ver info
-    </button>
+        onclick="verInfoReserva(${r.idUser}, '${r.dateStart}', '${r.dateFinish}', '${r.createdAt}')"
+        ${!r.createdAt ? 'disabled title="Sin fecha de creación"' : ''}>
+    Ver info
+</button>
     <button class="fc-btn-select" style="background:#e53e3e;margin-top:4px"
             onclick="eliminarReserva(${r.idDetalleReserve})">
         Eliminar
@@ -611,13 +611,26 @@ async function subirPDF(idDetalleReserve, input) {
 /* ══════════════════════════════════════
    MODAL: INFO RESERVAS
 ══════════════════════════════════════ */
-async function verInfoReserva(idUser, dateStart, dateFinish) {
+function truncarSegundo(val) {
+    const d = new Date(val);
+    d.setMilliseconds(0);
+    return d.getTime();
+}
+
+async function verInfoReserva(idUser, dateStart, dateFinish, createdAt) {
     try {
         const url = `/api/reservations/byUserAndDate?idUser=${idUser}&dateStart=${encodeURIComponent(dateStart)}&dateFinish=${encodeURIComponent(dateFinish)}`;
         const res  = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        renderModalReservas(data);
+
+        // Filtra en frontend comparando al segundo
+        const createdAtTrunc = truncarSegundo(createdAt);
+        const filtradas = data.filter(r =>
+            truncarSegundo(r.dateCreation) === createdAtTrunc
+        );
+
+        renderModalReservas(filtradas);
         document.getElementById('modal-reservas-overlay').classList.remove('d-none');
         document.body.style.overflow = 'hidden';
     } catch (err) {

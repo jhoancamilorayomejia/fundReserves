@@ -15,36 +15,36 @@ namespace FoundReserves.Controllers
             _context = context;
         }
 
+        // POST: api/reservations/create
         [HttpPost("create")]
-public async Task<ActionResult> CreateReservation([FromBody] Reserve reserve)
-{
-    var rol = HttpContext.Session.GetString("UserRol");
-    if (string.IsNullOrEmpty(rol))
-        return Unauthorized(new { message = "Debes iniciar sesión" });
+        public async Task<ActionResult> CreateReservation([FromBody] Reserve reserve)
+        {
+            var rol = HttpContext.Session.GetString("UserRol");
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
 
-    if (reserve == null)
-        return BadRequest(new { message = "Datos inválidos" });
+            if (reserve == null)
+                return BadRequest(new { message = "Datos inválidos" });
 
-    // ── Verificar disponibilidad ──────────────────────────────────────
-    var ocupado = _context.Reserves.Any(r =>
-        r.IdAccommodation == reserve.IdAccommodation &&
-        r.State           != "Cancelada"             &&
-        r.DateStart       <  reserve.DateFinish      &&
-        r.DateFinish      >  reserve.DateStart);
+            var ocupado = _context.Reserves.Any(r =>
+                r.IdAccommodation == reserve.IdAccommodation &&
+                r.State           != "Cancelada"             &&
+                r.DateStart       <  reserve.DateFinish      &&
+                r.DateFinish      >  reserve.DateStart);
 
-    if (ocupado)
-        return Conflict(new {
-            message = $"El alojamiento ya está reservado en ese rango de fechas."
-        });
+            if (ocupado)
+                return Conflict(new {
+                    message = "El alojamiento ya está reservado en ese rango de fechas."
+                });
 
-    reserve.State        = "Pendiente";
-    reserve.DateCreation = DateTime.Now;
+            reserve.State        = "Pendiente";
+            reserve.DateCreation = DateTime.Now;
 
-    _context.Reserves.Add(reserve);
-    await _context.SaveChangesAsync();
+            _context.Reserves.Add(reserve);
+            await _context.SaveChangesAsync();
 
-    return Ok(new { message = "Reserva creada exitosamente", data = reserve });
-}
+            return Ok(new { message = "Reserva creada exitosamente", data = reserve });
+        }
 
         // GET: api/reservations/my
         [HttpGet("my")]
@@ -62,7 +62,7 @@ public async Task<ActionResult> CreateReservation([FromBody] Reserve reserve)
             return Ok(reservas);
         }
 
-        // GET: api/reservations/byUserAndDate?idUser=6&createdAt=2026-05-22T12:37:34
+        // GET: api/reservations/byUserAndDate?idUser=6&dateStart=2026-06-01&dateFinish=2026-06-04
         [HttpGet("byUserAndDate")]
 public ActionResult GetByUserAndDate(
     [FromQuery] int idUser,
@@ -77,66 +77,95 @@ public ActionResult GetByUserAndDate(
               r => r.IdAccommodation,
               a => a.idAccommodation,
               (r, a) => new {
+                  idReservation            = r.IdReserve,
                   accommodationName        = a.name,
                   accommodationDescription = a.description,
-                  state                    = r.State
+                  state                    = r.State,
+                  dateCreation             = r.DateCreation  // ← expones la fecha
               })
         .ToList();
 
     return Ok(reservas);
 }
 
-    // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04
-    // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04&persons=3
-[HttpGet("available")]
-public ActionResult GetAvailable(
-    [FromQuery] int idSede,
-    [FromQuery] DateTime dateStart,
-    [FromQuery] DateTime dateFinish,
-    [FromQuery] int persons = 1)
-{
-    var ocupados = _context.Reserves
-        .Where(r => r.DateStart  < dateFinish &&
-                    r.DateFinish > dateStart  &&
-                    r.State != "Cancelada")
-        .Select(r => r.IdAccommodation)
-        .Distinct()
-        .ToList();
+        // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04&persons=3
+        [HttpGet("available")]
+        public ActionResult GetAvailable(
+            [FromQuery] int idSede,
+            [FromQuery] DateTime dateStart,
+            [FromQuery] DateTime dateFinish,
+            [FromQuery] int persons = 1)
+        {
+            var ocupados = _context.Reserves
+                .Where(r => r.DateStart  < dateFinish &&
+                            r.DateFinish > dateStart  &&
+                            r.State != "Cancelada")
+                .Select(r => r.IdAccommodation)
+                .Distinct()
+                .ToList();
 
-    var disponibles = _context.Accommodations
-        .Where(a => a.idsede == idSede &&
-                    !ocupados.Contains(a.idAccommodation) &&
-                    a.maximumPerson >= persons)
-        .Select(a => new {
-            a.idAccommodation,
-            a.name,
-            a.number,
-            a.maximumPerson,
-            a.description,
-            a.state,
-            tarifas = _context.Rates
-                .Where(r => r.idAccommodation == a.idAccommodation &&
-                            r.minimumPerson   <= persons &&
-                            r.maximumPerson   >= persons)
-                .Join(_context.Seasons,
-                      r => r.idSeason,
-                      s => s.idSeason,
-                      (r, s) => new {
-                          r.idPrice,
-                          seasonName   = s.name,
-                          seasonType   = s.type,
-                          r.priceNight,
-                          r.pricePersonAdditional,
-                          r.minimumPerson,
-                          r.maximumPerson
-                      })
-                .ToList()
-        })
-        .ToList();
+            var disponibles = _context.Accommodations
+                .Where(a => a.idsede == idSede &&
+                            !ocupados.Contains(a.idAccommodation) &&
+                            a.maximumPerson >= persons)
+                .Select(a => new {
+                    a.idAccommodation,
+                    a.name,
+                    a.number,
+                    a.maximumPerson,
+                    a.description,
+                    a.state,
+                    tarifas = _context.Rates
+                        .Where(r => r.idAccommodation == a.idAccommodation &&
+                                    r.minimumPerson   <= persons &&
+                                    r.maximumPerson   >= persons)
+                        .Join(_context.Seasons,
+                              r => r.idSeason,
+                              s => s.idSeason,
+                              (r, s) => new {
+                                  r.idPrice,
+                                  seasonName            = s.name,
+                                  seasonType            = s.type,
+                                  r.priceNight,
+                                  r.pricePersonAdditional,
+                                  r.minimumPerson,
+                                  r.maximumPerson
+                              })
+                        .ToList()
+                })
+                .ToList();
 
-    return Ok(disponibles);
-}
+            return Ok(disponibles);
+        }
 
+        // PUT: api/reservations/updateState/{idReservation}
+        [HttpPut("updateState/{idReservation}")]
+        public async Task<ActionResult> UpdateReservationState(
+            [FromRoute] int idReservation,
+            [FromBody] UpdateStateDto dto)
+        {
+            var rol = HttpContext.Session.GetString("UserRol");
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
 
+            var estadosValidos = new[] { "Pendiente", "Pagado", "Cancelado" };
+            if (!estadosValidos.Contains(dto.State))
+                return BadRequest(new { message = "Estado no válido. Usa: Pendiente, Pagado o Cancelado" });
+
+            var reserva = await _context.Reserves.FindAsync(idReservation);
+            if (reserva == null)
+                return NotFound(new { message = "Reserva no encontrada" });
+
+            reserva.State = dto.State;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Estado actualizado correctamente", state = reserva.State });
+        }
+    }
+
+    // DTO para recibir solo el campo State en el PUT
+    public class UpdateStateDto
+    {
+        public string State { get; set; } = string.Empty;
     }
 }

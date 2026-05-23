@@ -814,8 +814,6 @@
             <table class="table fr-table mb-0">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>ID</th>
                         <th>Cliente</th>
                         <th>Cédula</th>
                         <th>Sede</th>
@@ -826,12 +824,60 @@
                         <th>Total</th>
                         <th>Creado</th>
                         <th>Comprobante</th>
+                        <th>Acciones</th> 
                     </tr>
                 </thead>
                 <tbody id="tb-reservas">
                     <tr><td colspan="12" class="text-center text-muted py-4">Cargando...</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: HABITACIONES DE RESERVA (Admin) -->
+<div class="modal fade" id="modal-habitaciones-admin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Habitaciones de la reserva</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="fr-modal-body">
+                <p style="font-size:12px;color:#9ca3af;margin-bottom:14px;">
+                    Habitaciones asociadas a esta reserva. Puedes cambiar el estado individualmente.
+                </p>
+                <div class="table-responsive">
+                    <table class="table fr-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Habitación</th>
+                                <th>Descripción</th>
+                                <th>Estado actual</th>
+                                <th>Cambiar estado</th>
+                                <th>Guardar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-habitaciones-admin">
+                            <tr><td colspan="5" class="text-center text-muted py-4">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cerrar</button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -879,6 +925,15 @@ function fmtFecha(str) {
             year: 'numeric', month: 'short', day: '2-digit'
         });
     } catch { return '—'; }
+}
+
+function fmtFechaHora(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+    const fecha = d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hora  = d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${fecha}, ${hora}`;
 }
 
 /* Formatea número como moneda COP */
@@ -1589,28 +1644,30 @@ let allReservas = [];
 
 function filaReserva(r, i) {
     const comprobante = r.paymentProof
-        ? `<a href="${r.paymentProof}" target="_blank" class="btn btn-sm btn-outline-secondary">
-               Ver PDF
-           </a>`
+        ? `<a href="${r.paymentProof}" target="_blank" class="btn btn-sm btn-outline-secondary">Ver PDF</a>`
         : `<span class="text-muted" style="font-size:12px;">Sin comprobante</span>`;
 
     return `<tr>
-        <td class="fr-mono text-muted">${i + 1}</td>
-        <td class="fr-mono text-muted">${r.idDetalleReserve}</td>
-        <td>
-            <div style="font-weight:500;">${r.userName} ${r.userLastname}</div>
-            <div style="font-size:11px;color:#888;">ID: ${r.idUser}</div>
-        </td>
-        <td class="fr-mono">${r.userCedula}</td>
-        <td><span class="fw-500">${r.sedeName}</span></td>
-        <td class="fr-mono">${fmtFecha(r.dateStart)}</td>
-        <td class="fr-mono">${fmtFecha(r.dateFinish)}</td>
-        <td>${r.numberPerson} pers.</td>
-        <td style="text-align:center;">${r.numberRooms}</td>
-        <td class="fr-mono">${fmtPrecio(r.totalCal)}</td>
-        <td class="fr-mono text-muted">${fmtFecha(r.createdAt)}</td>
-        <td>${comprobante}</td>
-    </tr>`;
+    <td>
+        <div style="font-weight:500;">${r.userName} ${r.userLastname}</div>
+        <div style="font-size:11px;color:#888;">ID: ${r.idUser}</div>
+    </td>
+    <td class="fr-mono">${r.userCedula}</td>
+    <td><span class="fw-500">${r.sedeName}</span></td>
+    <td class="fr-mono">${fmtFecha(r.dateStart)}</td>
+    <td class="fr-mono">${fmtFecha(r.dateFinish)}</td>
+    <td>${r.numberPerson} pers.</td>
+    <td style="text-align:center;">${r.numberRooms}</td>
+    <td class="fr-mono">${fmtPrecio(r.totalCal)}</td>
+    <td class="fr-mono text-muted">${fmtFechaHora(r.createdAt)}</td>
+    <td>${comprobante}</td>
+    <td>
+        <button class="btn btn-sm btn-outline-primary"
+            onclick="verHabitacionesReserva(${r.idUser}, '${r.dateStart}', '${r.dateFinish}', '${r.createdAt}')">
+            Ver habitaciones
+        </button>
+    </td>
+</tr>`;
 }
 
 function renderReservas(reservas) {
@@ -1619,7 +1676,7 @@ function renderReservas(reservas) {
     document.getElementById('tb-reservas').innerHTML =
         reservas.length
             ? reservas.map(filaReserva).join('')
-            : filaVacia(12, 'No hay reservas registradas');
+            : filaVacia(11, 'No hay reservas registradas');
 }
 
 async function cargarReservas() {
@@ -1635,6 +1692,119 @@ async function cargarReservas() {
     }
 }
 
+/* ══════════════════════════════════════
+   MODAL: HABITACIONES DE RESERVA (Admin)
+══════════════════════════════════════ */
+
+function truncarSegundo(val) {
+    const d = new Date(val);
+    d.setMilliseconds(0);
+    return d.getTime();
+}
+
+async function verHabitacionesReserva(idUser, dateStart, dateFinish, createdAt) {
+    const tbody = document.getElementById('tb-habitaciones-admin');
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Cargando...</td></tr>`;
+
+    new bootstrap.Modal(document.getElementById('modal-habitaciones-admin')).show();
+
+    try {
+        const url = `/api/reservations/byUserAndDate?idUser=${idUser}&dateStart=${encodeURIComponent(dateStart)}&dateFinish=${encodeURIComponent(dateFinish)}`;
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const createdAtTrunc = truncarSegundo(createdAt);
+        const filtradas = data.filter(r =>
+            truncarSegundo(r.dateCreation) === createdAtTrunc
+        );
+
+        renderHabitacionesAdmin(filtradas);
+    } catch (err) {
+        console.error('[FR] Error habitaciones admin:', err);
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-3">Error al cargar habitaciones</td></tr>`;
+    }
+}
+
+function renderHabitacionesAdmin(reservas) {
+    const tbody = document.getElementById('tb-habitaciones-admin');
+
+    if (!reservas.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Sin habitaciones asociadas</td></tr>`;
+        return;
+    }
+
+    const ESTADOS = ['Pendiente', 'Pagado', 'Cancelado'];
+
+    tbody.innerHTML = reservas.map(r => {
+        const estadoBadge = r.state === 'Pagado'
+            ? 'bg-success'
+            : r.state === 'Cancelado'
+                ? 'bg-danger'
+                : 'bg-warning text-dark';
+
+        const options = ESTADOS.map(e =>
+            `<option value="${e}" ${r.state === e ? 'selected' : ''}>${e}</option>`
+        ).join('');
+
+        return `<tr id="row-hab-${r.idReservation ?? r.id}">
+            <td><span class="fw-500">${r.accommodationName ?? '—'}</span></td>
+            <td style="font-size:12.5px;color:#6b7280;max-width:200px;">${r.accommodationDescription ?? '—'}</td>
+            <td>
+                <span class="badge ${estadoBadge}" id="badge-estado-${r.idReservation ?? r.id}">
+                    ${r.state ?? '—'}
+                </span>
+            </td>
+            <td>
+                <select class="form-select form-select-sm" id="sel-estado-${r.idReservation ?? r.id}"
+                        style="min-width:130px;">
+                    ${options}
+                </select>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-dark"
+                        onclick="actualizarEstadoReserva(${r.idReservation ?? r.id})">
+                    Guardar
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function actualizarEstadoReserva(idReservation) {
+    const sel         = document.getElementById(`sel-estado-${idReservation}`);
+    const nuevoEstado = sel.value;
+
+    try {
+        const res = await fetch(`/api/reservations/updateState/${idReservation}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ state: nuevoEstado })
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.message || 'Error al actualizar el estado');
+            return;
+        }
+
+        const badge = document.getElementById(`badge-estado-${idReservation}`);
+        if (badge) {
+            badge.textContent = nuevoEstado;
+            badge.className = 'badge ' + (
+                nuevoEstado === 'Pagado'    ? 'bg-success' :
+                nuevoEstado === 'Cancelado' ? 'bg-danger'  :
+                                             'bg-warning text-dark'
+            );
+        }
+
+        alert(`Estado actualizado a "${nuevoEstado}" correctamente`);
+
+    } catch (err) {
+        console.error('[FR] Error actualizando estado:', err);
+        alert('Error de conexión');
+    }
+}
 
 /* ══════════════════════════════════════
    INICIO — carga todos los datos
