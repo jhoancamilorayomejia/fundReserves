@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Email Sent";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/login.css" />
+
+<div class="account-container">
+    <div class="account-box">
+
+        <h2 class="text-center mb-4">
+            Email Sent
+        </h2>
+
+        <p class="text-center">
+            A verification email has been sent to your email address.
+            Please check your inbox and follow the instructions.
+        </p>
+
+        <div class="text-center mt-4">
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="text-decoration-none">
+
+                Back To Login
+
+            </a>
+        </div>
+
+    </div>
+</div>

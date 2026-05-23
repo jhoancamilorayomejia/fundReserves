@@ -103,6 +103,13 @@ namespace FoundReserves.Data
 
                 entity.Property(e => e.autorizaCelular)
                     .IsRequired(false);
+
+                entity.Property(e => e.ResetToken)
+                    .IsRequired(false)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.ResetTokenExpiration)
+                    .IsRequired(false);
             });
 
             // ─────────────────────────────

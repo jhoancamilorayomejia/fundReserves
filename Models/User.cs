@@ -35,5 +35,11 @@ public string? preguntaSecreta { get; set; }
 public string? respuestaSecreta { get; set; }
 public bool? autorizaCorreo { get; set; }    // ← nullable
 public bool? autorizaCelular { get; set; }   // ← nullable
+
+[Column("resetToken")]
+public string? ResetToken { get; set; }
+
+[Column("resetTokenExpiration")]
+public DateTime? ResetTokenExpiration { get; set; }
     }
 }

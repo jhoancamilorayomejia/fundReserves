@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using FoundReserves.Data;
+using FoundReserves.Models;
+using FoundReserves.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
