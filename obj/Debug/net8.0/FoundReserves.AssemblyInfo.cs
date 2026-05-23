@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FoundReserves")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a07488b136d46235056bd7f0aa9ff2b571c4731d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c9f3fca297433e2a876a518c79236fab1d63c4a1")]
 [assembly: System.Reflection.AssemblyProductAttribute("FoundReserves")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FoundReserves")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

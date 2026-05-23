@@ -624,7 +624,7 @@ async function verInfoReserva(idUser, dateStart, dateFinish, createdAt) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
-        // Filtra en frontend comparando al segundo
+        // Filtra el frontend comparando al segundo
         const createdAtTrunc = truncarSegundo(createdAt);
         const filtradas = data.filter(r =>
             truncarSegundo(r.dateCreation) === createdAtTrunc
