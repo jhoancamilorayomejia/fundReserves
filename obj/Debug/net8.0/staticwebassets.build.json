@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "z88GQ5/7lrM3co/nMDVhtf6GpPThMPBsC7p4cNc/wVk=",
+  "Hash": "fz+JrS2CvN1UIe6e9xO9gCBQdpCbHAWXykzv3EXexVA=",
   "Source": "FoundReserves",
   "BasePath": "_content/FoundReserves",
   "Mode": "Default",
@@ -1440,6 +1440,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/comprobantes/81116fcc-8114-42ac-8e82-aff24f6b016d.pdf"
+    },
+    {
+      "Identity": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/uploads/comprobantes/8be602d3-cdc4-4ea1-ac67-89f357eb4f4e.pdf",
+      "SourceId": "FoundReserves",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/",
+      "BasePath": "_content/FoundReserves",
+      "RelativePath": "uploads/comprobantes/8be602d3-cdc4-4ea1-ac67-89f357eb4f4e.pdf",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/comprobantes/8be602d3-cdc4-4ea1-ac67-89f357eb4f4e.pdf"
     },
     {
       "Identity": "/home/jhoan/Documentos/ReservasNet/fundReserves/wwwroot/uploads/comprobantes/9acc85ad-24a0-4664-9a79-6df9a52dd159.pdf",
