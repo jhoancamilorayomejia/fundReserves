@@ -241,27 +241,82 @@
 
 
     <!-- ─────────────────────────────
-         SECCIÓN: ADMINISTRADORES
-    ───────────────────────────── -->
-    <div class="fr-section d-none" id="sec-admins">
-        <div class="fr-card">
-            <div class="fr-card-head">
-                <h2 class="fr-card-title">Administradores del sistema</h2>
-                <span class="fr-pill fr-pill-admin" id="lbl-admins">0 registros</span>
+     SECCIÓN: ADMINISTRADORES
+───────────────────────────── -->
+<div class="fr-section d-none" id="sec-admins">
+    <div class="fr-card">
+
+        <div class="fr-card-head">
+            <h2 class="fr-card-title">Administradores del sistema</h2>
+            <span class="fr-pill fr-pill-admin" id="lbl-admins">0 registros</span>
+        </div>
+
+        <!-- Formulario: agregar administrador -->
+<div class="p-4 border-bottom">
+    <h5 class="mb-3">Agregar nuevo administrador</h5>
+    <form id="form-admin" class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="admin-name" required />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Apellido <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="admin-lastname" required />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Cédula</label>
+            <input type="text" class="form-control" id="admin-cedula" />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="admin-phone" />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="admin-email" required />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="admin-password" required />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="admin-password-confirm" required />
+            <div class="form-text text-danger d-none" id="admin-pass-error">
+                Las contraseñas no coinciden
             </div>
-            <div class="table-responsive">
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-dark" id="btn-admin">
+                Registrar administrador
+            </button>
+        </div>
+
+    </form>
+</div>
+
+        <div class="table-responsive">
                 <table class="table fr-table mb-0">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>ID</th>
-                            <th>Nombre completo</th>
-                            <th>Cédula</th>
-                            <th>Teléfono</th>
-                            <th>Correo electrónico</th>
-                            <th>Fecha de registro</th>
-                        </tr>
-                    </thead>
+    <tr>
+        <th>#</th>
+        <th>ID</th>
+        <th>Nombre completo</th>
+        <th>Cédula</th>
+        <th>Teléfono</th>
+        <th>Correo electrónico</th>
+        <th>Fecha de registro</th>
+        <th>Acciones</th>
+    </tr>
+</thead>
                     <tbody id="tb-admins">
                         <tr><td colspan="7" class="text-center text-muted py-4">Cargando...</td></tr>
                     </tbody>
@@ -509,6 +564,7 @@
                             <th>Capacidad máx.</th>
                             <th>Precio lavandería</th>
                             <th>Descripción</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tb-sedes">
@@ -882,6 +938,227 @@
     </div>
 </div>
 
+
+<!-- MODAL: EDITAR ADMINISTRADOR -->
+<div class="modal fade" id="modal-edit-admin" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Editar administrador</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fr-modal-body">
+                <input type="hidden" id="edit-admin-id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit-admin-name" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="edit-admin-lastname" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Cédula</label>
+                        <input type="text" class="form-control" id="edit-admin-cedula" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="edit-admin-phone" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="edit-admin-email" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Nueva contraseña <span class="text-muted" style="font-size:11px;">(opcional)</span></label>
+                        <input type="password" class="form-control" id="edit-admin-password" placeholder="Dejar vacío para no cambiar" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Confirmar contraseña</label>
+                        <input type="password" class="form-control" id="edit-admin-password-confirm" />
+                        <div class="form-text text-danger d-none" id="edit-admin-pass-error">
+                            Las contraseñas no coinciden
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-dark"
+                        onclick="guardarEditAdmin()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL: EDITAR ALOJAMIENTO -->
+<div class="modal fade" id="modal-edit-accommodation" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Editar alojamiento</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fr-modal-body">
+                <input type="hidden" id="edit-acc-id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Sede</label>
+                        <select class="form-select" id="edit-acc-idSede"></select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit-acc-name" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Número</label>
+                        <input type="text" class="form-control" id="edit-acc-number" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Máx. personas</label>
+                        <input type="number" class="form-control" id="edit-acc-maximumPerson" min="1" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Estado</label>
+                        <select class="form-select" id="edit-acc-state">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Ocupado">Ocupado</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="edit-acc-description" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-dark"
+                        onclick="guardarEditAccommodation()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL: EDITAR TEMPORADA -->
+<div class="modal fade" id="modal-edit-season" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Editar temporada</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fr-modal-body">
+                <input type="hidden" id="edit-season-id" />
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit-season-name" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="edit-season-type">
+                            <option value="Alta">Temporada Alta</option>
+                            <option value="Baja">Temporada Baja</option>
+                            <option value="Especial">Temporada Especial</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-dark"
+                        onclick="guardarEditSeason()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR SEDE -->
+<div class="modal fade" id="modal-edit-sede" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content fr-modal-content">
+            <div class="fr-modal-header">
+                <h5 class="fr-modal-title">Editar sede</h5>
+                <button type="button" class="fr-modal-close" data-bs-dismiss="modal">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="fr-modal-body">
+                <input type="hidden" id="edit-sede-id" />
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit-sede-name" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" id="edit-sede-city" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Región</label>
+                        <input type="text" class="form-control" id="edit-sede-region" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="edit-sede-type">
+                            <option value="Hotel">Sede Recreativa</option>
+                            <option value="Apartamento">Apartamento</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Capacidad máxima</label>
+                        <input type="number" class="form-control" id="edit-sede-maximumCapacity" min="1" />
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Precio lavandería</label>
+                        <input type="number" class="form-control" id="edit-sede-priceLaundry" min="0" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" id="edit-sede-description" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="fr-modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-dark"
+                        onclick="guardarEditSede()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </main><!-- /fr-main -->
 
 
@@ -1015,8 +1292,48 @@ function filaAdmin(u, i) {
         <td>${u.phone  || '—'}</td>
         <td class="text-muted">${u.email || '—'}</td>
         <td class="fr-mono text-muted">${fmtFecha(u.createdAt)}</td>
+        <td>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="abrirEditAdmin(${u.iduser}, '${u.name}', '${u.lastname}', '${u.cedula || ''}', '${u.phone || ''}', '${u.email}')">
+                    Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarUsuario(${u.iduser}, '${u.name} ${u.lastname}')">
+                    Eliminar
+                </button>
+            </div>
+        </td>
     </tr>`;
 }
+
+/* POST /api/users/createAdmin — registra un nuevo administrador */
+document.getElementById('form-admin').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+        cedula:   document.getElementById('admin-cedula').value,
+        name:     document.getElementById('admin-name').value,
+        lastname: document.getElementById('admin-lastname').value,
+        phone:    document.getElementById('admin-phone').value,
+        email:    document.getElementById('admin-email').value,
+        password: document.getElementById('admin-password').value
+    };
+    try {
+        const res  = await fetch('/api/users/createAdmin', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al registrar administrador'); return; }
+        alert('Administrador registrado correctamente');
+        this.reset();
+        cargarUsuarios();
+    } catch (err) {
+        console.error('[FR] Error registrar admin:', err);
+        alert('Error de conexión');
+    }
+});
 
 /* Fila para tabla CLIENTES — columnas esenciales, botón Ver abre modal */
 function filaCustomer(u, i) {
@@ -1109,11 +1426,22 @@ function filaSede(s, i) {
         </td>
         <td class="fr-mono">${s.maximumCapacity ?? '—'} <small class="text-muted">pers.</small></td>
         <td class="fr-mono">${fmtPrecio(s.priceLaundry)}</td>
-        <td class="text-muted" style="max-width:260px;font-size:12.5px">${s.description || '—'}</td>
+        <td class="text-muted" style="max-width:200px;font-size:12.5px">${s.description || '—'}</td>
+        <td>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="abrirEditSede(${s.idSede}, '${(s.name || '').replace(/'/g, "\\'")}', '${(s.city || '').replace(/'/g, "\\'")}', '${(s.region || '').replace(/'/g, "\\'")}', '${s.type || ''}', ${s.maximumCapacity ?? 0}, ${s.priceLaundry ?? 0}, '${(s.description || '').replace(/'/g, "\\'")}')">
+                    Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarSede(${s.idSede}, '${(s.name || '').replace(/'/g, "\\'")}')">
+                    Eliminar
+                </button>
+            </div>
+        </td>
     </tr>`;
 }
 
-/* Fila para tabla ALOJAMIENTOS */
 /* Fila para tabla ALOJAMIENTOS */
 function filaAccommodation(a, i) {
     const estado = a.state === 'Disponible'
@@ -1125,17 +1453,23 @@ function filaAccommodation(a, i) {
     return `<tr>
         <td class="fr-mono text-muted">${i + 1}</td>
         <td class="fr-mono text-muted">${a.idAccommodation}</td>
-        <td><span class="fw-500">${a.sedeName || '—'}</span></td>  <!-- ← era a.sede -->
+        <td><span class="fw-500">${a.sedeName || '—'}</span></td>
         <td>${a.name   || '—'}</td>
         <td class="fr-mono">${a.number || '—'}</td>
         <td>${a.maximumPerson || '—'}</td>
         <td>${estado}</td>
         <td class="text-muted" style="max-width:220px;font-size:12.5px">${a.description || '—'}</td>
         <td>
-            <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarAccommodation(${a.idAccommodation}, '${a.name}')">
-                Eliminar
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="abrirEditAccommodation(${a.idAccommodation}, ${a.idsede}, '${(a.name || '').replace(/'/g, "\\'")}', '${a.number || ''}', ${a.maximumPerson || 1}, '${a.state || ''}', '${(a.description || '').replace(/'/g, "\\'")}')">
+                    Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarAccommodation(${a.idAccommodation}, '${a.name}')">
+                    Eliminar
+                </button>
+            </div>
         </td>
     </tr>`;
 }
@@ -1152,10 +1486,16 @@ function filaSeason(s, i) {
         <td>${s.name || '—'}</td>
         <td><span class="fr-pill ${pillCls}">${s.type || '—'}</span></td>
         <td>
-            <button class="btn btn-sm btn-outline-danger"
-                onclick="eliminarTemporada(${s.idSeason}, '${s.name}')">
-                Eliminar
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary"
+                    onclick="abrirEditSeason(${s.idSeason}, '${(s.name || '').replace(/'/g, "\\'")}', '${s.type || ''}')">
+                    Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger"
+                    onclick="eliminarTemporada(${s.idSeason}, '${s.name}')">
+                    Eliminar
+                </button>
+            </div>
         </td>
     </tr>`;
 }
@@ -1633,6 +1973,266 @@ async function guardarEditRate() {
         cargarRates();
     } catch (err) {
         console.error('[FR] Error actualizando tarifa:', err);
+        alert('Error de conexión');
+    }
+}
+
+async function guardarEditRate() {
+    const id   = parseInt(document.getElementById('edit-rate-id').value);
+    const body = {
+        minimumPerson:         parseInt(document.getElementById('edit-minPerson').value),
+        maximumPerson:         parseInt(document.getElementById('edit-maxPerson').value),
+        priceNight:            parseFloat(document.getElementById('edit-priceNight').value),
+        pricePersonAdditional: parseFloat(document.getElementById('edit-priceAdditional').value)
+    };
+
+    if (body.minimumPerson > body.maximumPerson) {
+        alert('El mínimo no puede ser mayor al máximo.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/rates/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-rate')
+        ).hide();
+
+        alert('Tarifa actualizada correctamente');
+        cargarRates();
+    } catch (err) {
+        console.error('[FR] Error actualizando tarifa:', err);
+        alert('Error de conexión');
+    }
+}
+
+/* ══════════════════════════════════════
+   EDITAR ADMINISTRADOR
+══════════════════════════════════════ */
+function abrirEditAdmin(id, name, lastname, cedula, phone, email) {
+    document.getElementById('edit-admin-id').value               = id;
+    document.getElementById('edit-admin-name').value             = name;
+    document.getElementById('edit-admin-lastname').value         = lastname;
+    document.getElementById('edit-admin-cedula').value           = cedula;
+    document.getElementById('edit-admin-phone').value            = phone;
+    document.getElementById('edit-admin-email').value            = email;
+    document.getElementById('edit-admin-password').value         = '';
+    document.getElementById('edit-admin-password-confirm').value = '';
+    document.getElementById('edit-admin-pass-error').classList.add('d-none');
+    new bootstrap.Modal(document.getElementById('modal-edit-admin')).show();
+}
+
+async function guardarEditAdmin() {
+    const pass        = document.getElementById('edit-admin-password').value;
+    const passConfirm = document.getElementById('edit-admin-password-confirm').value;
+    const passError   = document.getElementById('edit-admin-pass-error');
+
+    if (pass && pass !== passConfirm) {
+        passError.classList.remove('d-none');
+        return;
+    }
+    passError.classList.add('d-none');
+
+    const id   = parseInt(document.getElementById('edit-admin-id').value);
+    const body = {
+        cedula:   document.getElementById('edit-admin-cedula').value,
+        name:     document.getElementById('edit-admin-name').value,
+        lastname: document.getElementById('edit-admin-lastname').value,
+        phone:    document.getElementById('edit-admin-phone').value,
+        email:    document.getElementById('edit-admin-email').value,
+        ...(pass ? { password: pass } : {})
+    };
+
+    try {
+        const res  = await fetch(`/api/users/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-admin')
+        ).hide();
+
+        alert('Administrador actualizado correctamente');
+        cargarUsuarios();
+    } catch (err) {
+        console.error('[FR] Error actualizando admin:', err);
+        alert('Error de conexión');
+    }
+}
+
+/* ══════════════════════════════════════
+   EDITAR ALOJAMIENTO
+══════════════════════════════════════ */
+function abrirEditAccommodation(id, idSede, name, number, maximumPerson, state, description) {
+    document.getElementById('edit-acc-id').value            = id;
+    document.getElementById('edit-acc-name').value          = name;
+    document.getElementById('edit-acc-number').value        = number;
+    document.getElementById('edit-acc-maximumPerson').value = maximumPerson;
+    document.getElementById('edit-acc-state').value         = state;
+    document.getElementById('edit-acc-description').value   = description;
+
+    // Poblar select de sedes y seleccionar la actual
+    const sel = document.getElementById('edit-acc-idSede');
+    sel.innerHTML = '<option value="">Selecciona una sede...</option>';
+    allSedes.forEach(s => {
+        sel.innerHTML += `<option value="${s.idSede}" ${s.idSede === idSede ? 'selected' : ''}>
+            ${s.name}${s.city ? ' — ' + s.city : ''}
+        </option>`;
+    });
+
+    new bootstrap.Modal(document.getElementById('modal-edit-accommodation')).show();
+}
+
+async function guardarEditAccommodation() {
+    const id   = parseInt(document.getElementById('edit-acc-id').value);
+    const body = {
+        idSede:        parseInt(document.getElementById('edit-acc-idSede').value),
+        name:          document.getElementById('edit-acc-name').value,
+        number:        document.getElementById('edit-acc-number').value,
+        maximumPerson: parseInt(document.getElementById('edit-acc-maximumPerson').value),
+        state:         document.getElementById('edit-acc-state').value,
+        description:   document.getElementById('edit-acc-description').value
+    };
+
+    try {
+        const res  = await fetch(`/api/accommodation/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-accommodation')
+        ).hide();
+
+        alert('Alojamiento actualizado correctamente');
+        cargarAccommodation();
+    } catch (err) {
+        console.error('[FR] Error actualizando alojamiento:', err);
+        alert('Error de conexión');
+    }
+}
+
+
+/* ══════════════════════════════════════
+   EDITAR TEMPORADA
+══════════════════════════════════════ */
+function abrirEditSeason(id, name, type) {
+    document.getElementById('edit-season-id').value   = id;
+    document.getElementById('edit-season-name').value = name;
+    document.getElementById('edit-season-type').value = type;
+    new bootstrap.Modal(document.getElementById('modal-edit-season')).show();
+}
+
+async function guardarEditSeason() {
+    const id   = parseInt(document.getElementById('edit-season-id').value);
+    const body = {
+        name: document.getElementById('edit-season-name').value,
+        type: document.getElementById('edit-season-type').value
+    };
+
+    if (!body.name.trim()) {
+        alert('El nombre es obligatorio.');
+        return;
+    }
+
+    try {
+        const res  = await fetch(`/api/seasons/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-season')
+        ).hide();
+
+        alert('Temporada actualizada correctamente');
+        cargarSeasons();
+    } catch (err) {
+        console.error('[FR] Error actualizando temporada:', err);
+        alert('Error de conexión');
+    }
+}
+
+/* ══════════════════════════════════════
+   EDITAR / ELIMINAR SEDE
+══════════════════════════════════════ */
+function abrirEditSede(id, name, city, region, type, maximumCapacity, priceLaundry, description) {
+    document.getElementById('edit-sede-id').value              = id;
+    document.getElementById('edit-sede-name').value            = name;
+    document.getElementById('edit-sede-city').value            = city;
+    document.getElementById('edit-sede-region').value          = region;
+    document.getElementById('edit-sede-type').value            = type;
+    document.getElementById('edit-sede-maximumCapacity').value = maximumCapacity;
+    document.getElementById('edit-sede-priceLaundry').value    = priceLaundry;
+    document.getElementById('edit-sede-description').value     = description;
+    new bootstrap.Modal(document.getElementById('modal-edit-sede')).show();
+}
+
+async function guardarEditSede() {
+    const id   = parseInt(document.getElementById('edit-sede-id').value);
+    const body = {
+        name:            document.getElementById('edit-sede-name').value,
+        city:            document.getElementById('edit-sede-city').value,
+        region:          document.getElementById('edit-sede-region').value,
+        type:            document.getElementById('edit-sede-type').value,
+        maximumCapacity: parseInt(document.getElementById('edit-sede-maximumCapacity').value),
+        priceLaundry:    parseFloat(document.getElementById('edit-sede-priceLaundry').value),
+        description:     document.getElementById('edit-sede-description').value
+    };
+
+    if (!body.name.trim() || !body.city.trim()) {
+        alert('Nombre y ciudad son obligatorios.');
+        return;
+    }
+
+    try {
+        const res  = await fetch(`/api/sedes/update/${id}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.message || 'Error al actualizar'); return; }
+
+        bootstrap.Modal.getInstance(
+            document.getElementById('modal-edit-sede')
+        ).hide();
+
+        alert('Sede actualizada correctamente');
+        cargarSedes();
+    } catch (err) {
+        console.error('[FR] Error actualizando sede:', err);
+        alert('Error de conexión');
+    }
+}
+
+async function eliminarSede(id, nombre) {
+    if (!confirm(`¿Eliminar la sede "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
+    try {
+        const res = await fetch(`/api/sedes/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert((await res.json()).message || 'Error al eliminar'); return; }
+        allSedes = allSedes.filter(s => s.idSede !== id);
+        renderSedes(allSedes);
+        poblarSelectSede(allSedes);
+        alert(`Sede "${nombre}" eliminada correctamente`);
+    } catch (err) {
+        console.error('[FR] Error al eliminar sede:', err);
         alert('Error de conexión');
     }
 }

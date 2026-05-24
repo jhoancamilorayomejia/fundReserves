@@ -26,11 +26,12 @@ namespace FoundReserves.Controllers
             if (reserve == null)
                 return BadRequest(new { message = "Datos inválidos" });
 
+            // ✅ Bloqueado si existe reserva activa (Pendiente o Pagado) en ese rango
             var ocupado = _context.Reserves.Any(r =>
                 r.IdAccommodation == reserve.IdAccommodation &&
-                r.State           != "Cancelada"             &&
-                r.DateStart       <  reserve.DateFinish      &&
-                r.DateFinish      >  reserve.DateStart);
+                (r.State == "Pendiente" || r.State == "Pagado") &&
+                r.DateStart  < reserve.DateFinish &&
+                r.DateFinish > reserve.DateStart);
 
             if (ocupado)
                 return Conflict(new {
@@ -64,29 +65,29 @@ namespace FoundReserves.Controllers
 
         // GET: api/reservations/byUserAndDate?idUser=6&dateStart=2026-06-01&dateFinish=2026-06-04
         [HttpGet("byUserAndDate")]
-public ActionResult GetByUserAndDate(
-    [FromQuery] int idUser,
-    [FromQuery] DateTime dateStart,
-    [FromQuery] DateTime dateFinish)
-{
-    var reservas = _context.Reserves
-        .Where(r => r.IdUser     == idUser     &&
-                    r.DateStart  == dateStart   &&
-                    r.DateFinish == dateFinish)
-        .Join(_context.Accommodations,
-              r => r.IdAccommodation,
-              a => a.idAccommodation,
-              (r, a) => new {
-                  idReservation            = r.IdReserve,
-                  accommodationName        = a.name,
-                  accommodationDescription = a.description,
-                  state                    = r.State,
-                  dateCreation             = r.DateCreation  // ← expones la fecha
-              })
-        .ToList();
+        public ActionResult GetByUserAndDate(
+            [FromQuery] int idUser,
+            [FromQuery] DateTime dateStart,
+            [FromQuery] DateTime dateFinish)
+        {
+            var reservas = _context.Reserves
+                .Where(r => r.IdUser     == idUser     &&
+                            r.DateStart  == dateStart   &&
+                            r.DateFinish == dateFinish)
+                .Join(_context.Accommodations,
+                      r => r.IdAccommodation,
+                      a => a.idAccommodation,
+                      (r, a) => new {
+                          idReservation            = r.IdReserve,
+                          accommodationName        = a.name,
+                          accommodationDescription = a.description,
+                          state                    = r.State,
+                          dateCreation             = r.DateCreation
+                      })
+                .ToList();
 
-    return Ok(reservas);
-}
+            return Ok(reservas);
+        }
 
         // GET: api/reservations/available?idSede=1&dateStart=2026-06-01&dateFinish=2026-06-04&persons=3
         [HttpGet("available")]
@@ -96,10 +97,12 @@ public ActionResult GetByUserAndDate(
             [FromQuery] DateTime dateFinish,
             [FromQuery] int persons = 1)
         {
+            // ✅ Solo bloquea alojamientos con reservas Pendiente o Pagado en ese rango
+            // Si la reserva está Cancelada, el alojamiento vuelve a estar disponible
             var ocupados = _context.Reserves
                 .Where(r => r.DateStart  < dateFinish &&
                             r.DateFinish > dateStart  &&
-                            r.State != "Cancelada")
+                            (r.State == "Pendiente" || r.State == "Pagado"))
                 .Select(r => r.IdAccommodation)
                 .Distinct()
                 .ToList();

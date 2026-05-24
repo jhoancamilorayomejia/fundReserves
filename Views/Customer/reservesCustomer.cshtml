@@ -1094,8 +1094,22 @@ async function submitReserva() {
         }
 
         // ── 4. Éxito ──────────────────────────────────────────────────
-        showToast('¡Reserva creada exitosamente! Redirigiendo...', 'success');
-        setTimeout(() => history.back(), 2000);
+ // ── 4. Éxito ──────────────────────────────────────────────────
+        showToast('¡Reserva creada exitosamente!', 'success');
+
+        let segundos = 30;
+        btnSubmit.disabled  = true;
+        btnSubmit.innerHTML = `Si quieres hacer otra reserva podrás hacerlo en ${segundos}s`;
+
+        const intervalo = setInterval(() => {
+            segundos--;
+            if (segundos <= 0) {
+                clearInterval(intervalo);
+                history.back();
+            } else {
+                btnSubmit.innerHTML = `Si quieres hacer otra reserva podrás hacerlo en ${segundos}s`;
+            }
+        }, 1000);
 
     } catch (err) {
         console.error('[FR] Error creando reserva:', err);

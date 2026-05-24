@@ -362,12 +362,22 @@ function renderMisReservas(reservas) {
         const sedeNombre = sedeObj ? sedeObj.name : `Sede #${r.idSede ?? '—'}`;
 
         const comprobanteCell = r.paymentProof
-            ? `<a href="${r.paymentProof}" target="_blank" class="fc-btn-select">Ver PDF</a>`
-            : `<label class="fc-btn-select" style="cursor:pointer;">
-                   Subir PDF
-                   <input type="file" accept="application/pdf" style="display:none"
-                          onchange="subirPDF(${r.idDetalleReserve}, this)" />
-               </label>`;
+    ? `<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+           <a href="${r.paymentProof}" target="_blank" class="fc-btn-select">
+               Ver PDF
+           </a>
+           <label class="fc-btn-select" style="cursor:pointer;font-size:11px;
+                  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);">
+               Reemplazar PDF
+               <input type="file" accept="application/pdf" style="display:none"
+                      onchange="subirPDF(${r.idDetalleReserve}, this)" />
+           </label>
+       </div>`
+    : `<label class="fc-btn-select" style="cursor:pointer;">
+           Subir PDF
+           <input type="file" accept="application/pdf" style="display:none"
+                  onchange="subirPDF(${r.idDetalleReserve}, this)" />
+       </label>`;
 
         return `
         <tr class="fc-row">

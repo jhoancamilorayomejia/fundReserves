@@ -147,5 +147,30 @@ namespace FoundReserves.Controllers
                 message = "Temporada eliminada correctamente"
             });
         }
+
+        // PUT: /api/seasons/update/{id}
+[HttpPut("update/{id}")]
+public async Task<IActionResult> Update(int id, [FromBody] UpdateSeasonDto dto)
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol) || rol != "Admin")
+        return Unauthorized(new { message = "No autorizado" });
+
+    var season = await _context.Seasons.FindAsync(id);
+    if (season == null)
+        return NotFound(new { message = "Temporada no encontrada" });
+
+    if (!string.IsNullOrWhiteSpace(dto.Name)) season.name = dto.Name;
+    if (!string.IsNullOrWhiteSpace(dto.Type)) season.type = dto.Type;
+
+    await _context.SaveChangesAsync();
+    return Ok(new { message = "Temporada actualizada correctamente" });
+}
+
+public class UpdateSeasonDto
+{
+    public string? Name { get; set; }
+    public string? Type { get; set; }
+}
     }
 }
