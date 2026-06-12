@@ -25,18 +25,18 @@ namespace FoundReserves.Controllers
                 return Unauthorized(new { message = "Debes iniciar sesión" });
 
             var rates = await _context.Rates
-                .Join(_context.Accommodations,
-                    r => r.idAccommodation,
-                    a => a.idAccommodation,
+                .Join(_context.Accommodations,  //verifica que sean igual los id's
+                    r => r.idAccommodation,     // ← ID de Rates
+                    a => a.idAccommodation,     // ← ID de Accommodations (compara aquí)
                     (r, a) => new { rate = r, accommodation = a })
                 .Join(_context.Seasons,
-                    ra => ra.rate.idSeason,
-                    s => s.idSeason,
+                    ra => ra.rate.idSeason,     // ← ID de Rates
+                    s => s.idSeason,             // ← ID de Seasons
                     (ra, s) => new { ra.rate, ra.accommodation, season = s })
                 // ← JOIN nuevo: trae el nombre de la sede
                 .Join(_context.Sedes,
-                    ras => ras.accommodation.idsede,
-                    sede => sede.idSede,
+                    ras => ras.accommodation.idsede,  // ← ID de Accommodations
+                    sede => sede.idSede,              // ← ID de Sedes
                     (ras, sede) => new
                     {
                         ras.rate.idPrice,
@@ -44,24 +44,24 @@ namespace FoundReserves.Controllers
 
                         // Ahora incluye [NombreSede] delante
                         accommodationName =
-    "[" + (sede.name ?? "") + " — " + (sede.city ?? "") + "] " +
-    (ras.accommodation.name ?? "") +
-    (ras.accommodation.number != null
+    "[" + (sede.name ?? "") + " — " + (sede.city ?? "") + "] " +  //extrae name y city de sede
+    (ras.accommodation.name ?? "") +                              //igual extrae name pero de alojamiento
+    (ras.accommodation.number != null                             // extrae number de la tabla alojamiento
         ? " — N° " + ras.accommodation.number
         : ""),
 
                         ras.rate.idSeason,
-                        seasonName = ras.season.name,
+                        seasonName = ras.season.name,   //aqui los datos que vienen de temporada
                         seasonType = ras.season.type,
 
-                        ras.rate.minimumPerson,
+                        ras.rate.minimumPerson,       //aqui ya las que son de la tabla rates
                         ras.rate.maximumPerson,
                         ras.rate.priceNight,
                         ras.rate.pricePersonAdditional
                     })
                 .OrderBy(r => r.idPrice)
                 .ToListAsync();
-
+        //Asegura que el frontend siempre reciba las tarifas en el mismo orden, de menor a mayor ID
             return Ok(rates);
         }
 
@@ -138,7 +138,7 @@ namespace FoundReserves.Controllers
             return Ok(new { message = "Tarifa eliminada correctamente" });
         }
 
-        // GET: api/rates/byAccommodation/{idAccommodation}
+        // GET: para extrae solo las de un alojamiento en particular.
 [HttpGet("byAccommodation/{idAccommodation}")]
 public async Task<IActionResult> GetByAccommodation(int idAccommodation)
 {
@@ -146,9 +146,9 @@ public async Task<IActionResult> GetByAccommodation(int idAccommodation)
     if (string.IsNullOrEmpty(rol))
         return Unauthorized(new { message = "Debes iniciar sesión" });
 
-    var rates = await _context.Rates
-        .Where(r => r.idAccommodation == idAccommodation)
-        .Join(_context.Seasons,
+    var rates = await _context.Rates   //primero filtra y luego hace join
+        .Where(r => r.idAccommodation == idAccommodation) // ← filtra solo las tarifas de ese alojamiento
+        .Join(_context.Seasons,                     // ← luego une con temporadas
             r => r.idSeason,
             s => s.idSeason,
             (r, s) => new

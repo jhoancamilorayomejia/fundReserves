@@ -2237,6 +2237,45 @@ async function eliminarSede(id, nombre) {
     }
 }
 
+async function eliminarReservaCompleta(idUser, dateStart, dateFinish, nombreCliente) {
+    if (!confirm(`¿Eliminar toda la reserva de "${nombreCliente}"?\nSe eliminarán el detalle y todas las habitaciones asociadas. Esta acción no se puede deshacer.`))
+        return;
+
+    const params = `idUser=${idUser}&dateStart=${encodeURIComponent(dateStart)}&dateFinish=${encodeURIComponent(dateFinish)}`;
+
+    try {
+        // 1️⃣ Elimina las Reserves (habitaciones individuales)
+        const resReservas = await fetch(`/api/reservations/byUserAndDates?${params}`, {
+            method: 'DELETE'
+        });
+
+        // 404 es aceptable: puede no tener habitaciones aún asignadas
+        if (!resReservas.ok && resReservas.status !== 404) {
+            const err = await resReservas.json().catch(() => ({}));
+            alert(err.message || 'Error al eliminar habitaciones');
+            return;
+        }
+
+        // 2️⃣ Elimina el DetalleReserve
+        const resDetalle = await fetch(`/api/detalleReserve/byUserAndDates?${params}`, {
+            method: 'DELETE'
+        });
+
+        if (!resDetalle.ok) {
+            const err = await resDetalle.json().catch(() => ({}));
+            alert(err.message || 'Error al eliminar el detalle de reserva');
+            return;
+        }
+
+        alert('Reserva eliminada correctamente');
+        cargarReservas(); // refresca la tabla
+
+    } catch (err) {
+        console.error('[FR] Error eliminando reserva:', err);
+        alert('Error de conexión');
+    }
+}
+
 /* ══════════════════════════════════════
    RESERVAS
 ══════════════════════════════════════ */
@@ -2265,6 +2304,10 @@ function filaReserva(r, i) {
         <button class="btn btn-sm btn-outline-primary"
             onclick="verHabitacionesReserva(${r.idUser}, '${r.dateStart}', '${r.dateFinish}', '${r.createdAt}')">
             Ver habitaciones
+        </button>
+        <button class="btn btn-sm btn-outline-danger"
+            onclick="eliminarReservaCompleta(${r.idUser}, '${r.dateStart}', '${r.dateFinish}', '${r.userName} ${r.userLastname}')">
+            Eliminar
         </button>
     </td>
 </tr>`;

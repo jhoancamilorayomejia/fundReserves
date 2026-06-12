@@ -118,7 +118,7 @@ namespace FoundReserves.Controllers
         }
     }
 
-    public class UpdateSedeDto
+    public class UpdateSedeDto //para recibir los campos que quiero modificar
     {
         public string?  Name            { get; set; }
         public string?  City            { get; set; }

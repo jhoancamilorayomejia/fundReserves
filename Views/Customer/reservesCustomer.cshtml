@@ -263,7 +263,7 @@
     </div>
     <span class="rv-laundry-price" id="laundry-price-label">—</span>
 </div>
-                        <span class="rv-laundry-price" id="laundry-price-label">—</span>
+                        <!--span class="rv-laundry-price" id="laundry-price-label">—</!--span-->
                     </div>
                     <p id="no-services-msg"
                        style="font-size:12px;color:var(--text-muted,#9ca3af);display:none;">
@@ -471,22 +471,19 @@ function actualizarMaxPersonas() {
         return;
     }
 
-    const maxPermitido = Math.min(
-        ...[...selectedRooms.values()].map(e => Number(e.data.maximumPerson) || 999)
-    );
+    const maxPermitido = [...selectedRooms.values()]
+        .reduce((acc, e) => acc + (Number(e.data.maximumPerson) || 0), 0);
 
-    input.max        = maxPermitido;
-    input.title      = `Máximo ${maxPermitido} personas`;
-    hint.textContent = `Máximo ${maxPermitido} personas para este alojamiento`;
+    input.removeAttribute('max');        // sin límite
+    input.title      = '';
+    hint.textContent = selectedRooms.size > 1
+        ? `Capacidad total: ${maxPermitido} personas (${[...selectedRooms.values()].map(e => e.data.maximumPerson).join(' + ')} por habitación)`
+        : `Capacidad: ${maxPermitido} personas para este alojamiento`;
 
     extraField.style.display = 'block';
-    extraHint.textContent    = `Personas extra fuera de la capacidad máxima (${maxPermitido})`;
+    extraHint.textContent    = `Personas extra fuera de la capacidad (${maxPermitido})`;
 
-    const actual = parseInt(input.value) || 0;
-    if (actual > maxPermitido) {
-        input.value = maxPermitido;
-        showToast(`Máximo ${maxPermitido} personas. Usa "Personas adicionales" para más.`, 'error');
-    }
+    // ← elimina el bloque if (actual > maxPermitido) que estaba aquí
 }
 
 /* ══════════════════════════════════════
@@ -648,7 +645,7 @@ const FESTIVOS_MOVILES = {
     2026: ['04-02','04-03','05-18','06-08','06-29','08-17','10-19','11-02','11-16'],
     2027: ['03-25','03-26','05-10','05-31','06-28','08-16','10-18','11-01','11-15'],
 };
-
+// Si el día cae dentro de alguno de esos rangos, es temporada Alta.
 const RECESOS = [
     { label: 'Semana Santa',       start: '03-24', end: '04-13' },
     { label: 'Mitad de año',       start: '06-16', end: '07-31' },
@@ -758,10 +755,11 @@ async function calcularTotal() {
         totalEl.textContent   = '$ —';
         breakdown.textContent = 'Selecciona alojamientos, fechas y personas para calcular';
         btnSubmit.disabled    = true;
-        currentTotal          = 0;
+        currentTotal          = 0;    // resetea el total global
         return;
     }
-
+    // calcula días entre fechas → "2026-06-15" y "2026-06-20" = 5 noches
+    // si la fecha fin es igual o anterior a la fecha inicio
     const nights = diffDays(startDate, endDate);
     if (nights <= 0) {
         totalEl.textContent   = '$ —';
@@ -770,25 +768,26 @@ async function calcularTotal() {
         currentTotal          = 0;
         return;
     }
-
-    const desglose = desglosarTemporadas(startDate, endDate);
-    let grandTotal         = 0;
-    let adicionalTotal     = 0;
-    const laundryAmt       = withLaundry ? laundryPrice : 0;
-    const allDesgPanelRows = [];
+    // inicializo valores
+    const desglose = desglosarTemporadas(startDate, endDate);  //recorre dia por dia
+    let grandTotal         = 0;  //acumulador
+    let adicionalTotal     = 0; //acumulador solo de personas adicionales
+    const laundryAmt       = withLaundry ? laundryPrice : 0;  // y el de solo lavanderia
+    const allDesgPanelRows = []; //estos array son para poder mostrar la informacion en pantalla
     const summaryParts     = [];
 
-    try {
-        for (const [idAcc, entry] of selectedRooms) {
-            const qty    = entry.qty;
-            const rates  = await fetchRates(idAcc);
+    try {    // selectedRooms es un Map, itera cada habitación seleccionada
+        for (const [idAcc, entry] of selectedRooms) {  // llama /api/rates/byAccommodation/{id}
+            const qty    = entry.qty; // cantidad de esa habitación → siempre 1 (máximo 1 por alojamiento)
+            const rates  = await fetchRates(idAcc); //llama /api/rates/byAccommodation/{id}
             const nombre = entry.data.name || `Aloj. ${entry.data.number || idAcc}`;
 
-            let roomTotal  = 0;
-            const roomRows = [];
+            let roomTotal  = 0; // acumulador del total de esta habitación
+            const roomRows = [];  // filas de desglose de esta habitación para el panel visual
 
             for (const { type, nights: n } of desglose) {
-                const tarifa = buscarTarifa(rates, type, persons);
+                const tarifa = buscarTarifa(rates, type, persons); // busca en las tarifas del
+                                                                   //alojamiento la que coincida con
 
                 if (!tarifa) {
                     roomRows.push({
@@ -798,11 +797,18 @@ async function calcularTotal() {
                     });
                     continue;
                 }
-
+                /*Esta seria la operacion principal
+                dependiendo si la temporada es alta o baja o especial, hace el calculo
+                Alta: 75000 * 2 noches * 1 habitación = $$
+                Baja: 27000 * 3 noches * 1 habitación = $$ */
                 const subtotal = tarifa.priceNight * n * qty;
+
+
+                // roomTotal = 0 + 150000 = 150000  (después de Alta)
+                // roomTotal = 150000 + 150000 = 300000  (después de Baja)
                 roomTotal += subtotal;
 
-                roomRows.push({
+                roomRows.push({   // guarda los datos de esta fila para el panel visual
                     type, nights: n, qty, nombre,
                     priceNight:            tarifa.priceNight,
                     pricePersonAdditional: tarifa.pricePersonAdditional,
@@ -811,28 +817,35 @@ async function calcularTotal() {
                 });
             }
 
-            grandTotal += roomTotal;
+            grandTotal += roomTotal;  //para asignarle momentaneamente el valor total aqui
+            // guarda el desglose completo de esta habitación para el panel visua
             allDesgPanelRows.push({ nombre, qty, rows: roomRows, roomTotal });
+            //agrega en el array el nombre del apartamento y su valor
             summaryParts.push(`${nombre} ${fmtCOP(roomTotal)}`);
         }
 
-        if (extraPersons > 0) {
-            const firstRoomId = [...selectedRooms.keys()][0];
+        if (extraPersons > 0) { //aqui ya viene la conficion si hay personas extras y que cantidad
+            const firstRoomId = [...selectedRooms.keys()][0]; // toma el id de la primera habitación
+            // reutiliza las tarifas ya cargadas del caché → no hace petición nueva
             const firstRates  = await fetchRates(firstRoomId);
 
             for (const { type, nights: n } of desglose) {
                 const tarifaExtra = buscarTarifa(firstRates, type, persons);
+                // verifica que exista precio por persona adicional
                 if (tarifaExtra?.pricePersonAdditional) {
                     adicionalTotal += extraPersons * tarifaExtra.pricePersonAdditional * n;
+                // Alta: 1 persona * 16000 * 2 noches = 32000
+                // Baja: 1 persona * 11000 * 3 noches = 33000
+                // adicionalTotal = 65000
                 }
             }
-
+            // grandTotal = 300000 + 65000 = 365000
             grandTotal += adicionalTotal;
         }
 
-        grandTotal += laundryAmt;
+        grandTotal += laundryAmt; 
 
-        // ✅ FIX 1: guardar el total exacto en la variable global
+        // guarda el valor anterior siendo glogal 
         currentTotal = grandTotal;
 
         totalEl.textContent   = fmtCOP(grandTotal);
@@ -841,13 +854,15 @@ async function calcularTotal() {
             (adicionalTotal > 0
                 ? ` + ${extraPersons} pers. adicional ${fmtCOP(adicionalTotal)}`
                 : '') +
-            (withLaundry ? ` + lavandería ${fmtCOP(laundryPrice)}` : '');
-
+            (withLaundry ? ` + lavandería ${fmtCOP(laundryPrice)}` : ''); //y si aplica lavanderia, adiciona
+        
+        // habilita el botón "Crear reserva" porque ya hay un total válido
         btnSubmit.disabled = false;
-
+        
+        // envía todos los datos al panel visual para renderizar el desglose detallado
         renderDesglosePanel(allDesgPanelRows, grandTotal, laundryAmt, nights, adicionalTotal, extraPersons);
 
-    } catch (err) {
+    } catch (err) {  // resetea todo y deshabilita el botón para evitar enviar un total inválido
         console.error('[FR] Error calculando tarifa:', err);
         totalEl.textContent   = '$ —';
         breakdown.textContent = 'No se pudo calcular. Verifica los datos.';
@@ -1123,7 +1138,7 @@ async function submitReserva() {
    VERIFICAR DISPONIBILIDAD
 ══════════════════════════════════════ */
 async function verificarDisponibilidad() {
-    const dateStart = document.getElementById('avail-start').value;
+    const dateStart = document.getElementById('avail-start').value; 
     const dateEnd   = document.getElementById('avail-end').value;
     const tbody     = document.getElementById('tb-avail');
     const result    = document.getElementById('avail-result');
@@ -1171,7 +1186,7 @@ let calcAccId      = null; // alojamiento seleccionado en calculadora
 let calcRates      = [];   // tarifas del alojamiento seleccionado
 
 async function verificarDisponibilidad() {
-    const dateStart = document.getElementById('avail-start').value;
+    const dateStart = document.getElementById('avail-start').value;  //input mirar fechas
     const dateEnd   = document.getElementById('avail-end').value;
     const persons   = parseInt(document.getElementById('avail-persons').value) || 1;
     const cards     = document.getElementById('avail-cards');
@@ -1179,6 +1194,7 @@ async function verificarDisponibilidad() {
     const summary   = document.getElementById('avail-summary');
     const calcPanel = document.getElementById('calc-panel');
 
+    //verificar si el rango de fecha es permitido
     if (!dateStart || !dateEnd || dateEnd <= dateStart) {
         showToast('Selecciona un rango de fechas válido.', 'error');
         return;
@@ -1188,7 +1204,7 @@ async function verificarDisponibilidad() {
     result.style.display     = 'block';
     calcPanel.style.display  = 'none';
 
-    try {
+    try { //llama al backend
         const nights = diffDays(dateStart, dateEnd);
         const url    = `/api/reservations/available?idSede=${idSedeParam}&dateStart=${dateStart}&dateFinish=${dateEnd}&persons=${persons}`;
         const res    = await fetch(url);

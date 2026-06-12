@@ -1,120 +1,603 @@
+/* ══════════════════════════════════════════
+   FoundReserves — Login Page
+   Estilo: Resort de lujo inspirado en HotelsViva
+   Paleta: Verde profundo · Dorado arena · Crema
+══════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
 
-/* ══════════════════════════
-   VARIABLES GLOBALES
-══════════════════════════ */
-:root {
-    --bg:        #0a0a0a;
-    --sidebar-w: 240px;
-
-    /* superficies */
-    --surface-0: #0a0a0a;
-    --surface-1: #111111;
-    --surface-2: #1a1a1a;
-    --surface-3: #242424;
-
-    /* bordes */
-    --border:    rgba(255,255,255,.07);
-    --border-md: rgba(255,255,255,.12);
-
-    /* texto */
-    --text-1:   #f2f2f2;
-    --text-2:   #a0a0a0;
-    --text-3:   #5a5a5a;
-
-    /* accent admin (índigo) */
-    --admin-bg:    rgba(99,91,255,.14);
-    --admin-color: #a69eff;
-
-    /* accent customer (esmeralda) */
-    --cust-bg:    rgba(16,185,129,.13);
-    --cust-color: #34d399;
-
-    /* peligro */
-    --danger-bg:    rgba(239,68,68,.12);
-    --danger-color: #f87171;
-
-    /* radio */
-    --r-sm:  7px;
-    --r-md: 11px;
-    --r-lg: 15px;
-
-    /* sombras */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,.5);
-    --shadow-md: 0 4px 16px rgba(0,0,0,.6);
+/* ── Reset base ── */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
+/* ── Variables ── */
+:root {
+    --green-deep:   #0B2E33;
+    --green-mid:    #0f3d42;
+    --gold:         #C9A96E;
+    --gold-light:   #e8d5a3;
+    --cream:        #F5F0E8;
+    --cream-dark:   #E8E2D6;
+    --text-dark:    #1a1a18;
+    --text-muted:   #4a5e58;
+    --text-light:   #8a7c6e;
+    --border-soft:  #ccc7be;
+    --r-sm:         2px;
+}
+
+/* ── Body / fondo hero ── */
 body {
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
 
-        .login-card {
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
+    background-color: #0B2E33;
+    background-image:
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(201,169,110,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 80%, rgba(11,46,51,0.7) 0%, transparent 70%),
+        linear-gradient(160deg, #0B2E33 0%, #0f3d42 40%, #1a4a40 70%, #0e2e24 100%);
+}
 
-        .login-card h2 {
-            text-align: center;
-            margin-bottom: 8px;
-            font-weight: 700;
-            color: #1a1a2e;
-        }
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image:
+        repeating-linear-gradient(45deg,  #C9A96E 0, #C9A96E 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(-45deg, #C9A96E 0, #C9A96E 1px, transparent 1px, transparent 40px);
+    z-index: 0;
+}
 
-        .login-card p.subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 28px;
-            font-size: 14px;
-        }
+/* ── Marca / Logotipo ── */
+.brand-header {
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+}
 
-        .btn-login {
-            background-color: #1a1a2e;
-            color: white;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-        }
+.brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: 0.22em;
+    color: var(--cream);
+    text-transform: uppercase;
+    line-height: 1;
+}
 
-        .btn-login:hover {
-            background-color: #16213e;
-            color: white;
-        }
+.brand-tagline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+}
 
-        .btn-register {
-            background-color: transparent;
-            border: none;
-            margin-top: 18px;
-            width: 100%;
-            color: #1a1a2e;
-            font-weight: 600;
-        }
+.brand-tagline span {
+    font-size: 9px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 400;
+}
 
-        .btn-register:hover {
-            text-decoration: underline;
-        }
+.brand-tagline::before,
+.brand-tagline::after {
+    content: '';
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.65;
+}
 
-        .form-control {
-            border-radius: 8px;
-            padding: 12px;
-        }
+/* ── Card login ── */
+.login-card {
+    background: rgba(245, 240, 232, 0.97);
+    border-radius: var(--r-sm);
+    border-top: 3px solid var(--gold);
+    padding: 44px 48px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+}
 
-        .alert-error {
-            background-color: #ffe0e0;
-            color: #c0392b;
-            border-radius: 8px;
-            padding: 10px 14px;
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
+.login-card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+}
+
+.login-card p.subtitle {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-bottom: 32px;
+}
+
+/* ── Etiquetas de campo ── */
+.form-label {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* ── Inputs: solo línea inferior ── */
+.form-control {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid var(--border-soft);
+    border-radius: 0;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.25s ease;
+    box-shadow: none !important;
+}
+
+.form-control::placeholder {
+    color: #b8b2a8;
+    font-size: 13px;
+}
+
+.form-control:focus {
+    border-bottom-color: var(--gold);
+    background: transparent;
+    box-shadow: none !important;
+    color: var(--text-dark);
+}
+
+/* ── Input tipo date ── */
+input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.35;
+    filter: sepia(1) saturate(2) hue-rotate(5deg);
+    cursor: pointer;
+    margin-left: 4px;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+    color: var(--text-light);
+    padding: 0 2px;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+    color: var(--text-dark);
+    border-radius: 2px;
+    padding: 1px 2px;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus {
+    background-color: rgba(201, 169, 110, 0.18);
+    color: var(--text-dark);
+    outline: none;
+}
+
+/* ── Botón principal ── */
+.btn-login {
+    display: block;
+    width: 100%;
+    background: var(--green-deep);
+    color: var(--cream);
+    border: none;
+    padding: 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.25s ease;
+    margin-top: 8px;
+    border-radius: var(--r-sm);
+}
+
+.btn-login:hover {
+    background: var(--green-mid);
+    color: var(--cream);
+}
+
+/* ── Separador decorativo ── */
+.login-separator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0;
+}
+
+.login-separator::before,
+.login-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cream-dark);
+}
+
+.login-separator-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+}
+
+/* ── Botón registro (outline) ── */
+.btn-register {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--green-deep);
+    color: var(--green-deep);
+    padding: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border-radius: var(--r-sm);
+}
+
+.btn-register:hover {
+    background: var(--green-deep);
+    color: var(--cream);
+}
+
+/* ── Link olvidé contraseña ── */
+.forgot-password-link {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    display: inline-block;
+}
+
+.forgot-password-link:hover {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    text-decoration: none;
+}
+
+/* ── Alerta de error ── */
+.alert-error {
+    background: rgba(185, 65, 55, 0.08);
+    border-left: 3px solid #b94137;
+    color: #8b2e26;
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* ── Pie de página ── */
+.login-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 9px;
+    color: rgba(201,169,110,0.45);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+}
+
+/* ════════════════════════════════
+   MODAL DE REGISTRO
+════════════════════════════════ */
+
+.modal-content {
+    border: none;
+    border-radius: var(--r-sm);
+    border-top: 3px solid var(--gold);
+    background: var(--cream);
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-header {
+    background: var(--green-deep);
+    border-bottom: none;
+    padding: 18px 24px;
+    border-radius: 0;
+}
+
+.modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--cream);
+    letter-spacing: 0.06em;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+    opacity: 0.7;
+}
+
+.modal-body {
+    padding: 24px 28px 32px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-light) transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--gold-light);
+    border-radius: 2px;
+}
+
+/* ── Labels del modal ── */
+.modal-body .form-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.modal-body .form-label .label-hint {
+    font-size: 9px;
+    color: var(--text-light);
+    letter-spacing: 0.06em;
+    font-weight: 400;
+    text-transform: none;
+    margin-left: 4px;
+}
+
+/* ── Inputs y selects del modal ── */
+.modal-body .form-control,
+.modal-body .form-select {
+    border: none;
+    border-bottom: 1.5px solid var(--border-soft);
+    border-radius: 0;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-dark);
+    padding: 8px 0;
+    box-shadow: none !important;
+    transition: border-color 0.25s ease;
+}
+
+.modal-body .form-control::placeholder {
+    color: #b8b2a8;
+    font-size: 12.5px;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-bottom-color: var(--gold);
+    box-shadow: none !important;
+    background: transparent;
+    color: var(--text-dark);
+    outline: none;
+}
+
+/* ── Date input en modal ── */
+.modal-body input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.modal-body input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.35;
+    filter: sepia(1) saturate(2) hue-rotate(5deg);
+    cursor: pointer;
+    margin-left: 4px;
+    transition: opacity 0.2s;
+}
+
+.modal-body input[type="date"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+}
+
+.modal-body input[type="date"]::-webkit-datetime-edit {
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    padding: 0;
+}
+
+.modal-body input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.modal-body input[type="date"]::-webkit-datetime-edit-text {
+    color: var(--text-light);
+    padding: 0 2px;
+}
+
+.modal-body input[type="date"]::-webkit-datetime-edit-month-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-day-field,
+.modal-body input[type="date"]::-webkit-datetime-edit-year-field {
+    color: var(--text-dark);
+    border-radius: 2px;
+    padding: 1px 3px;
+}
+
+.modal-body input[type="date"]::-webkit-datetime-edit-month-field:focus,
+.modal-body input[type="date"]::-webkit-datetime-edit-day-field:focus,
+.modal-body input[type="date"]::-webkit-datetime-edit-year-field:focus {
+    background-color: rgba(201, 169, 110, 0.18);
+    color: var(--text-dark);
+    outline: none;
+}
+
+/* ── Select con flecha dorada ── */
+.modal-body .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A96E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    padding-right: 24px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.modal-body .form-select option[value=""] {
+    color: #a8a29a;
+}
+
+/* ── Texto de ayuda bajo inputs ── */
+.modal-body .form-text {
+    font-size: 10.5px;
+    color: var(--text-light);
+    letter-spacing: 0.03em;
+    margin-top: 4px;
+}
+
+/* ── Separador de secciones en el formulario ── */
+.modal-body .section-divider {
+    border: none;
+    border-top: 1px solid var(--cream-dark);
+    margin: 20px 0 4px;
+}
+
+/* ── Radio buttons ── */
+.modal-body .form-check-input {
+    cursor: pointer;
+}
+
+.modal-body .form-check-input:checked {
+    background-color: var(--green-deep);
+    border-color: var(--green-deep);
+}
+
+.modal-body .form-check-input:focus {
+    box-shadow: 0 0 0 2px rgba(201,169,110,0.25);
+    border-color: var(--gold);
+}
+
+.modal-body .form-check-inline {
+    margin-right: 16px;
+}
+
+.modal-body .form-check-label {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-dark);
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+.modal-body .form-label.d-block {
+    margin-bottom: 8px;
+}
+
+/* ── Botón submit del modal ── */
+.modal-body .btn-success {
+    background: var(--green-deep) !important;
+    border-color: var(--green-deep) !important;
+    color: var(--cream) !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 15px;
+    border-radius: var(--r-sm);
+    transition: background 0.25s ease;
+    margin-top: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-body .btn-success::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.35s ease;
+}
+
+.modal-body .btn-success:hover {
+    background: var(--green-mid) !important;
+    border-color: var(--green-mid) !important;
+}
+
+.modal-body .btn-success:hover::after {
+    transform: scaleX(1);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 32px 28px;
+    }
+
+    .brand-name {
+        font-size: 28px;
+    }
+
+    .modal-body {
+        padding: 20px 18px 28px;
+    }
+}

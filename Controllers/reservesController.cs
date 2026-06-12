@@ -26,11 +26,11 @@ namespace FoundReserves.Controllers
             if (reserve == null)
                 return BadRequest(new { message = "Datos inválidos" });
 
-            // ✅ Bloqueado si existe reserva activa (Pendiente o Pagado) en ese rango
+            // Bloqueado si existe reserva activa (Pendiente o Pagado) en ese rango
             var ocupado = _context.Reserves.Any(r =>
                 r.IdAccommodation == reserve.IdAccommodation &&
                 (r.State == "Pendiente" || r.State == "Pagado") &&
-                r.DateStart  < reserve.DateFinish &&
+                r.DateStart  < reserve.DateFinish &&  //
                 r.DateFinish > reserve.DateStart);
 
             if (ocupado)
@@ -50,12 +50,12 @@ namespace FoundReserves.Controllers
         // GET: api/reservations/my
         [HttpGet("my")]
         public ActionResult GetMyReservations()
-        {
+        {   //Toma directamente el ID que fue guardado en sesión
             var idUser = HttpContext.Session.GetInt32("IdUser");
             if (idUser == null)
                 return Unauthorized(new { message = "Debes iniciar sesión" });
 
-            var reservas = _context.Reserves
+            var reservas = _context.Reserves //filtra por ese ID y las ordena de la más reciente a la más antigua
                 .Where(r => r.IdUser == idUser.Value)
                 .OrderByDescending(r => r.DateCreation)
                 .ToList();
@@ -164,11 +164,51 @@ namespace FoundReserves.Controllers
 
             return Ok(new { message = "Estado actualizado correctamente", state = reserva.State });
         }
+
+        // ────────────────────────────────────────────────────────────
+        // DELETE: api/reservations/byUserAndDates
+        //         ?idUser=1&dateStart=2026-06-01&dateFinish=2026-06-04
+        // Elimina todas las Reserves que coincidan con usuario + fechas
+        // ────────────────────────────────────────────────────────────
+        [HttpDelete("byUserAndDates")]
+        public async Task<ActionResult> DeleteByUserAndDates(
+            [FromQuery] int idUser,
+            [FromQuery] DateTime dateStart,
+            [FromQuery] DateTime dateFinish)
+        {
+            var rol = HttpContext.Session.GetString("UserRol");
+            if (string.IsNullOrEmpty(rol))
+                return Unauthorized(new { message = "Debes iniciar sesión" });
+
+            var reservas = _context.Reserves
+                .Where(r => r.IdUser     == idUser    &&
+                            r.DateStart  == dateStart &&
+                            r.DateFinish == dateFinish)
+                .ToList();
+
+            // No es error si no hay habitaciones asignadas todavía
+            if (!reservas.Any())
+                return NotFound(new { message = "No se encontraron reservas asociadas" });
+
+            _context.Reserves.RemoveRange(reservas);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"{reservas.Count} reserva(s) eliminada(s)" });
+        }
     }
+    
+
+
+    
 
     // DTO para recibir solo el campo State en el PUT
     public class UpdateStateDto
     {
         public string State { get; set; } = string.Empty;
     }
+
+
+
+    
 }
+

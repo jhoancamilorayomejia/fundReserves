@@ -16,7 +16,7 @@ namespace FoundReserves.Controllers
             _context = context;
         }
 
-        [HttpPost("login")]
+     /*   [HttpPost("login")]
 public async Task<IActionResult> Login([FromBody] LoginModel model)
 {
     if (!ModelState.IsValid)
@@ -46,7 +46,7 @@ public async Task<IActionResult> Login([FromBody] LoginModel model)
         rol = user.rol,
         createdAt = user.createdAt
     });
-}
+} */
 
         [HttpPost("register")]
 public async Task<IActionResult> Register([FromBody] RegisterModel model)
@@ -55,14 +55,14 @@ public async Task<IActionResult> Register([FromBody] RegisterModel model)
         return BadRequest(ModelState);
 
     var exists = await _context.Users
-        .AnyAsync(u => u.email == model.Email);
+        .AnyAsync(u => u.email == model.Email); //camparar email
 
     if (exists)
         return Conflict(new { message = "El correo ya está registrado" });
 
-    // ✅ Verifica también por cédula
+    // Verifica también por cédula
     var existsCedula = await _context.Users
-        .AnyAsync(u => u.cedula == model.Cedula);
+        .AnyAsync(u => u.cedula == model.Cedula); //compara cedula
 
     if (existsCedula)
         return Conflict(new { message = "La cédula ya está registrada" });
@@ -75,7 +75,7 @@ public async Task<IActionResult> Register([FromBody] RegisterModel model)
     lastname         = model.Lastname,
     phone            = model.Phone,
     email            = model.Email,
-    password         = BCrypt.Net.BCrypt.HashPassword(model.Password),
+    password         = BCrypt.Net.BCrypt.HashPassword(model.Password), //Construye el objeto y hashea la contraseña
     rol              = "Customer",
     createdAt        = DateTime.Now,
     fechaNacimiento  = model.FechaNacimiento,
@@ -89,8 +89,8 @@ public async Task<IActionResult> Register([FromBody] RegisterModel model)
     autorizaCelular  = model.AutorizaCelular
 };
 
-    // LOGIN en AuthController
-    if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.password)) // ✅ Verifica
+    //
+    if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.password)) //
         return Unauthorized(new { message = "Cédula o contraseña incorrectos" });
 
     _context.Users.Add(user);

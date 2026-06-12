@@ -6,10 +6,10 @@ namespace FoundReserves.ViewModels
     {
         [Required(ErrorMessage = "El correo es obligatorio.")]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;  // valida que sea formato email válido
 
         [Required]
-        public string Token { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty; // el GUID generado al solicitar recuperación
 
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [StringLength(40, MinimumLength = 8,

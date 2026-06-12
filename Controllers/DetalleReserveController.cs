@@ -61,7 +61,7 @@ namespace FoundReserves.Controllers
             IFormFile file
         )
         {
-            if (file == null || file.Length == 0)
+            if (file == null || file.Length == 0)  //validando si llega algo
             {
                 return BadRequest(new
                 {
@@ -74,7 +74,7 @@ namespace FoundReserves.Controllers
                 .FirstOrDefaultAsync(d =>
                     d.IdDetalleReserve == id);
 
-            if (detalle == null)
+            if (detalle == null)    //aqui verificando si existe esa reserva
             {
                 return NotFound(new
                 {
@@ -87,7 +87,7 @@ namespace FoundReserves.Controllers
                 .GetExtension(file.FileName)
                 .ToLower();
 
-            if (extension != ".pdf")
+            if (extension != ".pdf") //validar si es pdf
             {
                 return BadRequest(new
                 {
@@ -95,7 +95,7 @@ namespace FoundReserves.Controllers
                 });
             }
 
-            // Ruta carpeta
+            // Ruta de donde guardo mis archivos
             var folder = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "wwwroot",
@@ -109,7 +109,7 @@ namespace FoundReserves.Controllers
                 Directory.CreateDirectory(folder);
             }
 
-            // Nombre único
+            // aqui me genera un nombre unico para guardarlo en la BD
             var fileName = $"{Guid.NewGuid()}.pdf";
 
             // Ruta completa
@@ -189,7 +189,7 @@ namespace FoundReserves.Controllers
 public async Task<IActionResult> GetAllWithDetails()
 {
     var rol = HttpContext.Session.GetString("UserRol");
-    if (string.IsNullOrEmpty(rol) || rol != "Admin")
+    if (string.IsNullOrEmpty(rol) || rol != "Admin")  //solo admin puede acceder
         return Unauthorized(new { message = "Acceso no autorizado" });
 
     var lista = await _db.DetalleReserves
@@ -222,7 +222,38 @@ public async Task<IActionResult> GetAllWithDetails()
     return Ok(lista);
 }
 
+
+
+// DELETE: /api/detalleReserve/byUserAndDates?idUser=1&dateStart=2026-06-01&dateFinish=2026-06-04
+[HttpDelete("byUserAndDates")]
+public async Task<IActionResult> DeleteByUserAndDates(
+    [FromQuery] int idUser,
+    [FromQuery] DateTime dateStart,
+    [FromQuery] DateTime dateFinish)
+{
+    var rol = HttpContext.Session.GetString("UserRol");
+    if (string.IsNullOrEmpty(rol) || rol != "Admin")
+        return Unauthorized(new { message = "Acceso no autorizado" });
+
+    var detalle = await _db.DetalleReserves
+        .FirstOrDefaultAsync(d =>
+            d.IdUser     == idUser    &&
+            d.DateStart  == dateStart &&
+            d.DateFinish == dateFinish);
+
+    if (detalle == null)
+        return NotFound(new { message = "Reserva no encontrada" });
+
+    _db.DetalleReserves.Remove(detalle);
+    await _db.SaveChangesAsync();
+
+    return Ok(new { message = "Detalle de reserva eliminado" });
+}
+
     }
+
+
+    
 
 
     

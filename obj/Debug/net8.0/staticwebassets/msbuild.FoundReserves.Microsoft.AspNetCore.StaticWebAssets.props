@@ -1200,6 +1200,22 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\uploads\comprobantes\8be602d3-cdc4-4ea1-ac67-89f357eb4f4e.pdf))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\uploads\comprobantes\931c424d-1c0c-4b18-9a52-7938c5a5d861.pdf))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoundReserves</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoundReserves</BasePath>
+      <RelativePath>uploads/comprobantes/931c424d-1c0c-4b18-9a52-7938c5a5d861.pdf</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\uploads\comprobantes\931c424d-1c0c-4b18-9a52-7938c5a5d861.pdf))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\staticwebassets\uploads\comprobantes\9acc85ad-24a0-4664-9a79-6df9a52dd159.pdf))">
       <SourceType>Package</SourceType>
       <SourceId>FoundReserves</SourceId>

@@ -33,7 +33,7 @@ namespace FoundReserves.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]  //seguridad web
         public async Task<IActionResult> Login(LoginModel model)
         {
             if (!ModelState.IsValid)
@@ -44,13 +44,14 @@ namespace FoundReserves.Controllers
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.cedula == model.Cedula);
-
+            
+            // Verifica credenciales con BCrypt
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.password))
             {
                 ViewBag.Error = "Cédula o contraseña incorrectos.";
                 return View("Index");
             }
-
+            // Guarda datos en sesión
             HttpContext.Session.SetInt32("IdUser",    user.iduser);
             HttpContext.Session.SetString("UserEmail",    user.email);
             HttpContext.Session.SetString("UserRol",      user.rol);
@@ -66,7 +67,7 @@ namespace FoundReserves.Controllers
         }
 
         // ══════════════════════════════════════
-        // DASHBOARDS
+        // Dashboard Admin or customer
         // ══════════════════════════════════════
         public IActionResult Dashboard()
         {
@@ -90,7 +91,7 @@ namespace FoundReserves.Controllers
         {
             var email = HttpContext.Session.GetString("UserEmail");
             var rol   = HttpContext.Session.GetString("UserRol");
-
+        //Esta sesión es la que todos los controladores API verifican antes de ejecutar cualquier
             if (email == null || rol != "Customer")
                 return RedirectToAction("Index");
 
@@ -133,29 +134,29 @@ namespace FoundReserves.Controllers
         [HttpGet]
         public IActionResult ForgotPassword() => View();
 
-        // POST: /Home/ForgotPassword
+        // POST: /Home/ForgotPassword   procesar el email
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.email == email);
-
+                .FirstOrDefaultAsync(u => u.email == email);   //verifica que el email este en la BD
+ 
             // Siempre redirigimos para no revelar si el correo existe
-            if (user != null)
+            if (user != null)  //si el correo no existe aun asi procesa
             {
                 var token = Guid.NewGuid().ToString();
 
                 user.ResetToken           = token;
-                user.ResetTokenExpiration = DateTime.Now.AddHours(1);
-                await _context.SaveChangesAsync();
+                user.ResetTokenExpiration = DateTime.Now.AddHours(1);  //genera el token para una hora
+                await _context.SaveChangesAsync(); // se guarda en BD
 
                 var resetLink = Url.Action(
-                    "ChangePassword", "Home",
+                    "ChangePassword", "Home",   //aqui muestra el paso siguiente
                     new { token, email },
                     Request.Scheme
                 );
-
+                //aqui construyo el enlace para que se muestre en el correo
                 var subject = "Recuperación de contraseña — FoundReserves";
                 var body    = $@"
                     <div style='font-family:sans-serif;max-width:480px;margin:auto;
@@ -203,7 +204,7 @@ namespace FoundReserves.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = await _context.Users
+            var user = await _context.Users    //validando el token BD
                 .FirstOrDefaultAsync(u =>
                     u.email                == model.Email &&
                     u.ResetToken           == model.Token &&
@@ -216,8 +217,8 @@ namespace FoundReserves.Controllers
             }
 
             user.password             = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
-            user.ResetToken           = null;
-            user.ResetTokenExpiration = null;
+            user.ResetToken           = null;   // ← token eliminado
+            user.ResetTokenExpiration = null;   // ← expiración eliminada
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Contraseña actualizada correctamente. Ya puedes iniciar sesión.";
